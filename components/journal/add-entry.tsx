@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Plus, X, Apple, BookOpen, Search, ChefHat, History, Check, ScanBarcode } from 'lucide-react'
 import { Portal } from '@/components/ui/portal'
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,8 @@ interface Props {
   defaultOpen?: boolean
   /** Ouvre directement le scanner */
   defaultScan?: boolean
+  /** Code-barres déjà lu (scanner ouvert depuis le menu « + ») */
+  defaultBarcode?: string
   /** Recette pré-sélectionnée (bouton « Ajouter au journal » d'une recette) */
   recipe?: PickableRecipe
   trigger?: 'button' | 'icon' | 'wide'
@@ -38,11 +40,13 @@ function defaultMealForNow(): Meal {
   return 'dinner'
 }
 
-export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = false, defaultScan = false, recipe, trigger = 'button' }: Props) {
+export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = false, defaultScan = false, defaultBarcode, recipe, trigger = 'button' }: Props) {
   const router = useRouter()
+  const pathname = usePathname()
+  const params = useSearchParams()
   const firstTab: Tab = recipe ? 'recipe' : recents.length ? 'recent' : 'food'
-  const [open, setOpen] = useState(defaultOpen || defaultScan)
-  const [tab, setTab] = useState<Tab>(defaultScan ? 'food' : firstTab)
+  const [open, setOpen] = useState(defaultOpen || defaultScan || !!defaultBarcode)
+  const [tab, setTab] = useState<Tab>(defaultScan || defaultBarcode ? 'food' : firstTab)
   const [selectedMeal, setSelectedMeal] = useState<Meal>(meal ?? 'lunch')
   // Repas par défaut selon l'heure locale (calculé côté navigateur)
   useEffect(() => { if (!meal) setSelectedMeal(defaultMealForNow()) }, [meal])
@@ -58,7 +62,7 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
   const [food, setFood] = useState<FoodSuggestion | null>(null)
   const [grams, setGrams] = useState('100')
   const [scanning, setScanning] = useState(defaultScan)
-  const [barcode, setBarcode] = useState<string | null>(null)
+  const [barcode, setBarcode] = useState<string | null>(defaultBarcode ?? null)
 
   // Recette
   const [query, setQuery] = useState('')
@@ -73,7 +77,12 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
   const close = () => {
     const changed = added.size > 0
     setOpen(false); reset()
-    if (changed) router.refresh()
+    // Ouverte depuis un lien (?add=1, ?barcode=…) : on nettoie l'adresse pour ne pas la rouvrir
+    if (params.has('add') || params.has('scan') || params.has('barcode')) {
+      const q = new URLSearchParams(params)
+      q.delete('add'); q.delete('scan'); q.delete('barcode')
+      router.replace(q.size ? `${pathname}?${q}` : pathname, { scroll: false })
+    } else if (changed) router.refresh()
   }
 
   const onDetected = useCallback((code: string) => { setScanning(false); setBarcode(code) }, [])

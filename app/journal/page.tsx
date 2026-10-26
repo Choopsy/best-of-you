@@ -14,11 +14,12 @@ import { EntryRow } from '@/components/journal/entry-row'
 import { AddEntry } from '@/components/journal/add-entry'
 
 interface Props {
-  searchParams: Promise<{ date?: string; add?: string; scan?: string }>
+  searchParams: Promise<{ date?: string; add?: string; scan?: string; barcode?: string }>
 }
 
 export default async function JournalPage({ searchParams }: Props) {
-  const { date: rawDate, add, scan } = await searchParams
+  const { date: rawDate, add, scan, barcode: rawBarcode } = await searchParams
+  const barcode = rawBarcode && /^[0-9]{8,14}$/.test(rawBarcode) ? rawBarcode : undefined
   const today = todayISO()
   const date = isISODate(rawDate) ? rawDate : today
 
@@ -40,7 +41,9 @@ export default async function JournalPage({ searchParams }: Props) {
   return (
     <div className="min-h-svh pb-24">
       <PageHeader title="Journal">
-        <AddEntry date={date} recipes={recipes} recents={recents} defaultOpen={add === '1'} defaultScan={scan === '1'} />
+        {/* La clé change avec l'URL : « + » depuis le journal rouvre bien la fenêtre */}
+        <AddEntry key={`${add}|${scan}|${barcode}`} date={date} recipes={recipes} recents={recents}
+          defaultOpen={add === '1'} defaultScan={scan === '1'} defaultBarcode={barcode} />
       </PageHeader>
 
       <main className="px-4 py-4 max-w-2xl mx-auto space-y-4">

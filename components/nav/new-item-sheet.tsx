@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { BarcodeScanner } from '@/components/scan/barcode-scanner'
 import { PlusCircle, BookOpen, NotebookPen, Refrigerator, ScanBarcode, Dumbbell, Scale, X } from 'lucide-react'
 
 const ITEMS = [
   { href: '/journal?add=1', Icon: NotebookPen, title: 'Un repas', hint: 'Au journal' },
-  { href: '/journal?scan=1', Icon: ScanBarcode, title: 'Scanner', hint: 'Un produit' },
+  { href: 'scan', Icon: ScanBarcode, title: 'Scanner', hint: 'Un produit' },
   { href: '/forme?add=seance', Icon: Dumbbell, title: 'Une séance', hint: 'De sport' },
   { href: '/frigo?add=1', Icon: Refrigerator, title: 'Au frigo', hint: 'Avec sa date' },
   { href: '/recipes/new', Icon: BookOpen, title: 'Une recette', hint: 'À cuisiner' },
@@ -15,11 +16,15 @@ const ITEMS = [
 
 export function NewItemSheet() {
   const [open, setOpen] = useState(false)
+  const [scanning, setScanning] = useState(false)
   const router = useRouter()
 
   const go = (href: string) => {
     setOpen(false)
-    router.push(href)
+    // Le scanner s'ouvre sur place : la caméra démarre sur le geste de l'utilisateur
+    // (après un changement de page, certains téléphones bloquent la vidéo)
+    if (href === 'scan') setScanning(true)
+    else router.push(href)
   }
 
   return (
@@ -34,6 +39,13 @@ export function NewItemSheet() {
       >
         <PlusCircle className="h-6 w-6" strokeWidth={2} />
       </button>
+
+      {scanning && (
+        <BarcodeScanner
+          onDetected={(code) => { setScanning(false); router.push(`/journal?barcode=${code}`) }}
+          onClose={() => setScanning(false)}
+        />
+      )}
 
       {open && <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setOpen(false)} />}
 
