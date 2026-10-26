@@ -198,6 +198,8 @@ Le script gère les particularités du format : virgule décimale, « traces »,
 
 ## Feuille de route
 
+Le détail de ce qui reste à faire et des idées est dans [`SUIVI.md`](SUIVI.md).
+
 - [x] Recettes, mode cuisine, nutrition par portion
 - [x] Profil santé et objectifs sourcés
 - [x] Journal alimentaire et ronds de progression
