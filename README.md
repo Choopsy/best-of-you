@@ -29,6 +29,13 @@
 - Ajout d'un repas en un geste : une recette (en portions) ou un aliment Ciqual (en grammes).
 - Des **ronds de progression** pour la journée, et un rond par jour pour la semaine.
 
+### 🧺 Cuisine du foyer
+- **Frigo** : ce que tu as, avec sa quantité et sa date limite ; les aliments à consommer vite remontent en haut.
+- **Alertes** : un bandeau sur l'accueil et une pastille sur « Cuisine » quand un aliment périme dans les 2 jours.
+- **Semaine** : planifie tes recettes jour par jour, avec le nombre de portions.
+- **Courses** : la liste se calcule à partir de la semaine, **moins ce qu'il y a déjà au frigo** (quantités comparées, unités converties). Coche en magasin, puis « Ranger au frigo ».
+- **Foyer partagé** : invite ton ou ta partenaire, et le frigo, le planning et la liste de courses deviennent communs. Les données de santé restent privées.
+
 ### 👥 Entre amis
 - Demandes d'amis, recettes privées, visibles des amis ou publiques.
 - Partage d'une recette avec des amis précis.
@@ -72,6 +79,7 @@ Le code du calcul est dans [`lib/targets.ts`](lib/targets.ts) et ses tests dans 
 ```
 app/                   Pages (App Router)
   journal/             Journal alimentaire du jour
+  frigo/ semaine/ courses/ foyer/   Cuisine partagée du foyer
   recipes/             Liste, détail, création et mode cuisine des recettes
   profile/health/      Profil santé et explication des objectifs
   collections/ friends/ favorites/ onboarding/ (auth)/
@@ -80,6 +88,7 @@ components/            Composants d'interface (journal, recettes, navigation, th
 lib/
   targets.ts           Calcul des objectifs (formules et sources)
   nutrition.ts         Calcul nutritionnel à partir de Ciqual
+  shopping.ts          Liste de courses moins le frigo
   auth.ts              Session côté serveur
 supabase/migrations/   Schéma SQL et données Ciqual
 scripts/               Import Ciqual et tests
@@ -94,7 +103,8 @@ scripts/               Import Ciqual et tests
 1. Crée un projet sur [supabase.com](https://supabase.com).
 2. Dans **SQL Editor**, exécute dans l'ordre :
    - `supabase/migrations/001_ciqual.sql` : les quelque 3 500 aliments de la table Ciqual ;
-   - `supabase/migrations/002_schema.sql` : les tables, les règles de sécurité et le stockage des photos.
+   - `supabase/migrations/002_schema.sql` : les tables, les règles de sécurité et le stockage des photos ;
+   - `supabase/migrations/003_foyer.sql` : le foyer partagé, le frigo, le planning et la liste de courses.
 3. Dans **Authentication > URL Configuration**, indique `http://localhost:3000` en Site URL et ajoute `http://localhost:3000/auth/callback` aux Redirect URLs.
 
 ### 2. Variables d'environnement
@@ -152,8 +162,8 @@ Le script gère les particularités du format : virgule décimale, « traces »,
 
 ## Tests et sécurité
 
-- `npm test` vérifie le calcul des objectifs : chaque cas est recalculé à la main à partir des formules publiées.
-- **Sécurité de la base (Row Level Security)** : chaque utilisateur ne voit que ses propres données de santé, son poids, son journal et ses collections. Une recette n'est visible que de son auteur, de ses amis (si elle est en mode « amis »), de tout le monde (si elle est publique) ou des amis avec qui elle est partagée. Ces règles sont testées dans [`supabase/tests/rls_tests.sql`](supabase/tests/rls_tests.sql) (34 vérifications).
+- `npm test` vérifie le calcul des objectifs (chaque cas recalculé à la main à partir des formules publiées) et celui de la liste de courses.
+- **Sécurité de la base (Row Level Security)** : chaque utilisateur ne voit que ses propres données de santé, son poids, son journal et ses collections. Une recette n'est visible que de son auteur, de ses amis (si elle est en mode « amis »), de tout le monde (si elle est publique) ou des amis avec qui elle est partagée. Les membres d'un foyer partagent seulement le frigo, le planning et les courses. Ces règles sont testées dans [`supabase/tests/`](supabase/tests/) (55 vérifications).
 
 ---
 
@@ -164,6 +174,7 @@ Le script gère les particularités du format : virgule décimale, « traces »,
 - [x] Journal alimentaire et ronds de progression
 - [x] Amis et partage de recettes
 - [x] Mode clair / sombre
+- [x] Frigo, planning de la semaine, liste de courses et foyer partagé
 - [ ] Activités physiques et calories dépensées
 - [ ] Objectif de séances par semaine
 - [ ] Courbe de poids et poids cible
