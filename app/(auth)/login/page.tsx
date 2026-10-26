@@ -41,6 +41,9 @@ export default async function LoginPage({ searchParams }: Props) {
           Créer un compte
         </Link>
       </p>
+      <p className="text-center text-xs text-muted-foreground">
+        <Link href="/confidentialite" className="underline underline-offset-4">Confidentialité et données</Link>
+      </p>
     </div>
   )
 }

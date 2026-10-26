@@ -58,6 +58,11 @@ export async function saveHealthProfile(formData: FormData) {
   if (targetWeight != null && (targetWeight < 35 || targetWeight > 250)) fail('Poids cible invalide.')
   if (sessions != null && (sessions < 0 || sessions > 21)) fail('Nombre de séances invalide.')
 
+  // Accord explicite (RGPD art. 9) : déjà donné, ou coché dans ce formulaire
+  const { data: existing } = await supabase.from('health_profiles').select('health_consent_at').eq('user_id', user.id).maybeSingle()
+  const consentAt = existing?.health_consent_at ?? (formData.get('health_consent') === 'on' ? new Date().toISOString() : null)
+  if (!consentAt) fail('Coche la case d\'accord pour que tes données de santé puissent être enregistrées.')
+
   const { error } = await supabase.from('health_profiles').upsert({
     user_id: user.id,
     sex,
@@ -71,6 +76,7 @@ export async function saveHealthProfile(formData: FormData) {
     exclusions,
     weekly_sessions_goal: sessions != null ? Math.round(sessions) : null,
     sport_mode: sportMode,
+    health_consent_at: consentAt,
     updated_at: new Date().toISOString(),
   })
   if (error) fail(error.message)

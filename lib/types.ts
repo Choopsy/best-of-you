@@ -63,6 +63,8 @@ export interface HealthProfile {
   exclusions: Exclusion[]
   weekly_sessions_goal: number | null
   sport_mode: 'included' | 'logged'
+  /** Accord explicite pour les données de santé (null = jamais donné) */
+  health_consent_at: string | null
 }
 
 export interface Collection {

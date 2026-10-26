@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { SubmitButton } from '@/components/auth/submit-button'
 import { saveHealthProfile } from '@/actions/health'
+import { HealthConsentField } from '@/components/privacy/health-consent'
 import { ACTIVITY_LABELS, GOAL_LABELS, LOSS_RATES, type ActivityLevel, type Goal } from '@/lib/targets'
 import { DIET_LABELS, EXCLUSION_LABELS, type Diet, type Exclusion, type HealthProfile } from '@/lib/types'
 
@@ -45,6 +46,8 @@ export function HealthForm({ health, weightKg, back, next, submitLabel }: Props)
   const [rate, setRate] = useState<string>(String(health?.goal_rate_kg_week ?? 0.5))
   const [diet, setDiet] = useState<Diet>(health?.diet ?? 'omnivore')
   const [exclusions, setExclusions] = useState<Exclusion[]>(health?.exclusions ?? [])
+  const hasConsent = !!health?.health_consent_at
+  const [consent, setConsent] = useState(hasConsent)
 
   const toggleExclusion = (e: string) =>
     setExclusions((xs) => (xs.includes(e as Exclusion) ? xs.filter((x) => x !== e) : [...xs, e as Exclusion]))
@@ -155,7 +158,9 @@ export function HealthForm({ health, weightKg, back, next, submitLabel }: Props)
         <p className="text-xs text-muted-foreground">Sert à te proposer les recettes qui te correspondent.</p>
       </section>
 
-      <SubmitButton disabled={!sex || !activity}>{submitLabel}</SubmitButton>
+      {!hasConsent && <HealthConsentField checked={consent} onChange={setConsent} />}
+
+      <SubmitButton disabled={!sex || !activity || !consent}>{submitLabel}</SubmitButton>
     </form>
   )
 }

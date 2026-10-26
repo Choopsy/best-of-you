@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { redirect } from 'next/navigation'
 import { ageFromBirthDate, computeTargets, validateInput, type DailyTargets } from './targets'
 import type { HealthProfile } from './types'
 import { todayISO } from './dates'
@@ -22,6 +23,8 @@ export async function getHealthContext(supabase: SupabaseClient, userId: string,
   ])
 
   const h = health as HealthProfile | null
+  // Profil créé avant la demande d'accord explicite (RGPD art. 9) : on le demande d'abord
+  if (h && !h.health_consent_at) redirect('/consentement')
   const weightKg = weight ? Number(weight.weight_kg) : null
   const age = h?.birth_date ? ageFromBirthDate(h.birth_date) : null
   const complete = !!(h?.sex && h.birth_date && h.height_cm && h.activity_level && weightKg)

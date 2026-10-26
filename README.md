@@ -46,6 +46,12 @@
 - **Courses** : la liste se calcule à partir de la semaine, **moins ce qu'il y a déjà au frigo** (quantités comparées, unités converties). Coche en magasin, puis « Ranger au frigo ».
 - **Foyer partagé** : invite ton ou ta partenaire, et le frigo, le planning et la liste de courses deviennent communs. Les données de santé restent privées.
 
+### 🔒 Données et vie privée
+- **Politique de confidentialité** claire, lisible sans compte (`/confidentialite`).
+- **Accord explicite** avant d'enregistrer des données de santé (RGPD, article 9), daté et révocable.
+- **Mes données** : téléchargement de tout son compte en JSON, retrait de l'accord santé (efface les données), suppression définitive du compte.
+- Pas de publicité, pas de traceurs, seulement deux cookies indispensables (session et thème).
+
 ### 👥 Entre amis
 - Demandes d'amis, recettes privées, visibles des amis ou publiques.
 - Partage d'une recette avec des amis précis.
@@ -123,7 +129,8 @@ scripts/               Import Ciqual et tests
    - `supabase/migrations/001_ciqual.sql` : les quelque 3 500 aliments de la table Ciqual ;
    - `supabase/migrations/002_schema.sql` : les tables, les règles de sécurité et le stockage des photos ;
    - `supabase/migrations/003_foyer.sql` : le foyer partagé, le frigo, le planning et la liste de courses ;
-   - `supabase/migrations/004_sport_produits.sql` : les séances de sport et les produits scannés.
+   - `supabase/migrations/004_sport_produits.sql` : les séances de sport et les produits scannés ;
+   - `supabase/migrations/005_rgpd.sql` : l'accord pour les données de santé, son retrait et la suppression du compte.
 3. Dans **Authentication > URL Configuration**, indique `http://localhost:3000` en Site URL et ajoute `http://localhost:3000/auth/callback` aux Redirect URLs.
 
 ### 2. Variables d'environnement
@@ -134,6 +141,9 @@ Copie `.env.example` en `.env.local`, puis remplis-le avec les valeurs de **Proj
 NEXT_PUBLIC_SUPABASE_URL=https://<ton-projet>.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+# Facultatif, affichés dans la politique de confidentialité
+NEXT_PUBLIC_CONTACT_EMAIL=toi@exemple.fr
+NEXT_PUBLIC_DATABASE_REGION=Union européenne (Francfort)
 ```
 
 ### 3. Démarrer
@@ -182,7 +192,7 @@ Le script gère les particularités du format : virgule décimale, « traces »,
 ## Tests et sécurité
 
 - `npm test` vérifie le calcul des objectifs (chaque cas recalculé à la main à partir des formules publiées), la liste de courses, les idées de recettes, la dépense des séances et la tendance du poids.
-- **Sécurité de la base (Row Level Security)** : chaque utilisateur ne voit que ses propres données de santé, son poids, son journal et ses collections. Une recette n'est visible que de son auteur, de ses amis (si elle est en mode « amis »), de tout le monde (si elle est publique) ou des amis avec qui elle est partagée. Les membres d'un foyer partagent seulement le frigo, le planning et les courses. Ces règles sont testées dans [`supabase/tests/`](supabase/tests/) (plus de 60 vérifications).
+- **Sécurité de la base (Row Level Security)** : chaque utilisateur ne voit que ses propres données de santé, son poids, son journal et ses collections. Une recette n'est visible que de son auteur, de ses amis (si elle est en mode « amis »), de tout le monde (si elle est publique) ou des amis avec qui elle est partagée. Les membres d'un foyer partagent seulement le frigo, le planning et les courses. Ces règles sont testées dans [`supabase/tests/`](supabase/tests/) (75 vérifications, dont le retrait de l'accord et la suppression d'un compte).
 
 ---
 

@@ -3,6 +3,7 @@
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { LEGAL } from '@/lib/legal'
 
 async function siteUrl() {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '')
@@ -33,13 +34,15 @@ export async function signUp(formData: FormData) {
   if (!fullName || !email) redirect(`/register?error=${enc('Nom et email obligatoires.')}`)
   if (password.length < 8) redirect(`/register?error=${enc('Le mot de passe doit faire au moins 8 caractères.')}`)
   if (password !== confirm) redirect(`/register?error=${enc('Les mots de passe ne correspondent pas.')}`)
+  if (formData.get('privacy') !== 'on') redirect(`/register?error=${enc('Lis et accepte la politique de confidentialité pour créer ton compte.')}`)
 
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { full_name: fullName },
+      // Trace de l'information donnée (version de la politique lue)
+      data: { full_name: fullName, privacy_version: LEGAL.version, privacy_accepted_at: new Date().toISOString() },
       emailRedirectTo: `${await siteUrl()}/auth/callback?next=/onboarding`,
     },
   })

@@ -2,6 +2,8 @@ import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
 
 const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password']
+/** Lisibles par tout le monde, connecté ou non */
+const OPEN_ROUTES = ['/confidentialite']
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -35,7 +37,7 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl
   const isPublic =
-    PUBLIC_ROUTES.includes(pathname) || pathname.startsWith('/auth/')
+    PUBLIC_ROUTES.includes(pathname) || OPEN_ROUTES.includes(pathname) || pathname.startsWith('/auth/')
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone()

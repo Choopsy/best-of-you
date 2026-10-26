@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Check, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -33,10 +34,11 @@ const RULES = [
 export function RegisterForm() {
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [privacy, setPrivacy] = useState(false)
 
   const allRulesValid = RULES.every((r) => r.test(password))
   const confirmMatches = confirm.length > 0 && password === confirm
-  const canSubmit = allRulesValid && confirmMatches
+  const canSubmit = allRulesValid && confirmMatches && privacy
 
   return (
     <form action={signUp} className="space-y-4">
@@ -137,6 +139,16 @@ export function RegisterForm() {
           </p>
         )}
       </div>
+
+      <label className="flex items-start gap-3 rounded-lg border bg-muted/40 px-3 py-3 text-sm leading-snug">
+        <input type="checkbox" name="privacy" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)}
+          className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--primary)]" required />
+        <span>
+          J&apos;ai lu la{' '}
+          <Link href="/confidentialite" target="_blank" className="font-medium underline underline-offset-4">politique de confidentialité</Link>
+          {' '}: comment mes données sont utilisées et comment les supprimer.
+        </span>
+      </label>
 
       <SubmitButton disabled={!canSubmit}>Créer mon compte</SubmitButton>
     </form>
