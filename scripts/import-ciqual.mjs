@@ -1,7 +1,8 @@
 /**
  * Import CIQUAL 2025 → canonical_ingredients
  *
- * Usage : node scripts/import-ciqual.mjs
+ * Usage : node scripts/import-ciqual.mjs            (télécharge les fichiers)
+ *         node scripts/import-ciqual.mjs alim.xml compo.xml   (fichiers déjà téléchargés)
  * Génère : supabase/migrations/001_ciqual.sql (à coller dans Supabase SQL Editor)
  * Les teneurs sont lues avec la virgule décimale française (voir parseTeneur).
  */
@@ -126,14 +127,17 @@ function esc(v) {
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 async function main() {
-  const tmp = tmpdir()
-  const alimPath  = join(tmp, 'ciqual_alim.xml')
-  const compoPath = join(tmp, 'ciqual_compo.xml')
-
-  console.log('⬇  Téléchargement alim.xml…')
-  await download(FILE_IDS.alim, alimPath)
-  console.log('⬇  Téléchargement compo.xml (gros fichier, ~30s)…')
-  await download(FILE_IDS.compo, compoPath)
+  // Fichiers déjà téléchargés : node scripts/import-ciqual.mjs alim.xml compo.xml
+  let [alimPath, compoPath] = process.argv.slice(2)
+  if (!alimPath || !compoPath) {
+    const tmp = tmpdir()
+    alimPath  = join(tmp, 'ciqual_alim.xml')
+    compoPath = join(tmp, 'ciqual_compo.xml')
+    console.log('⬇  Téléchargement alim.xml…')
+    await download(FILE_IDS.alim, alimPath)
+    console.log('⬇  Téléchargement compo.xml (gros fichier, ~30s)…')
+    await download(FILE_IDS.compo, compoPath)
+  }
 
   console.log('🔍 Parsing…')
   const alimXml  = readFileSync(alimPath, 'utf8')
