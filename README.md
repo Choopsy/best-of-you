@@ -56,10 +56,21 @@ Copie `.env.example` en `.env.local` et remplis-le (Supabase > Project Settings 
 
 ### 6. Lancer
 
+Avec Node 22 installé :
+
 ```bash
 npm install
 npm run dev
 ```
+
+Ou avec Docker (aucune installation de Node nécessaire, il faut Docker Desktop) :
+
+```bash
+docker compose up --build
+```
+
+Puis ouvre http://localhost:3000. Après un changement de dépendances dans `package.json`, relance avec
+`docker compose down -v` puis `docker compose up --build`.
 
 ## Tests
 
