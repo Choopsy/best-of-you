@@ -128,15 +128,15 @@ export interface RecipeNutrition {
   missing: { name: string; reason: 'not_linked' | 'no_quantity' }[]
 }
 
-export async function calcRecipeNutrition(
-  supabase: SupabaseClient,
+/** Calcul à partir d'une table Ciqual déjà chargée (pour traiter plusieurs recettes d'un coup). */
+export function computeRecipeNutrition(
   ingredients: NutritionIngredient[],
   baseServings: number,
-): Promise<RecipeNutrition | null> {
+  ciqual: Map<string, { name: string; per100: Nutrients }>,
+): RecipeNutrition | null {
   const list = ingredients.filter((i) => i.name?.trim())
   if (list.length === 0) return null
 
-  const ciqual = await fetchCiqual(supabase, list.map((i) => i.ciqual_code ?? ''))
   const parts: Nutrients[] = []
   const missing: RecipeNutrition['missing'] = []
   let approximate = false
@@ -159,4 +159,13 @@ export async function calcRecipeNutrition(
     approximate,
     missing,
   }
+}
+
+export async function calcRecipeNutrition(
+  supabase: SupabaseClient,
+  ingredients: NutritionIngredient[],
+  baseServings: number,
+): Promise<RecipeNutrition | null> {
+  const ciqual = await fetchCiqual(supabase, ingredients.map((i) => i.ciqual_code ?? ''))
+  return computeRecipeNutrition(ingredients, baseServings, ciqual)
 }

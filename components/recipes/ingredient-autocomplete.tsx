@@ -16,10 +16,12 @@ interface Props {
   /** Affiche l'état « lié / non lié » à droite du champ */
   showStatus?: boolean
   autoFocus?: boolean
+  /** Inclure les produits enregistrés du foyer (code-barres) */
+  includeProducts?: boolean
 }
 
 export function IngredientAutocomplete({
-  value, ciqualCode, onChange, onPick, placeholder, className, showStatus = true, autoFocus,
+  value, ciqualCode, onChange, onPick, placeholder, className, showStatus = true, autoFocus, includeProducts = false,
 }: Props) {
   const [suggestions, setSuggestions] = useState<FoodSuggestion[]>([])
   const [open, setOpen] = useState(false)
@@ -29,12 +31,12 @@ export function IngredientAutocomplete({
 
   const search = useCallback(async (q: string) => {
     if (q.trim().length < 2) { setSuggestions([]); setOpen(false); return }
-    const res = await fetch(`/api/ingredients/search?q=${encodeURIComponent(q)}`)
+    const res = await fetch(`/api/ingredients/search?q=${encodeURIComponent(q)}${includeProducts ? '&products=1' : ''}`)
     const data: FoodSuggestion[] = res.ok ? await res.json() : []
     setSuggestions(data)
     setOpen(data.length > 0)
     setActiveIndex(-1)
-  }, [])
+  }, [includeProducts])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value
@@ -111,7 +113,10 @@ export function IngredientAutocomplete({
                   i === activeIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'
                 }`}
               >
-                <span className="truncate">{s.name}</span>
+                <span className="truncate">
+                  {s.kind === 'custom' && <span className="mr-1.5 rounded bg-secondary px-1.5 py-0.5 text-[10px] font-bold text-secondary-foreground">Mes produits</span>}
+                  {s.name}
+                </span>
                 {s.kcal != null && (
                   <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">{Math.round(s.kcal)} kcal/100 g</span>
                 )}

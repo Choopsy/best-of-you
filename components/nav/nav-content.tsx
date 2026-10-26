@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, NotebookPen, BookOpen, Users, User, Leaf, Plus, Refrigerator } from 'lucide-react'
+import { Home, NotebookPen, Users, User, Leaf, Plus, ChefHat, Activity } from 'lucide-react'
 import { signOut } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { NewItemSheet } from './new-item-sheet'
@@ -19,8 +19,8 @@ interface Props {
 const DESKTOP_ITEMS = [
   { href: '/', icon: Home, label: 'Accueil' },
   { href: '/journal', icon: NotebookPen, label: 'Journal' },
-  { href: '/recipes', icon: BookOpen, label: 'Recettes' },
-  { href: '/frigo', icon: Refrigerator, label: 'Cuisine' },
+  { href: '/recipes', icon: ChefHat, label: 'Cuisine' },
+  { href: '/forme', icon: Activity, label: 'Forme' },
   { href: '/friends', icon: Users, label: 'Amis' },
 ]
 
@@ -29,15 +29,15 @@ export function NavContent({ avatarUrl, fullName, pendingFriendsCount, kitchenAl
   // Pas de barre de navigation pendant le premier remplissage du profil
   if (pathname === '/onboarding') return null
 
-  const KITCHEN = ['/frigo', '/semaine', '/courses', '/foyer']
+  const KITCHEN = ['/recipes', '/frigo', '/semaine', '/courses', '/foyer', '/idees', '/collections', '/favorites']
   const isActive = (href: string) =>
     href === '/' ? pathname === '/'
-      : href === '/frigo' ? KITCHEN.some((k) => pathname.startsWith(k))
+      : href === '/recipes' ? KITCHEN.some((k) => pathname.startsWith(k))
       : pathname.startsWith(href)
   const badge = pendingFriendsCount > 0
 
   const MobileLink = ({ href, icon: Icon, label, dot }: { href: string; icon: typeof Home; label: string; dot?: boolean }) => {
-    const active = isActive(href)
+    const active = isActive(href === '/frigo' ? '/recipes' : href)
     return (
       <Link href={href} aria-current={active ? 'page' : undefined} className="flex min-w-14 flex-col items-center gap-1 py-2 px-2">
         <span className="relative inline-flex">
@@ -64,7 +64,7 @@ export function NavContent({ avatarUrl, fullName, pendingFriendsCount, kitchenAl
               <Button variant={isActive(href) ? 'secondary' : 'ghost'} size="sm" className="gap-1.5">
                 <Icon className="h-4 w-4" />
                 {label}
-                {href === '/frigo' && kitchenAlerts > 0 && (
+                {href === '/recipes' && kitchenAlerts > 0 && (
                   <span className="ml-0.5 h-2 w-2 rounded-full bg-red-500" aria-label="Alertes cuisine" />
                 )}
                 {href === '/friends' && badge && (
@@ -102,8 +102,9 @@ export function NavContent({ avatarUrl, fullName, pendingFriendsCount, kitchenAl
         </div>
         <NewItemSheet />
         <div className="flex flex-1 items-center justify-around">
-          <MobileLink href="/recipes" icon={BookOpen} label="Recettes" />
-          <MobileLink href="/frigo" icon={Refrigerator} label="Cuisine" dot={kitchenAlerts > 0} />
+          {/* Avec une alerte (aliment qui périme), on emmène directement au frigo */}
+          <MobileLink href={kitchenAlerts > 0 ? '/frigo' : '/recipes'} icon={ChefHat} label="Cuisine" dot={kitchenAlerts > 0} />
+          <MobileLink href="/forme" icon={Activity} label="Forme" />
         </div>
       </nav>
     </>

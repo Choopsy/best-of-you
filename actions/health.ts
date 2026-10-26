@@ -43,6 +43,7 @@ export async function saveHealthProfile(formData: FormData) {
   const diet = String(formData.get('diet') ?? 'omnivore')
   const exclusions = formData.getAll('exclusions').map(String).filter((e) => EXCLUSIONS.includes(e))
   const sessions = num(formData.get('weekly_sessions_goal'))
+  const sportMode = String(formData.get('sport_mode') ?? 'included') === 'logged' ? 'logged' : 'included'
 
   if (sex !== 'male' && sex !== 'female') fail('Indique ton sexe (utilisé par l\'équation du métabolisme).')
   if (!isISODate(birthDate)) fail('Indique ta date de naissance.')
@@ -69,6 +70,7 @@ export async function saveHealthProfile(formData: FormData) {
     diet,
     exclusions,
     weekly_sessions_goal: sessions != null ? Math.round(sessions) : null,
+    sport_mode: sportMode,
     updated_at: new Date().toISOString(),
   })
   if (error) fail(error.message)

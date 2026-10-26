@@ -26,12 +26,22 @@
 - Garde-fous : pas d'objectif de perte de poids sous un IMC de 18,5, un plancher calorique, réservé aux adultes.
 
 ### 📒 Journal alimentaire
-- Ajout d'un repas en un geste : une recette (en portions) ou un aliment Ciqual (en grammes).
+- Ajout d'un repas : une recette (en portions) ou un aliment Ciqual (en grammes).
+- **Scanner un code-barres** avec l'appareil photo : la composition vient d'[Open Food Facts](https://world.openfoodfacts.org). Produit inconnu ? On recopie l'étiquette une fois et il est reconnu ensuite, pour tout le foyer.
+- **Récents** : ce que tu manges souvent se rajoute en un geste, avec la même quantité.
+- **Comme hier** : recopie le même repas que la veille.
 - Des **ronds de progression** pour la journée, et un rond par jour pour la semaine.
+
+### 🏃 Forme
+- **Séances de sport** : 22 activités, durée et date ; la dépense est estimée avec le Compendium des activités physiques 2024 et ton métabolisme de base.
+- Au choix : ton niveau d'activité inclut déjà ton sport, ou **tes séances s'ajoutent à ton objectif calories du jour**.
+- **Ta semaine en ronds** : séances par rapport à ton objectif, minutes actives (repère OMS de 150 min) et jours de renforcement (2 par semaine).
+- **Courbe de poids** avec une tendance lissée, le rythme par semaine et le poids cible.
 
 ### 🧺 Cuisine du foyer
 - **Frigo** : ce que tu as, avec sa quantité et sa date limite ; les aliments à consommer vite remontent en haut.
 - **Alertes** : un bandeau sur l'accueil et une pastille sur « Cuisine » quand un aliment périme dans les 2 jours.
+- **Qu'est-ce qu'on mange ?** : des idées de recettes avec ce qu'il y a au frigo, en priorité celles qui sauvent un aliment qui périme. Avec les ingrédients manquants et les calories par portion.
 - **Semaine** : planifie tes recettes jour par jour, avec le nombre de portions.
 - **Courses** : la liste se calcule à partir de la semaine, **moins ce qu'il y a déjà au frigo** (quantités comparées, unités converties). Coche en magasin, puis « Ranger au frigo ».
 - **Foyer partagé** : invite ton ou ta partenaire, et le frigo, le planning et la liste de courses deviennent communs. Les données de santé restent privées.
@@ -59,6 +69,8 @@
 | Protéines | 0,83 g/kg ; 1,2 g/kg en perte de poids ou si très actif ; 1,6 g/kg pour la prise de muscle | [EFSA](https://www.efsa.europa.eu/sites/default/files/assets/DRV_Summary_tables_jan_17.pdf), [Leidy, 2015](https://pubmed.ncbi.nlm.nih.gov/25926512/), [Morton, 2018](https://pubmed.ncbi.nlm.nih.gov/28698222/) |
 | Lipides, glucides, fibres, sucres | 35–40 %, 40–55 % de l'énergie ; 30 g de fibres ; moins de 100 g de sucres | [ANSES, 2016](https://www.anses.fr/fr/system/files/NUT2012SA0103Ra-1.pdf) |
 | Sel | Moins de 5 g par jour | OMS |
+| Dépense d'une séance | (MET − 1) × métabolisme de base horaire × durée | [Compendium 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC10818145/) |
+| Semaine active | 150 min d'activité modérée (1 min soutenue = 2), renforcement 2 jours | [OMS, 2020](https://www.who.int/publications/i/item/9789240015128) |
 
 Le code du calcul est dans [`lib/targets.ts`](lib/targets.ts) et ses tests dans [`scripts/test-targets.ts`](scripts/test-targets.ts).
 
@@ -80,6 +92,9 @@ Le code du calcul est dans [`lib/targets.ts`](lib/targets.ts) et ses tests dans 
 app/                   Pages (App Router)
   journal/             Journal alimentaire du jour
   frigo/ semaine/ courses/ foyer/   Cuisine partagée du foyer
+  idees/               « Qu'est-ce qu'on mange ? »
+  forme/               Séances, semaine active et courbe de poids
+  api/products/        Recherche d'un code-barres (Open Food Facts)
   recipes/             Liste, détail, création et mode cuisine des recettes
   profile/health/      Profil santé et explication des objectifs
   collections/ friends/ favorites/ onboarding/ (auth)/
@@ -89,6 +104,9 @@ lib/
   targets.ts           Calcul des objectifs (formules et sources)
   nutrition.ts         Calcul nutritionnel à partir de Ciqual
   shopping.ts          Liste de courses moins le frigo
+  suggest.ts           Idées de recettes selon le frigo
+  activities.ts        Activités, MET et repères OMS
+  weight.ts            Tendance du poids
   auth.ts              Session côté serveur
 supabase/migrations/   Schéma SQL et données Ciqual
 scripts/               Import Ciqual et tests
@@ -104,7 +122,8 @@ scripts/               Import Ciqual et tests
 2. Dans **SQL Editor**, exécute dans l'ordre :
    - `supabase/migrations/001_ciqual.sql` : les quelque 3 500 aliments de la table Ciqual ;
    - `supabase/migrations/002_schema.sql` : les tables, les règles de sécurité et le stockage des photos ;
-   - `supabase/migrations/003_foyer.sql` : le foyer partagé, le frigo, le planning et la liste de courses.
+   - `supabase/migrations/003_foyer.sql` : le foyer partagé, le frigo, le planning et la liste de courses ;
+   - `supabase/migrations/004_sport_produits.sql` : les séances de sport et les produits scannés.
 3. Dans **Authentication > URL Configuration**, indique `http://localhost:3000` en Site URL et ajoute `http://localhost:3000/auth/callback` aux Redirect URLs.
 
 ### 2. Variables d'environnement
@@ -162,8 +181,8 @@ Le script gère les particularités du format : virgule décimale, « traces »,
 
 ## Tests et sécurité
 
-- `npm test` vérifie le calcul des objectifs (chaque cas recalculé à la main à partir des formules publiées) et celui de la liste de courses.
-- **Sécurité de la base (Row Level Security)** : chaque utilisateur ne voit que ses propres données de santé, son poids, son journal et ses collections. Une recette n'est visible que de son auteur, de ses amis (si elle est en mode « amis »), de tout le monde (si elle est publique) ou des amis avec qui elle est partagée. Les membres d'un foyer partagent seulement le frigo, le planning et les courses. Ces règles sont testées dans [`supabase/tests/`](supabase/tests/) (55 vérifications).
+- `npm test` vérifie le calcul des objectifs (chaque cas recalculé à la main à partir des formules publiées), la liste de courses, les idées de recettes, la dépense des séances et la tendance du poids.
+- **Sécurité de la base (Row Level Security)** : chaque utilisateur ne voit que ses propres données de santé, son poids, son journal et ses collections. Une recette n'est visible que de son auteur, de ses amis (si elle est en mode « amis »), de tout le monde (si elle est publique) ou des amis avec qui elle est partagée. Les membres d'un foyer partagent seulement le frigo, le planning et les courses. Ces règles sont testées dans [`supabase/tests/`](supabase/tests/) (plus de 60 vérifications).
 
 ---
 
@@ -175,13 +194,18 @@ Le script gère les particularités du format : virgule décimale, « traces »,
 - [x] Amis et partage de recettes
 - [x] Mode clair / sombre
 - [x] Frigo, planning de la semaine, liste de courses et foyer partagé
-- [ ] Activités physiques et calories dépensées
-- [ ] Objectif de séances par semaine
-- [ ] Courbe de poids et poids cible
+- [x] Activités physiques et calories dépensées
+- [x] Objectif de séances par semaine
+- [x] Courbe de poids et poids cible
+- [x] Scan de code-barres, « Récents » et « Comme hier »
+- [x] « Qu'est-ce qu'on mange ? » selon le frigo
+- [ ] Import de recettes depuis un site
 
 ---
 
 ## Crédits
 
 - Données nutritionnelles : **Table de composition nutritionnelle des aliments Ciqual**, ANSES, sous [Licence Ouverte / Open Licence](https://www.etalab.gouv.fr/licence-ouverte-open-licence/).
+- Produits scannés : **[Open Food Facts](https://world.openfoodfacts.org)**, base collaborative sous licence [ODbL](https://opendatacommons.org/licenses/odbl/1-0/).
+- Dépense des activités : **2024 Adult Compendium of Physical Activities** (Herrmann et al.).
 - Projet personnel de **Perret Cheun** ([@Choopsy](https://github.com/Choopsy)).

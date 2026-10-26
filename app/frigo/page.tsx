@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Refrigerator, Users } from 'lucide-react'
+import { Refrigerator, Sparkles, Users } from 'lucide-react'
 import { getSession } from '@/lib/auth'
 import { getFridge, getHouseholdId } from '@/lib/household'
 import { todayISO } from '@/lib/dates'
@@ -46,6 +46,16 @@ export default async function FridgePage({ searchParams }: Props) {
 
       <main className="px-4 py-4 max-w-xl mx-auto space-y-5">
         <KitchenTabs active="/frigo" />
+
+        {items.length > 0 && (
+          <Link href="/idees" className="flex items-center gap-3 rounded-3xl bg-primary px-4 py-3.5 text-primary-foreground shadow-[0_6px_16px_color-mix(in_oklab,var(--primary)_25%,transparent)]">
+            <Sparkles className="h-5 w-5 shrink-0" />
+            <span className="flex-1">
+              <span className="block font-bold">Qu&apos;est-ce qu&apos;on mange ?</span>
+              <span className="block text-xs opacity-90">Des idées de recettes avec ce que tu as, en priorité ce qui périme</span>
+            </span>
+          </Link>
+        )}
 
         {items.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-12 text-center">

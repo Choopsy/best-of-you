@@ -92,4 +92,18 @@ test('Les macros retombent sur l\'énergie totale (± arrondis)', () => {
   }
 })
 
+test('Séances notées : la dépense nette s\'ajoute à l\'énergie', () => {
+  const base = { sex: 'male' as const, ageYears: 30, heightCm: 175, weightKg: 70, activity: 'sedentary' as const, goal: 'maintain' as const }
+  const a = computeTargets(base)
+  const b = computeTargets(base, { exerciseKcal: 265 })
+  // 1 648,75 × 1,4 = 2 308,25 → 2 310 ; + 265 = 2 573,25 → 2 570
+  assert.equal(a.energyKcal, 2310)
+  assert.equal(b.energyKcal, 2570)
+  // Protéines : le plancher ANSES de 10 % de l'énergie suit la hausse (2 570 × 10 % / 4 = 64)
+  assert.equal(a.proteinsG, 58)
+  assert.equal(b.proteinsG, 64)
+  assert.ok(b.carbsG > a.carbsG)
+  assert.equal(b.exerciseKcal, 265)
+})
+
 console.log(`\n${n} tests OK`)

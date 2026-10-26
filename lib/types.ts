@@ -62,6 +62,7 @@ export interface HealthProfile {
   diet: Diet
   exclusions: Exclusion[]
   weekly_sessions_goal: number | null
+  sport_mode: 'included' | 'logged'
 }
 
 export interface Collection {
@@ -194,10 +195,12 @@ export interface CreateRecipeInput {
 }
 
 export interface FoodSuggestion {
+  /** Code Ciqual, ou identifiant du produit enregistré (kind = 'custom') */
   code: string
   name: string
   kcal: number | null
   proteins: number | null
+  kind?: 'ciqual' | 'custom'
 }
 
 export interface PickableRecipe {

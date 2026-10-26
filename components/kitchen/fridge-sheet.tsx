@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, X, Pencil } from 'lucide-react'
+import { Plus, X, Pencil, ScanBarcode } from 'lucide-react'
+import { BarcodeScanner } from '@/components/scan/barcode-scanner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -38,9 +39,29 @@ export function FridgeSheet({ today, item, trigger = 'button', defaultOpen = fal
   const [expires, setExpires] = useState(item?.expires_on ?? '')
   const [error, setError] = useState<string | null>(null)
   const [pending, start] = useTransition()
+  const [scanning, setScanning] = useState(false)
+  const [lookup, setLookup] = useState<string | null>(null)
+
+  // Code-barres → nom du produit (Open Food Facts ou produits déjà enregistrés)
+  const onDetected = async (barcode: string) => {
+    setScanning(false); setError(null); setLookup('Recherche du produit…')
+    try {
+      const r = await fetch(`/api/products/${barcode}`)
+      const p = await r.json()
+      if (p.found && p.name) {
+        setName(p.brand ? `${p.name} (${p.brand})` : p.name); setCode(null)
+        setLookup(null)
+      } else {
+        setLookup('Produit inconnu : écris son nom à la main.')
+      }
+    } catch {
+      setLookup('Pas de connexion : écris son nom à la main.')
+    }
+  }
 
   const reset = () => {
     if (!item) { setName(''); setCode(null); setQuantity(''); setUnit(''); setExpires('') }
+    setLookup(null)
     setError(null)
   }
   const close = () => { setOpen(false); reset() }
@@ -79,6 +100,8 @@ export function FridgeSheet({ today, item, trigger = 'button', defaultOpen = fal
         </Button>
       )}
 
+      {scanning && <BarcodeScanner onDetected={onDetected} onClose={() => setScanning(false)} />}
+
       {open && (
         <Portal>
           <div className="fixed inset-0 z-50 flex items-end sm:items-start sm:pt-20 justify-center">
@@ -103,7 +126,13 @@ export function FridgeSheet({ today, item, trigger = 'button', defaultOpen = fal
                     showStatus={false}
                     autoFocus={!item}
                   />
-                  <p className="text-xs text-muted-foreground">Choisir dans la liste aide à le retrouver dans tes recettes.</p>
+                  {!item && (
+                    <button type="button" onClick={() => setScanning(true)}
+                      className="flex min-h-10 items-center gap-2 text-sm font-bold text-primary">
+                      <ScanBarcode className="h-4 w-4" /> Scanner le code-barres
+                    </button>
+                  )}
+                  <p className="text-xs text-muted-foreground">{lookup ?? 'Choisir dans la liste aide à le retrouver dans tes recettes.'}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

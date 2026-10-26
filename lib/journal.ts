@@ -47,3 +47,34 @@ export async function getWeekTotals(supabase: SupabaseClient, userId: string, to
     return { date, kcal: byDay.get(date) ?? 0 }
   })
 }
+
+export interface RecentEntry {
+  logId: string
+  label: string
+  detail: string
+  kcal: number
+}
+
+/** Entrées récentes (30 jours), sans doublon : pour « Ajouter à nouveau ». */
+export async function getRecentEntries(supabase: SupabaseClient, userId: string, today: string, limit = 12): Promise<RecentEntry[]> {
+  const { data } = await supabase
+    .from('food_logs')
+    .select('id, label, servings, grams, energy_kcal, created_at')
+    .eq('user_id', userId)
+    .gte('eaten_on', shiftDate(today, -30))
+    .order('created_at', { ascending: false })
+    .limit(150)
+  const seen = new Set<string>()
+  const out: RecentEntry[] = []
+  for (const r of data ?? []) {
+    const detail = r.servings != null
+      ? `${Number(r.servings).toLocaleString('fr-FR')} portion${Number(r.servings) > 1 ? 's' : ''}`
+      : r.grams != null ? `${Math.round(Number(r.grams))} g` : ''
+    const key = `${r.label}|${detail}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push({ logId: r.id, label: r.label, detail, kcal: Math.round(Number(r.energy_kcal)) })
+    if (out.length >= limit) break
+  }
+  return out
+}

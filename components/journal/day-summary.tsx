@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Target } from 'lucide-react'
+import { Dumbbell, Target } from 'lucide-react'
 import type { DailyTargets } from '@/lib/targets'
 import type { Nutrients } from '@/lib/nutrition'
 import { Ring, ringColor } from './ring'
@@ -62,6 +62,11 @@ export function DaySummary({ totals, targets, compact = false }: { totals: Nutri
             {left >= 0 ? `reste ${f(left)}` : `+${f(-left)} kcal`}
           </span>
         </Ring>
+        {targets.exerciseKcal > 0 && (
+          <Link href="/forme" className="-mt-2 flex items-center gap-1.5 rounded-full bg-sage/15 px-3 py-1 text-xs font-bold">
+            <Dumbbell className="h-3.5 w-3.5 text-sage" /> dont +{f(targets.exerciseKcal)} kcal grâce au sport
+          </Link>
+        )}
         <div className="grid w-full grid-cols-3 gap-2">
           <MacroRing label="Protéines" value={totals.proteins_g} target={targets.proteinsG} unit="g" color="var(--terracotta)" />
           <MacroRing label="Glucides" value={totals.carbs_g} target={targets.carbsG} unit="g" color="var(--honey)" />

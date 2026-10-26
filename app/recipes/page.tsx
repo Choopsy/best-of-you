@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react'
 import { getSession } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/layout/page-header'
+import { KitchenTabs } from '@/components/kitchen/kitchen-tabs'
 import { RecipeCard } from '@/components/recipes/recipe-card'
 import { RecipeFilters } from '@/components/recipes/filters'
 import { RECIPE_SUMMARY_SELECT, toSummary } from '@/lib/recipes'
@@ -74,20 +75,22 @@ export default async function RecipesPage({ searchParams }: Props) {
 
   return (
     <div className="min-h-svh pb-24">
-      <PageHeader title="Recettes">
+      <PageHeader title="Cuisine">
         <Link href="/recipes/new">
           <Button size="sm" className="gap-1.5"><Plus className="h-4 w-4" /> Nouvelle</Button>
         </Link>
       </PageHeader>
 
       <main className="px-4 py-4 space-y-4 max-w-2xl mx-auto">
-        <div className="flex gap-1 rounded-xl bg-muted p-1 overflow-x-auto no-scrollbar">
+        <KitchenTabs active="/recipes" />
+        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
           {TABS.map((t) => (
             <Link
               key={t.key}
               href={`/recipes?tab=${t.key}`}
-              className={`flex-1 whitespace-nowrap text-center rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                tab === t.key ? 'bg-background shadow-sm' : 'text-muted-foreground'
+              aria-current={tab === t.key ? 'page' : undefined}
+              className={`whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm font-bold transition-colors ${
+                tab === t.key ? 'border-primary bg-primary text-primary-foreground' : 'bg-card text-muted-foreground'
               }`}
             >
               {t.label}

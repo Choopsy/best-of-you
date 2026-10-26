@@ -78,6 +78,8 @@ export interface DailyTargets {
     carbsG: [number, number]
   }
   bmi: number
+  /** Calories des séances du jour ajoutées à l'objectif */
+  exerciseKcal: number
   effectiveGoal: Goal
   explanations: Explanation[]
   warnings: string[]
@@ -120,7 +122,7 @@ export function validateInput(i: TargetInput): string | null {
  * Calcule les objectifs du jour.
  * Lève une erreur si l'entrée sort des plages de validité (voir validateInput).
  */
-export function computeTargets(input: TargetInput): DailyTargets {
+export function computeTargets(input: TargetInput, opts: { exerciseKcal?: number } = {}): DailyTargets {
   const invalid = validateInput(input)
   if (invalid) throw new Error(invalid)
 
@@ -169,6 +171,12 @@ export function computeTargets(input: TargetInput): DailyTargets {
     energy = tdee * 1.1
     energyHow += ' Surplus de +10 % pour la prise de muscle (bas de la fourchette 10–20 %).'
     energySources.push('iraki')
+  }
+  const exercise = Math.max(0, Math.round(opts.exerciseKcal ?? 0))
+  if (exercise > 0) {
+    energy += exercise
+    energyHow += ` Séances du jour : +${fr(exercise)} kcal (dépense nette estimée avec le Compendium 2024).`
+    energySources.push('compendium')
   }
   energy = round10(energy)
 
@@ -279,6 +287,7 @@ export function computeTargets(input: TargetInput): DailyTargets {
       carbsG: [round1(0.40 * energy / 4), round1(0.55 * energy / 4)],
     },
     bmi: Math.round(imc * 10) / 10,
+    exerciseKcal: exercise,
     effectiveGoal: goal,
     explanations,
     warnings,
@@ -327,6 +336,10 @@ export const SOURCES = {
   who_salt: {
     label: 'OMS. Réduire la consommation de sodium (moins de 5 g de sel par jour)',
     url: 'https://www.who.int/fr/news-room/fact-sheets/detail/salt-reduction',
+  },
+  compendium: {
+    label: 'Herrmann SD et al. 2024 Adult Compendium of Physical Activities. J Sport Health Sci, 2024',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10818145/',
   },
   who_activity: {
     label: 'OMS. Lignes directrices sur l\'activité physique et la sédentarité, 2020',

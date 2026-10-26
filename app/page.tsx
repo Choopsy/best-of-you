@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { AlarmClock, ArrowRight, ChevronRight, Plus, User } from 'lucide-react'
+import { Activity, AlarmClock, ArrowRight, ChevronRight, Plus, Sparkles, User } from 'lucide-react'
+import { weekSummary, WHO_WEEKLY_MINUTES } from '@/lib/activities'
 import { getSession } from '@/lib/auth'
 import { DaySummary } from '@/components/journal/day-summary'
 import { WeekRings } from '@/components/journal/week-rings'
@@ -9,7 +10,7 @@ import { getHealthContext } from '@/lib/health'
 import { getDayLogs, getWeekTotals } from '@/lib/journal'
 import { getExpiringSoon } from '@/lib/household'
 import { expiryInfo } from '@/components/kitchen/expiry'
-import { formatDateFr, todayISO } from '@/lib/dates'
+import { formatDateFr, todayISO, weekStart } from '@/lib/dates'
 import { RECIPE_SUMMARY_SELECT, toSummary } from '@/lib/recipes'
 import { MEALS, MEAL_LABELS } from '@/lib/types'
 
@@ -26,7 +27,7 @@ export default async function HomePage() {
   if (!user) redirect('/login')
 
   const today = todayISO()
-  const [ctx, { logs, totals }, week, { data: profile }, { data: rawRecipes }, expiring, { count: friendRequests }] = await Promise.all([
+  const [ctx, { logs, totals }, week, { data: profile }, { data: rawRecipes }, expiring, { count: friendRequests }, { data: acts }] = await Promise.all([
     getHealthContext(supabase, user.id),
     getDayLogs(supabase, user.id, today),
     getWeekTotals(supabase, user.id, today),
@@ -35,7 +36,10 @@ export default async function HomePage() {
       .order('created_at', { ascending: false }).limit(4),
     getExpiringSoon(supabase, today),
     supabase.from('friendships').select('*', { count: 'exact', head: true }).eq('addressee_id', user.id).eq('status', 'pending'),
+    supabase.from('activities').select('done_on, duration_min, met, activity_key').eq('user_id', user.id).gte('done_on', weekStart(today)),
   ])
+  const sport = weekSummary((acts ?? []).map((a) => ({ ...a, met: Number(a.met) })))
+  const sessionsGoal = ctx.health?.weekly_sessions_goal ?? null
 
   // Première connexion : profil santé jamais rempli
   if (!ctx.health?.sex) redirect('/onboarding')
@@ -117,6 +121,21 @@ export default async function HomePage() {
           </ul>
         )}
       </section>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Link href="/idees" className="flex flex-col gap-2 rounded-3xl bg-card px-4 py-3.5 shadow-[0_1px_0_var(--border)]">
+          <Sparkles className="h-5 w-5 text-primary" />
+          <span className="text-[15px] font-bold leading-snug">Qu&apos;est-ce qu&apos;on mange ce soir ?</span>
+          <span className="text-xs text-muted-foreground">Idées avec ton frigo</span>
+        </Link>
+        <Link href="/forme" className="flex flex-col gap-2 rounded-3xl bg-card px-4 py-3.5 shadow-[0_1px_0_var(--border)]">
+          <Activity className="h-5 w-5 text-sage" />
+          <span className="text-[15px] font-bold leading-snug tabular-nums">
+            {sport.sessions} séance{sport.sessions > 1 ? 's' : ''}{sessionsGoal ? ` / ${sessionsGoal}` : ''}
+          </span>
+          <span className="text-xs text-muted-foreground tabular-nums">{sport.moderateEquivalent} / {WHO_WEEKLY_MINUTES} min actives cette semaine</span>
+        </Link>
+      </div>
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">

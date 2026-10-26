@@ -40,6 +40,7 @@ function Choice({
 export function HealthForm({ health, weightKg, back, next, submitLabel }: Props) {
   const [sex, setSex] = useState<string>(health?.sex ?? '')
   const [activity, setActivity] = useState<string>(health?.activity_level ?? '')
+  const [sportMode, setSportMode] = useState<string>(health?.sport_mode ?? 'included')
   const [goal, setGoal] = useState<Goal>(health?.goal ?? 'maintain')
   const [rate, setRate] = useState<string>(String(health?.goal_rate_kg_week ?? 0.5))
   const [diet, setDiet] = useState<Diet>(health?.diet ?? 'omnivore')
@@ -83,8 +84,17 @@ export function HealthForm({ health, weightKg, back, next, submitLabel }: Props)
 
       <section className="space-y-3">
         <h2 className="font-semibold">Ton niveau d&apos;activité habituel</h2>
-        <p className="text-xs text-muted-foreground -mt-1">
-          Ta vie de tous les jours, sport habituel compris. Ce sont les quatre niveaux de l&apos;EFSA (1,4 à 2,0).
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Choice name="sport_mode" value="included" checked={sportMode === 'included'} onChange={setSportMode}
+            title="Mon sport est compris dedans" hint="Objectifs stables d'un jour à l'autre" />
+          <Choice name="sport_mode" value="logged" checked={sportMode === 'logged'} onChange={setSportMode}
+            title="Je note mes séances" hint="Chaque séance notée augmente l'objectif du jour" />
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {sportMode === 'logged'
+            ? 'Choisis ton niveau SANS compter tes séances de sport : elles s\'ajoutent quand tu les notes (pas de double comptage).'
+            : 'Ta vie de tous les jours, sport habituel compris.'}{' '}
+          Ce sont les quatre niveaux de l&apos;EFSA (1,4 à 2,0).
         </p>
         <div className="grid gap-2 sm:grid-cols-2">
           {(Object.keys(ACTIVITY_LABELS) as ActivityLevel[]).map((a) => (

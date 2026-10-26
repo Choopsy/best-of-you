@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getSession } from '@/lib/auth'
 import { getHealthContext } from '@/lib/health'
-import { getDayLogs, getPickableRecipes } from '@/lib/journal'
+import { getDayLogs, getPickableRecipes, getRecentEntries } from '@/lib/journal'
+import { CopyMeal } from '@/components/journal/copy-meal'
 import { formatDateFr, isISODate, shiftDate, todayISO } from '@/lib/dates'
 import { MEALS, MEAL_LABELS } from '@/lib/types'
 import { Button } from '@/components/ui/button'
@@ -13,21 +14,24 @@ import { EntryRow } from '@/components/journal/entry-row'
 import { AddEntry } from '@/components/journal/add-entry'
 
 interface Props {
-  searchParams: Promise<{ date?: string; add?: string }>
+  searchParams: Promise<{ date?: string; add?: string; scan?: string }>
 }
 
 export default async function JournalPage({ searchParams }: Props) {
-  const { date: rawDate, add } = await searchParams
+  const { date: rawDate, add, scan } = await searchParams
   const today = todayISO()
   const date = isISODate(rawDate) ? rawDate : today
 
   const { supabase, user } = await getSession()
   if (!user) redirect('/login')
 
-  const [ctx, { logs, totals }, recipes] = await Promise.all([
-    getHealthContext(supabase, user.id),
+  const yesterday = shiftDate(date, -1)
+  const [ctx, { logs, totals }, recipes, recents, { logs: prevLogs }] = await Promise.all([
+    getHealthContext(supabase, user.id, date),
     getDayLogs(supabase, user.id, date),
     getPickableRecipes(supabase, user.id),
+    getRecentEntries(supabase, user.id, date),
+    getDayLogs(supabase, user.id, yesterday),
   ])
 
   const isToday = date === today
@@ -36,7 +40,7 @@ export default async function JournalPage({ searchParams }: Props) {
   return (
     <div className="min-h-svh pb-24">
       <PageHeader title="Journal">
-        <AddEntry date={date} recipes={recipes} defaultOpen={add === '1'} />
+        <AddEntry date={date} recipes={recipes} recents={recents} defaultOpen={add === '1'} defaultScan={scan === '1'} />
       </PageHeader>
 
       <main className="px-4 py-4 max-w-2xl mx-auto space-y-4">
@@ -66,12 +70,15 @@ export default async function JournalPage({ searchParams }: Props) {
                   {MEAL_LABELS[meal]}
                   {entries.length > 0 && <span className="ml-2 font-normal text-muted-foreground tabular-nums">{kcal(meal).toLocaleString('fr-FR')} kcal</span>}
                 </h2>
-                <AddEntry date={date} meal={meal} recipes={recipes} trigger="icon" />
+                <AddEntry date={date} meal={meal} recipes={recipes} recents={recents} trigger="icon" />
               </div>
               {entries.length > 0 ? (
                 <ul className="divide-y">
                   {entries.map((e) => <EntryRow key={e.id} entry={e} />)}
                 </ul>
+              ) : prevLogs.some((l) => l.meal === meal) ? (
+                <CopyMeal from={yesterday} to={date} meal={meal}
+                  summary={prevLogs.filter((l) => l.meal === meal).map((l) => l.label).join(', ')} />
               ) : (
                 <p className="text-xs text-muted-foreground pb-1">Rien pour l&apos;instant.</p>
               )}
