@@ -75,6 +75,18 @@ export function toGrams(
 
 // ── Lecture Ciqual ───────────────────────────────────────────────────────────
 
+/**
+ * Quand Ciqual ne donne pas l'énergie d'un aliment, on l'estime à partir des
+ * macronutriments avec les coefficients du règlement UE 1169/2011 (annexe XIV) :
+ * protéines 4, glucides 4, lipides 9, fibres 2 kcal/g. Null si aucune macro connue.
+ */
+export function estimateKcal(row: { proteins_g?: unknown; carbs_g?: unknown; fat_g?: unknown; fiber_g?: unknown }): number | null {
+  const vals = [row.proteins_g, row.carbs_g, row.fat_g, row.fiber_g]
+  if (vals.every((v) => v == null)) return null
+  const n = (v: unknown) => Number(v ?? 0) || 0
+  return Math.round(4 * n(row.proteins_g) + 4 * n(row.carbs_g) + 9 * n(row.fat_g) + 2 * n(row.fiber_g))
+}
+
 const COLS = NUTRIENT_KEYS.join(',')
 
 export async function fetchCiqual(
@@ -91,6 +103,7 @@ export async function fetchCiqual(
   for (const row of (data ?? []) as unknown as Array<Record<string, unknown>>) {
     const per100 = zero()
     for (const k of NUTRIENT_KEYS) per100[k] = Number(row[k] ?? 0) || 0
+    if (row.energy_kcal == null) per100.energy_kcal = estimateKcal(row) ?? 0
     map.set(String(row.ciqual_code), { name: String(row.name_fr), per100 })
   }
   return map

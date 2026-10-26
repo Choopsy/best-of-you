@@ -99,11 +99,13 @@ export function IngredientAutocomplete({
         </span>
       )}
       {open && suggestions.length > 0 && (
-        <ul className="absolute left-0 right-0 top-full z-50 mt-1 min-w-64 rounded-xl border bg-popover shadow-lg overflow-hidden text-sm">
+        <ul role="listbox" aria-label="Aliments Ciqual" className="absolute left-0 right-0 top-full z-50 mt-1 min-w-64 rounded-xl border bg-popover shadow-lg overflow-hidden text-sm">
           {suggestions.map((s, i) => (
             <li key={s.code}>
               <button
                 type="button"
+                role="option"
+                aria-selected={i === activeIndex}
                 onMouseDown={(e) => { e.preventDefault(); select(s) }}
                 className={`w-full text-left px-3 py-2 transition-colors flex items-baseline justify-between gap-3 ${
                   i === activeIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'

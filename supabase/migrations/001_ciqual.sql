@@ -1,3 +1,7 @@
+-- ⚠ ATTENTION : ce fichier a été généré par l'ancienne version du script, qui tronquait
+-- les décimales (ex. 1,6 g lu comme 1 g). Régénère-le avant de l'importer :
+--   node scripts/import-ciqual.mjs
+
 
 -- ============================================================
 -- Migration CIQUAL 2025 — table canonical_ingredients

@@ -3,11 +3,13 @@
  *
  * Usage : node scripts/import-ciqual.mjs
  * Génère : supabase/migrations/001_ciqual.sql (à coller dans Supabase SQL Editor)
+ * Les teneurs sont lues avec la virgule décimale française (voir parseTeneur).
  */
 
 import { readFileSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
+import { fileURLToPath } from 'url'
 
 // ── Nutriments retenus ──────────────────────────────────────────────────────
 const NUTRIENTS = {
@@ -66,6 +68,25 @@ function parseAlim(xml) {
   return map
 }
 
+/**
+ * Lit une teneur Ciqual. Le fichier utilise la virgule décimale (« 3,3 »),
+ * « traces » et « < 0,5 » (sous la limite de quantification).
+ *  - « 3,3 »    → 3.3
+ *  - « traces » → 0
+ *  - « < 0,5 »  → 0.25 (moitié de la limite : estimation usuelle)
+ *  - « - » ou vide → null (non mesuré)
+ */
+export function parseTeneur(raw) {
+  if (raw == null) return null
+  const v = decodeEntities(String(raw)).trim().toLowerCase()
+  if (v === '' || v === '-') return null
+  if (v.startsWith('traces')) return 0
+  const lessThan = v.startsWith('<')
+  const n = parseFloat(v.replace(/^</, '').trim().replace(',', '.'))
+  if (Number.isNaN(n)) return null
+  return lessThan ? n / 2 : n
+}
+
 function parseCompo(xml, wantedCodes) {
   // compo_code[alim_code][const_code] = teneur
   const data = new Map()
@@ -76,8 +97,7 @@ function parseCompo(xml, wantedCodes) {
     const val   = block.match(/<teneur>\s*([^<]+)\s*<\/teneur>/)?.[1]?.trim()
     if (!alim || !cst || !wantedCodes.has(cst)) continue
     if (!data.has(alim)) data.set(alim, {})
-    const parsed = parseFloat(val)
-    data.get(alim)[cst] = isNaN(parsed) ? null : parsed
+    data.get(alim)[cst] = parseTeneur(val)
   }
   return data
 }
@@ -182,4 +202,6 @@ values
   console.log('   Colle ce fichier dans Supabase > SQL Editor > New query et exécute-le.')
 }
 
-main().catch(console.error)
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  main().catch(console.error)
+}

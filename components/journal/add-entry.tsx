@@ -1,5 +1,6 @@
 'use client'
 
+import { Portal } from '@/components/ui/portal'
 import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, X, Apple, BookOpen, Search, ChefHat } from 'lucide-react'
@@ -92,6 +93,7 @@ export function AddEntry({ date, meal, recipes, defaultOpen = false, recipe, tri
         </Button>
       )}
 
+      <Portal>
       {open && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-start sm:pt-20 justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={close} />
@@ -223,6 +225,7 @@ export function AddEntry({ date, meal, recipes, defaultOpen = false, recipe, tri
           </div>
         </div>
       )}
+      </Portal>
     </>
   )
 }

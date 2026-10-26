@@ -1,6 +1,7 @@
 import { type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import type { FoodSuggestion } from '@/lib/types'
+import { estimateKcal } from '@/lib/nutrition'
 
 
 function normalizeSearch(s: string) {
@@ -20,22 +21,25 @@ export async function GET(request: NextRequest) {
 
   const q = normalizeSearch(raw)
   const supabase = await createClient()
-  const cols = 'ciqual_code, name_fr, energy_kcal, proteins_g'
+  const cols = 'ciqual_code, name_fr, energy_kcal, proteins_g, carbs_g, fat_g, fiber_g'
 
-  // Priorité : commence par la requête, puis contient la requête
+  // Priorité : commence par la requête, puis contient la requête ;
+  // dans chaque groupe, les noms les plus courts (les plus « simples ») d'abord.
   const [{ data: starts }, { data: contains }] = await Promise.all([
     supabase.from('canonical_ingredients').select(cols)
-      .ilike('search_name', `${q}%`).order('search_name').limit(6),
+      .ilike('search_name', `${q}%`).limit(40),
     supabase.from('canonical_ingredients').select(cols)
-      .ilike('search_name', `%${q}%`).not('search_name', 'ilike', `${q}%`).order('search_name').limit(6),
+      .ilike('search_name', `%${q}%`).not('search_name', 'ilike', `${q}%`).limit(40),
   ])
+  const byLength = (a: { name_fr: string }, b: { name_fr: string }) =>
+    a.name_fr.length - b.name_fr.length || a.name_fr.localeCompare(b.name_fr, 'fr')
 
-  const results: FoodSuggestion[] = [...(starts ?? []), ...(contains ?? [])]
+  const results: FoodSuggestion[] = [...(starts ?? []).sort(byLength), ...(contains ?? []).sort(byLength)]
     .slice(0, 8)
     .map((r) => ({
       code: String(r.ciqual_code),
       name: r.name_fr,
-      kcal: r.energy_kcal != null ? Number(r.energy_kcal) : null,
+      kcal: r.energy_kcal != null ? Number(r.energy_kcal) : estimateKcal(r),
       proteins: r.proteins_g != null ? Number(r.proteins_g) : null,
     }))
 

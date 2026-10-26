@@ -1,5 +1,6 @@
 'use client'
 
+import { Portal } from '@/components/ui/portal'
 import { useState, useEffect } from 'react'
 import { Heart, BookmarkPlus, Check, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -159,6 +160,7 @@ export function RecipeActions({ recipeId, initialLiked, userCollections }: Props
       </Button>
 
       {/* Dialog — s'ouvre juste sous la barre du haut */}
+      <Portal>
       {dialogOpen && (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/50" onClick={handleCancel} />
@@ -242,6 +244,7 @@ export function RecipeActions({ recipeId, initialLiked, userCollections }: Props
           </div>
         </div>
       )}
+      </Portal>
     </>
   )
 }

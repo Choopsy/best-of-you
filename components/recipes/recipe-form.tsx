@@ -28,7 +28,7 @@ import { createRecipe, updateRecipe, deleteRecipe } from '@/actions/recipes'
 import { ImagePicker } from '@/components/recipes/image-picker'
 import { IngredientAutocomplete } from '@/components/recipes/ingredient-autocomplete'
 import { UNITS, needsWeight } from '@/lib/nutrition'
-import { VISIBILITY_LABELS } from '@/lib/types'
+import { DIFFICULTY_LABELS, VISIBILITY_LABELS } from '@/lib/types'
 import type { Tag, Collection, RecipeDetail, Difficulty, CreateRecipeInput, RecipeVisibility } from '@/lib/types'
 
 // ── Types locaux ──────────────────────────────────────────────────────────────
@@ -38,6 +38,7 @@ interface GroupRow { id: string; name: string; ingredients: IngRow[] }
 interface StepRow { id: string; content: string; image_url: string; ingredient_local_ids: string[] }
 
 const uid = () => Math.random().toString(36).slice(2)
+const UNIT_ITEMS = Object.fromEntries(UNITS.map((u) => [u, u || '—']))
 
 const emptyIng = (): IngRow => ({ id: uid(), name: '', amount: '', unit: '', ciqual_code: null, weight_g: '' })
 
@@ -290,7 +291,7 @@ export function RecipeForm({ tags, collections, defaultCollectionId, initialData
           </div>
           <div className="space-y-2">
             <Label>Difficulté *</Label>
-            <Select value={difficulty} onValueChange={(v) => setDifficulty(v as Difficulty)}>
+            <Select value={difficulty} onValueChange={(v) => setDifficulty(v as Difficulty)} items={DIFFICULTY_LABELS}>
               <SelectTrigger>
                 <SelectValue placeholder="Choisir..." />
               </SelectTrigger>
@@ -323,7 +324,11 @@ export function RecipeForm({ tags, collections, defaultCollectionId, initialData
         {!initialData && collections.length > 0 && (
           <div className="space-y-2">
             <Label>Ajouter à une collection (facultatif)</Label>
-            <Select value={collectionId} onValueChange={(v) => setCollectionId(v ?? '')}>
+            <Select
+              value={collectionId}
+              onValueChange={(v) => setCollectionId(v ?? '')}
+              items={{ '': 'Aucune', ...Object.fromEntries(collections.map((c) => [c.id, c.name])) }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Aucune" />
               </SelectTrigger>
@@ -410,7 +415,7 @@ export function RecipeForm({ tags, collections, defaultCollectionId, initialData
                     />
                     <Input value={ing.amount} onChange={(e) => setIngField(group.id, ing.id, 'amount', e.target.value)}
                       placeholder="200" className="h-8 text-sm text-center px-1" type="number" min={0} step="any" />
-                    <Select value={ing.unit} onValueChange={(v) => setIngField(group.id, ing.id, 'unit', v ?? '')}>
+                    <Select value={ing.unit} onValueChange={(v) => setIngField(group.id, ing.id, 'unit', v ?? '')} items={UNIT_ITEMS}>
                       <SelectTrigger className="h-8 text-xs px-1">
                         <SelectValue placeholder="—" />
                       </SelectTrigger>

@@ -37,8 +37,10 @@ export function NewItemSheet() {
 
       {/* Sheet */}
       <div
-        className={`fixed left-0 right-0 bottom-0 z-50 bg-background rounded-t-2xl border-t shadow-xl transition-transform duration-300 ease-out ${
-          open ? 'translate-y-0' : 'translate-y-full'
+        aria-hidden={!open}
+        inert={!open}
+        className={`fixed left-0 right-0 bottom-0 z-50 bg-background rounded-t-2xl border-t shadow-xl transition-[translate,visibility] duration-300 ease-out ${
+          open ? 'translate-y-0 visible' : 'translate-y-full invisible'
         }`}
       >
         <div className="px-4 pt-4 pb-8">

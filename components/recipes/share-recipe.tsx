@@ -1,5 +1,6 @@
 'use client'
 
+import { Portal } from '@/components/ui/portal'
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { Share2, Check, User, X } from 'lucide-react'
@@ -36,6 +37,7 @@ export function ShareRecipe({ recipeId, friends, sharedWith }: { recipeId: strin
       <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setOpen(true)} aria-label="Partager avec des amis">
         <Share2 className="h-4 w-4" />
       </Button>
+      <Portal>
       {open && (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
@@ -83,6 +85,7 @@ export function ShareRecipe({ recipeId, friends, sharedWith }: { recipeId: strin
           </div>
         </div>
       )}
+      </Portal>
     </>
   )
 }
