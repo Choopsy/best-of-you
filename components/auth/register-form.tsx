@@ -85,7 +85,7 @@ export function RegisterForm() {
                 <li
                   key={rule.id}
                   className={`flex items-center gap-2 text-xs transition-colors duration-150 ${
-                    ok ? 'text-green-600' : 'text-muted-foreground'
+                    ok ? 'text-sage' : 'text-muted-foreground'
                   }`}
                 >
                   {ok ? (
@@ -115,7 +115,7 @@ export function RegisterForm() {
           className={
             confirm.length > 0
               ? confirmMatches
-                ? 'border-green-500 focus-visible:ring-green-500/20'
+                ? 'border-sage focus-visible:ring-sage/20'
                 : 'border-destructive focus-visible:ring-destructive/20'
               : ''
           }
@@ -123,7 +123,7 @@ export function RegisterForm() {
         {confirm.length > 0 && (
           <p
             className={`flex items-center gap-1.5 text-xs transition-colors duration-150 ${
-              confirmMatches ? 'text-green-600' : 'text-destructive'
+              confirmMatches ? 'text-sage' : 'text-destructive'
             }`}
           >
             {confirmMatches ? (

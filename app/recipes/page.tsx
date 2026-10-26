@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Plus } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/layout/page-header'
 import { RecipeCard } from '@/components/recipes/recipe-card'
@@ -32,8 +32,7 @@ export default async function RecipesPage({ searchParams }: Props) {
   const { tab: rawTab, q, difficulty, tag, all } = await searchParams
   const tab: TabKey = rawTab === 'discover' || rawTab === 'shared' ? rawTab : 'mine'
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getSession()
   if (!user) redirect('/login')
 
   const [{ data: allTags }, { data: health }] = await Promise.all([

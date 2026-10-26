@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth'
 import { getHealthContext } from '@/lib/health'
 import { HealthForm } from '@/components/health/health-form'
 import { Notice } from '@/components/layout/page-header'
@@ -11,8 +11,7 @@ interface Props {
 
 export default async function OnboardingPage({ searchParams }: Props) {
   const { error } = await searchParams
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getSession()
   if (!user) redirect('/login')
 
   const ctx = await getHealthContext(supabase, user.id)

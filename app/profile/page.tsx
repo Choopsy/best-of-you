@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ChevronRight, Target, Users, Library, Heart } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth'
 import { Notice, PageHeader } from '@/components/layout/page-header'
 import { ProfileForm } from '@/components/profile/profile-form'
 import { signOut } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
+import { ThemeSwitcher } from '@/components/theme/theme-switcher'
 
 interface Props {
   searchParams: Promise<{ error?: string; message?: string }>
@@ -13,8 +14,7 @@ interface Props {
 
 export default async function ProfilePage({ searchParams }: Props) {
   const { error, message } = await searchParams
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getSession()
   if (!user) redirect('/login')
 
   const [{ data: profile }, { count: pending }] = await Promise.all([
@@ -35,7 +35,12 @@ export default async function ProfilePage({ searchParams }: Props) {
       <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
         <Notice error={error} message={message} />
 
-        <nav className="rounded-2xl border divide-y overflow-hidden">
+        <section className="space-y-2">
+          <h2 className="text-lg">Apparence</h2>
+          <ThemeSwitcher />
+        </section>
+
+        <nav className="rounded-3xl bg-card divide-y overflow-hidden shadow-[0_1px_0_var(--border)]">
           {links.map(({ href, icon: Icon, label, badge }) => (
             <Link key={href} href={href} className="flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors">
               <Icon className="h-4 w-4 text-primary" />

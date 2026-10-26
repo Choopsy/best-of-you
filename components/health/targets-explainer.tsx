@@ -8,7 +8,7 @@ export function TargetsExplainer({ targets }: { targets: DailyTargets }) {
   return (
     <div className="space-y-4">
       {targets.warnings.map((w) => (
-        <div key={w} className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">{w}</div>
+        <div key={w} className="rounded-xl border border-honey/40 bg-honey/15 px-4 py-3 text-sm">{w}</div>
       ))}
 
       <div className="rounded-2xl border divide-y">

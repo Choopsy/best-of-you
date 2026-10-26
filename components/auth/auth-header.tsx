@@ -20,7 +20,7 @@ export function AuthAlerts({ error, message }: { error?: string; message?: strin
         </div>
       )}
       {message && (
-        <div className="bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-3 rounded-lg">
+        <div className="bg-sage/15 border border-sage/30 text-foreground text-sm px-4 py-3 rounded-lg">
           {message}
         </div>
       )}

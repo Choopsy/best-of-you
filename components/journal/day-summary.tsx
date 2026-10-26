@@ -2,32 +2,33 @@ import Link from 'next/link'
 import { Target } from 'lucide-react'
 import type { DailyTargets } from '@/lib/targets'
 import type { Nutrients } from '@/lib/nutrition'
-
-type Kind = 'goal' | 'min' | 'max'
+import { Ring, ringColor } from './ring'
 
 const f = (v: number) => Math.round(v).toLocaleString('fr-FR')
+const pct = (v: number, t: number) => (t > 0 ? Math.round((v / t) * 100) : 0)
 
-function Bar({ label, value, target, unit, kind, range }: {
-  label: string; value: number; target: number; unit: string; kind: Kind; range?: [number, number]
-}) {
-  const pct = target > 0 ? (value / target) * 100 : 0
-  let color = 'bg-primary'
-  if (kind === 'max') color = pct > 100 ? 'bg-red-500' : pct > 85 ? 'bg-amber-500' : 'bg-emerald-500'
-  if (kind === 'min') color = pct >= 100 ? 'bg-emerald-500' : 'bg-primary'
-  if (kind === 'goal' && pct > 115) color = 'bg-amber-500'
-  const prefix = kind === 'max' ? 'max ' : kind === 'min' ? 'min ' : ''
+function MacroRing({ label, value, target, unit, color }: { label: string; value: number; target: number; unit: string; color: string }) {
   return (
-    <div className="space-y-1">
-      <div className="flex items-baseline justify-between text-xs">
-        <span className="font-medium">{label}</span>
-        <span className="tabular-nums text-muted-foreground">
-          <span className="text-foreground font-medium">{f(value)}</span> / {prefix}{f(target)} {unit}
-          {range && <span className="hidden sm:inline"> (repère {f(range[0])}–{f(range[1])})</span>}
-        </span>
-      </div>
-      <div className="h-2 rounded-full bg-muted overflow-hidden">
-        <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${Math.min(100, pct)}%` }} />
-      </div>
+    <div className="flex flex-col items-center gap-1.5 min-w-0">
+      <Ring value={value} max={target} size={68} stroke={8} color={color} label={`${label} : ${f(value)} sur ${f(target)} ${unit}`}>
+        <span className="text-[13px] font-bold tabular-nums">{pct(value, target)}%</span>
+      </Ring>
+      <span className="text-[13px] font-bold">{label}</span>
+      <span className="text-xs text-muted-foreground tabular-nums">{f(value)} / {f(target)} {unit}</span>
+    </div>
+  )
+}
+
+function LimitRing({ label, value, target, unit, kind }: { label: string; value: number; target: number; unit: string; kind: 'min' | 'max' }) {
+  const word = kind === 'max' ? 'max' : 'min'
+  return (
+    <div className="flex flex-col items-center gap-1 min-w-0">
+      <Ring value={value} max={target} size={52} stroke={6} color={ringColor(kind, value, target)}
+        label={`${label} : ${f(value)} ${unit}, repère ${word} ${f(target)} ${unit}`}>
+        <span className="text-[11px] font-bold tabular-nums">{f(value)}</span>
+      </Ring>
+      <span className="text-xs font-bold text-center leading-tight">{label}</span>
+      <span className="text-[11px] text-muted-foreground tabular-nums">{word} {f(target)} {unit}</span>
     </div>
   )
 }
@@ -35,12 +36,12 @@ function Bar({ label, value, target, unit, kind, range }: {
 export function DaySummary({ totals, targets, compact = false }: { totals: Nutrients; targets: DailyTargets | null; compact?: boolean }) {
   if (!targets) {
     return (
-      <div className="rounded-2xl border bg-card p-4 space-y-3">
+      <div className="rounded-3xl bg-card p-5 space-y-4 shadow-[0_1px_0_var(--border)]">
         <div className="flex items-baseline justify-between">
           <p className="text-sm text-muted-foreground">Consommé aujourd&apos;hui</p>
-          <p className="text-2xl font-bold tabular-nums">{f(totals.energy_kcal)} kcal</p>
+          <p className="font-heading text-3xl tabular-nums">{f(totals.energy_kcal)} kcal</p>
         </div>
-        <Link href="/profile/health" className="flex items-center gap-2 rounded-xl bg-primary/10 px-3 py-2.5 text-sm text-primary font-medium">
+        <Link href="/profile/health" className="flex items-center gap-2 rounded-2xl bg-secondary px-4 py-3 text-sm font-bold text-secondary-foreground">
           <Target className="h-4 w-4" />
           Complète ton profil santé pour voir tes objectifs du jour
         </Link>
@@ -49,39 +50,34 @@ export function DaySummary({ totals, targets, compact = false }: { totals: Nutri
   }
 
   const left = targets.energyKcal - totals.energy_kcal
-  const pct = Math.min(100, (totals.energy_kcal / targets.energyKcal) * 100)
-
   return (
-    <div className="rounded-2xl border bg-card p-4 space-y-4">
-      <div className="space-y-2">
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <p className="text-xs text-muted-foreground">Énergie</p>
-            <p className="text-2xl font-bold tabular-nums leading-tight">
-              {f(totals.energy_kcal)} <span className="text-sm font-normal text-muted-foreground">/ {f(targets.energyKcal)} kcal</span>
-            </p>
-          </div>
-          <p className={`text-sm font-medium tabular-nums ${left < 0 ? 'text-amber-600' : 'text-muted-foreground'}`}>
-            {left >= 0 ? `reste ${f(left)} kcal` : `+${f(-left)} kcal`}
-          </p>
+    <div className="space-y-3">
+      <div className="rounded-3xl bg-card px-5 py-6 flex flex-col items-center gap-5 shadow-[0_1px_0_var(--border)]">
+        <Ring value={totals.energy_kcal} max={targets.energyKcal} size={196} stroke={16}
+          color={ringColor('goal', totals.energy_kcal, targets.energyKcal)}
+          label={`Énergie : ${f(totals.energy_kcal)} sur ${f(targets.energyKcal)} kilocalories`}>
+          <span className="font-heading text-[40px] leading-none tabular-nums">{f(totals.energy_kcal)}</span>
+          <span className="text-[13px] text-muted-foreground mt-1">sur {f(targets.energyKcal)} kcal</span>
+          <span className="mt-2 rounded-full bg-secondary px-3 py-0.5 text-xs font-bold text-secondary-foreground tabular-nums">
+            {left >= 0 ? `reste ${f(left)}` : `+${f(-left)} kcal`}
+          </span>
+        </Ring>
+        <div className="grid w-full grid-cols-3 gap-2">
+          <MacroRing label="Protéines" value={totals.proteins_g} target={targets.proteinsG} unit="g" color="var(--terracotta)" />
+          <MacroRing label="Glucides" value={totals.carbs_g} target={targets.carbsG} unit="g" color="var(--honey)" />
+          <MacroRing label="Lipides" value={totals.fat_g} target={targets.fatG} unit="g" color="var(--sage)" />
         </div>
-        <div className="h-3 rounded-full bg-muted overflow-hidden">
-          <div className={`h-full rounded-full ${left < -0.1 * targets.energyKcal ? 'bg-amber-500' : 'bg-primary'}`} style={{ width: `${pct}%` }} />
-        </div>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Bar label="Protéines" value={totals.proteins_g} target={targets.proteinsG} unit="g" kind="goal" />
-        <Bar label="Glucides" value={totals.carbs_g} target={targets.carbsG} unit="g" kind="goal" range={targets.ranges.carbsG} />
-        <Bar label="Lipides" value={totals.fat_g} target={targets.fatG} unit="g" kind="goal" range={targets.ranges.fatG} />
       </div>
 
       {!compact && (
-        <div className="grid gap-3 sm:grid-cols-2 pt-1 border-t">
-          <div className="pt-3"><Bar label="Fibres" value={totals.fiber_g} target={targets.fiberMinG} unit="g" kind="min" /></div>
-          <div className="sm:pt-3"><Bar label="Sucres" value={totals.sugars_g} target={targets.sugarsMaxG} unit="g" kind="max" /></div>
-          <Bar label="Acides gras saturés" value={totals.saturated_fat_g} target={targets.saturatedFatMaxG} unit="g" kind="max" />
-          <Bar label="Sel" value={totals.salt_g} target={targets.saltMaxG} unit="g" kind="max" />
+        <div className="rounded-3xl bg-card px-4 py-4 shadow-[0_1px_0_var(--border)]">
+          <p className="text-sm font-bold mb-3 px-1">Repères du jour</p>
+          <div className="grid grid-cols-4 gap-2">
+            <LimitRing label="Fibres" value={totals.fiber_g} target={targets.fiberMinG} unit="g" kind="min" />
+            <LimitRing label="Sucres" value={totals.sugars_g} target={targets.sugarsMaxG} unit="g" kind="max" />
+            <LimitRing label="Gras saturés" value={totals.saturated_fat_g} target={targets.saturatedFatMaxG} unit="g" kind="max" />
+            <LimitRing label="Sel" value={totals.salt_g} target={targets.saltMaxG} unit="g" kind="max" />
+          </div>
         </div>
       )}
     </div>

@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Clock, Users, Pencil, ChefHat, User, Globe, Lock } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -27,8 +27,7 @@ interface Props {
 export default async function RecipeDetailPage({ params, searchParams }: Props) {
   const { id } = await params
   const { from } = await searchParams
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getSession()
   if (!user) redirect('/login')
 
   const [recipe, { data: likeRow }, { data: userCols }, { data: reviewsData }, ctx] = await Promise.all([

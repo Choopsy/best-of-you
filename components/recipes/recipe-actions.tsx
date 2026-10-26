@@ -55,7 +55,8 @@ export function RecipeActions({ recipeId, initialLiked, userCollections }: Props
   const toggleLike = async () => {
     setLikeLoading(true)
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    // Session locale du navigateur : pas d'appel réseau (la base vérifie les droits)
+    const user = (await supabase.auth.getSession()).data.session?.user
     if (!user) { setLikeLoading(false); return }
     if (liked) {
       await supabase.from('recipe_likes').delete().eq('user_id', user.id).eq('recipe_id', recipeId)
@@ -118,7 +119,8 @@ export function RecipeActions({ recipeId, initialLiked, userCollections }: Props
     setCreating(true)
     setCreateError(null)
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    // Session locale du navigateur : pas d'appel réseau (la base vérifie les droits)
+    const user = (await supabase.auth.getSession()).data.session?.user
     if (!user) { setCreating(false); return }
 
     const { data, error } = await supabase

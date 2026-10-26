@@ -27,10 +27,11 @@ export async function proxy(request: NextRequest) {
     },
   )
 
-  // NE PAS mettre de code entre createServerClient et getUser()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // NE PAS mettre de code entre createServerClient et getClaims().
+  // getClaims() rafraîchit la session si besoin (cookies) et vérifie le jeton
+  // localement : pas d'appel au serveur d'authentification à chaque navigation.
+  const { data } = await supabase.auth.getClaims()
+  const user = data?.claims?.sub ?? null
 
   const { pathname } = request.nextUrl
   const isPublic =

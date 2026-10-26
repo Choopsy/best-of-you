@@ -1,13 +1,12 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Plus, Library } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/layout/page-header'
 
 export default async function CollectionsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getSession()
   if (!user) redirect('/login')
 
   const { data } = await supabase

@@ -1,9 +1,8 @@
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth'
 import { NavContent } from './nav-content'
 
 export async function AppNav() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getSession()
   if (!user) return null
 
   const [{ data: profile }, { count: pendingCount }] = await Promise.all([

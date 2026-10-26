@@ -1,15 +1,14 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Heart } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/layout/page-header'
 import { RecipeCard } from '@/components/recipes/recipe-card'
 import { RECIPE_SUMMARY_SELECT, toSummary } from '@/lib/recipes'
 
 export default async function FavoritesPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getSession()
   if (!user) redirect('/login')
 
   const { data: likes } = await supabase

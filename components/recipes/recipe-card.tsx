@@ -10,7 +10,7 @@ export function RecipeCard({ recipe, from, showAuthor = true }: { recipe: Recipe
 
   return (
     <Link href={href} className="group block">
-      <div className="rounded-xl overflow-hidden border bg-card shadow-sm transition-shadow group-hover:shadow-md">
+      <div className="rounded-2xl overflow-hidden bg-card shadow-[0_1px_0_var(--border)] transition-shadow group-hover:shadow-md">
         <div className="aspect-[4/3] relative bg-muted flex items-center justify-center overflow-hidden">
           {recipe.cover_image_url ? (
             <img

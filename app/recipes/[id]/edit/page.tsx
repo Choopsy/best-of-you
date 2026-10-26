@@ -1,5 +1,5 @@
 import { notFound, redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth'
 import { PageHeader } from '@/components/layout/page-header'
 import { RecipeForm } from '@/components/recipes/recipe-form'
 import { loadRecipe } from '@/lib/recipes'
@@ -11,8 +11,7 @@ interface Props {
 
 export default async function EditRecipePage({ params }: Props) {
   const { id } = await params
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getSession()
   if (!user) redirect('/login')
 
   const [recipe, { data: tags }] = await Promise.all([

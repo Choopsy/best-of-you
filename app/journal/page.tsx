@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth'
 import { getHealthContext } from '@/lib/health'
 import { getDayLogs, getPickableRecipes } from '@/lib/journal'
 import { formatDateFr, isISODate, shiftDate, todayISO } from '@/lib/dates'
@@ -21,8 +21,7 @@ export default async function JournalPage({ searchParams }: Props) {
   const today = todayISO()
   const date = isISODate(rawDate) ? rawDate : today
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getSession()
   if (!user) redirect('/login')
 
   const [ctx, { logs, totals }, recipes] = await Promise.all([
@@ -61,7 +60,7 @@ export default async function JournalPage({ searchParams }: Props) {
         {MEALS.map((meal) => {
           const entries = logs.filter((l) => l.meal === meal)
           return (
-            <section key={meal} className="rounded-2xl border bg-card px-4 py-3">
+            <section key={meal} className="rounded-3xl bg-card shadow-[0_1px_0_var(--border)] px-4 py-3">
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-sm">
                   {MEAL_LABELS[meal]}

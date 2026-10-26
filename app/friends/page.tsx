@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft, User, UserCheck, UserPlus, UserX, Clock } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FriendActions } from '@/components/friends/friend-actions'
@@ -11,8 +11,7 @@ interface Props {
 
 export default async function FriendsPage({ searchParams }: Props) {
   const { q } = await searchParams
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getSession()
   if (!user) return null
 
   const { data: friendships } = await supabase
@@ -56,7 +55,7 @@ export default async function FriendsPage({ searchParams }: Props) {
 
   return (
     <div className="min-h-svh pb-8">
-      <header className="sticky top-0 md:top-14 z-10 bg-background/80 backdrop-blur-sm border-b px-2 py-2 flex items-center gap-2">
+      <header className="sticky top-0 md:top-14 z-10 bg-background border-b px-2 py-2 flex items-center gap-2">
         <Link href="/profile">
           <Button variant="ghost" size="icon" className="h-9 w-9">
             <ArrowLeft className="h-4 w-4" />

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSession } from '@/lib/auth'
 import { PageHeader } from '@/components/layout/page-header'
 import { RecipeForm } from '@/components/recipes/recipe-form'
 import type { Tag, Collection } from '@/lib/types'
@@ -10,8 +10,7 @@ interface Props {
 
 export default async function NewRecipePage({ searchParams }: Props) {
   const { collection } = await searchParams
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getSession()
   if (!user) redirect('/login')
 
   const [{ data: tags }, { data: collections }] = await Promise.all([

@@ -94,8 +94,8 @@ export function IngredientAutocomplete({
           title={linked ? 'Aliment Ciqual : compté dans la nutrition' : 'Choisis un aliment dans la liste pour le compter dans la nutrition'}
         >
           {linked
-            ? <CircleCheck className="h-3.5 w-3.5 text-green-600" />
-            : <CircleAlert className="h-3.5 w-3.5 text-amber-500" />}
+            ? <CircleCheck className="h-3.5 w-3.5 text-sage" />
+            : <CircleAlert className="h-3.5 w-3.5 text-honey" />}
         </span>
       )}
       {open && suggestions.length > 0 && (

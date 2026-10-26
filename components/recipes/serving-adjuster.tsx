@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Minus, Plus, Utensils } from 'lucide-react'
+import { Minus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 import type { IngredientGroup } from '@/lib/types'
 
 function fmt(value: number): string {
@@ -47,39 +46,24 @@ export function ServingAdjuster({ baseServings, groups }: Props) {
         </div>
       </div>
 
-      <div className="space-y-4">
-        {groups.map((group, gi) => (
-          <div key={group.id}>
-            {gi > 0 && <Separator className="mb-4" />}
+      <div className="space-y-3">
+        {groups.map((group) => (
+          <div key={group.id} className="rounded-3xl bg-card px-4 py-1 shadow-[0_1px_0_var(--border)]">
             {group.name && (
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">
-                {group.name}
-              </p>
+              <p className="pt-3 pb-1 text-xs font-bold uppercase tracking-wide text-muted-foreground">{group.name}</p>
             )}
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            <ul className="divide-y">
               {group.ingredients.map((ing) => {
                 const qty = ing.amount != null ? fmt(ing.amount * ratio) : null
                 const label = [qty, ing.unit].filter(Boolean).join(' ')
                 return (
-                  <div
-                    key={ing.id}
-                    className="flex flex-col items-center gap-1.5 rounded-xl border bg-card p-2 text-center"
-                  >
-                    <div className="w-full aspect-square rounded-lg bg-muted flex items-center justify-center">
-                      <Utensils className="h-5 w-5 text-muted-foreground/30" />
-                    </div>
-                    <p className="text-xs font-medium leading-tight line-clamp-2 w-full">
-                      {ing.name}
-                    </p>
-                    {label && (
-                      <p className="text-xs text-muted-foreground tabular-nums">
-                        {label}
-                      </p>
-                    )}
-                  </div>
+                  <li key={ing.id} className="flex items-baseline justify-between gap-3 py-2.5 text-[15px]">
+                    <span className="min-w-0">{ing.name}</span>
+                    {label && <span className="shrink-0 text-muted-foreground tabular-nums">{label}</span>}
+                  </li>
                 )
               })}
-            </div>
+            </ul>
           </div>
         ))}
       </div>

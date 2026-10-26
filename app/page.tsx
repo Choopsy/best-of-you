@@ -1,28 +1,34 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowRight, BookOpen, NotebookPen, Scale, Leaf } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
-import { signOut } from '@/actions/auth'
-import { Button } from '@/components/ui/button'
+import { ArrowRight, Plus, User } from 'lucide-react'
+import { getSession } from '@/lib/auth'
 import { DaySummary } from '@/components/journal/day-summary'
+import { WeekRings } from '@/components/journal/week-rings'
 import { RecipeCard } from '@/components/recipes/recipe-card'
 import { getHealthContext } from '@/lib/health'
-import { getDayLogs } from '@/lib/journal'
-import { todayISO } from '@/lib/dates'
+import { getDayLogs, getWeekTotals } from '@/lib/journal'
+import { formatDateFr, todayISO } from '@/lib/dates'
 import { RECIPE_SUMMARY_SELECT, toSummary } from '@/lib/recipes'
-import { GOAL_LABELS } from '@/lib/targets'
-import { APP_NAME } from '@/lib/brand'
+import { MEALS, MEAL_LABELS } from '@/lib/types'
+
+const MEAL_TINT: Record<string, string> = {
+  breakfast: 'bg-secondary text-secondary-foreground',
+  lunch: 'bg-sage/15 text-foreground',
+  dinner: 'bg-honey/20 text-foreground',
+  snack: 'bg-muted text-foreground',
+}
+const MEAL_SHORT: Record<string, string> = { breakfast: 'Matin', lunch: 'Midi', dinner: 'Soir', snack: 'Pause' }
 
 export default async function HomePage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await getSession()
   if (!user) redirect('/login')
 
   const today = todayISO()
-  const [ctx, { totals }, { data: profile }, { data: rawRecipes }] = await Promise.all([
+  const [ctx, { logs, totals }, week, { data: profile }, { data: rawRecipes }] = await Promise.all([
     getHealthContext(supabase, user.id),
     getDayLogs(supabase, user.id, today),
-    supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle(),
+    getWeekTotals(supabase, user.id, today),
+    supabase.from('profiles').select('full_name, avatar_url').eq('id', user.id).maybeSingle(),
     supabase.from('recipes').select(RECIPE_SUMMARY_SELECT).eq('author_id', user.id)
       .order('created_at', { ascending: false }).limit(4),
   ])
@@ -32,82 +38,80 @@ export default async function HomePage() {
 
   const firstName = profile?.full_name?.split(' ')[0]
   const recipes = (rawRecipes ?? []).map(toSummary)
-  const target = ctx.health?.target_weight_kg != null ? Number(ctx.health.target_weight_kg) : null
+  const meals = MEALS.map((m) => ({
+    meal: m,
+    items: logs.filter((l) => l.meal === m),
+  })).filter((m) => m.items.length > 0)
 
   return (
-    <div className="min-h-svh pb-24">
-      <header className="md:hidden sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Leaf className="h-5 w-5 text-primary" />
-          <span className="font-bold">{APP_NAME}</span>
+    <main className="px-5 pt-7 pb-6 max-w-xl mx-auto space-y-5">
+      <header className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm text-muted-foreground first-letter:uppercase">{formatDateFr(today)}</p>
+          <h1 className="text-[30px] leading-tight">Bonjour{firstName ? ` ${firstName}` : ''}</h1>
         </div>
-        <form action={signOut}>
-          <Button variant="ghost" size="sm" type="submit" className="text-muted-foreground text-xs">Déconnexion</Button>
-        </form>
+        <Link href="/profile" aria-label="Mon profil" className="md:hidden h-11 w-11 shrink-0 overflow-hidden rounded-full bg-muted flex items-center justify-center">
+          {profile?.avatar_url
+            ? <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+            : <User className="h-5 w-5" />}
+        </Link>
       </header>
 
-      <main className="px-4 py-5 max-w-2xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-xl font-bold">Bonjour{firstName ? ` ${firstName}` : ''} 👋</h1>
-          {ctx.health && (
-            <p className="text-sm text-muted-foreground">Objectif : {GOAL_LABELS[ctx.targets?.effectiveGoal ?? ctx.health.goal].toLowerCase()}</p>
-          )}
-        </div>
+      <WeekRings days={week} target={ctx.targets?.energyKcal ?? null} today={today} />
 
-        <section className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Aujourd&apos;hui</h2>
-            <Link href="/journal" className="text-sm text-muted-foreground flex items-center gap-1 hover:text-foreground">
-              Journal <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-          <DaySummary totals={totals} targets={ctx.targets} compact />
-        </section>
+      <Link href="/journal" className="block" aria-label="Ouvrir le journal du jour">
+        <DaySummary totals={totals} targets={ctx.targets} compact />
+      </Link>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Link href="/journal?add=1" className="rounded-2xl border bg-card p-4 flex items-center gap-3 hover:bg-muted transition-colors">
-            <NotebookPen className="h-5 w-5 text-primary shrink-0" />
-            <span className="text-sm font-medium">Ajouter un repas</span>
-          </Link>
-          <Link href="/recipes/new" className="rounded-2xl border bg-card p-4 flex items-center gap-3 hover:bg-muted transition-colors">
-            <BookOpen className="h-5 w-5 text-primary shrink-0" />
-            <span className="text-sm font-medium">Nouvelle recette</span>
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl">Mes repas</h2>
+          <Link href="/journal?add=1" className="flex items-center gap-1 text-sm font-bold text-primary">
+            <Plus className="h-4 w-4" /> Ajouter
           </Link>
         </div>
-
-        {ctx.weightKg != null && (
-          <Link href="/profile/health" className="rounded-2xl border bg-card p-4 flex items-center gap-3 hover:bg-muted transition-colors">
-            <Scale className="h-5 w-5 text-primary shrink-0" />
-            <div className="flex-1 text-sm">
-              <p className="font-medium">{ctx.weightKg.toLocaleString('fr-FR')} kg</p>
-              <p className="text-xs text-muted-foreground">
-                {target != null
-                  ? `Objectif ${target.toLocaleString('fr-FR')} kg · ${Math.abs(ctx.weightKg - target).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} kg d'écart`
-                  : 'Dernière pesée enregistrée'}
-              </p>
-            </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+        {meals.length === 0 ? (
+          <Link href="/journal?add=1" className="block rounded-2xl border border-dashed border-input px-4 py-5 text-center text-sm text-muted-foreground">
+            Rien de noté aujourd&apos;hui. Ajoute ton premier repas.
           </Link>
+        ) : (
+          <ul className="space-y-2">
+            {meals.flatMap(({ meal, items }) => items.map((l) => (
+              <li key={l.id}>
+                <Link href={l.recipe_id ? `/recipes/${l.recipe_id}` : '/journal'}
+                  className="flex items-center gap-3 rounded-2xl bg-card px-3.5 py-3">
+                  <span className={`flex h-10 w-12 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold ${MEAL_TINT[meal]}`}>
+                    {MEAL_SHORT[meal]}
+                  </span>
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate text-[15px] font-bold">{l.label}</span>
+                    <span className="text-xs text-muted-foreground">{MEAL_LABELS[meal]}</span>
+                  </span>
+                  <span className="text-sm font-bold tabular-nums">{Math.round(Number(l.energy_kcal))} kcal</span>
+                </Link>
+              </li>
+            )))}
+          </ul>
         )}
+      </section>
 
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Mes dernières recettes</h2>
-            <Link href="/recipes" className="text-sm text-muted-foreground flex items-center gap-1 hover:text-foreground">
-              Tout voir <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl">Mes recettes</h2>
+          <Link href="/recipes" className="flex items-center gap-1 text-sm font-bold text-muted-foreground">
+            Tout voir <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+        {recipes.length === 0 ? (
+          <Link href="/recipes/new" className="block rounded-2xl border border-dashed border-input px-4 py-5 text-center text-sm text-muted-foreground">
+            Ajoute ta première recette : ses valeurs nutritionnelles seront calculées automatiquement.
+          </Link>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {recipes.map((r) => <RecipeCard key={r.id} recipe={r} showAuthor={false} from="/" />)}
           </div>
-          {recipes.length === 0 ? (
-            <p className="text-sm text-muted-foreground rounded-2xl border border-dashed px-4 py-6 text-center">
-              Ajoute tes recettes pour suivre leurs valeurs nutritionnelles et les noter dans ton journal en un clic.
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {recipes.map((r) => <RecipeCard key={r.id} recipe={r} showAuthor={false} from="/" />)}
-            </div>
-          )}
-        </section>
-      </main>
-    </div>
+        )}
+      </section>
+    </main>
   )
 }

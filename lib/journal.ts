@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { NUTRIENT_KEYS, sum, zero, type Nutrients } from './nutrition'
 import type { FoodLog, PickableRecipe } from './types'
+import { shiftDate } from './dates'
 
 export async function getDayLogs(supabase: SupabaseClient, userId: string, date: string) {
   const { data } = await supabase
@@ -28,4 +29,21 @@ export async function getPickableRecipes(supabase: SupabaseClient, userId: strin
     if (row.recipes && !seen.has(row.recipes.id)) { list.push(row.recipes); seen.add(row.recipes.id) }
   }
   return list
+}
+
+/** Calories des 7 derniers jours (du plus ancien à aujourd'hui). */
+export async function getWeekTotals(supabase: SupabaseClient, userId: string, today: string) {
+  const from = shiftDate(today, -6)
+  const { data } = await supabase
+    .from('food_logs')
+    .select('eaten_on, energy_kcal')
+    .eq('user_id', userId)
+    .gte('eaten_on', from)
+    .lte('eaten_on', today)
+  const byDay = new Map<string, number>()
+  for (const r of data ?? []) byDay.set(r.eaten_on, (byDay.get(r.eaten_on) ?? 0) + Number(r.energy_kcal))
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = shiftDate(from, i)
+    return { date, kcal: byDay.get(date) ?? 0 }
+  })
 }

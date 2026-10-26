@@ -21,7 +21,8 @@ export function ImagePicker({ value, onChange, aspectRatio = 'video', compact = 
     setError(null)
 
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    // Session locale du navigateur : pas d'appel réseau (la base vérifie les droits)
+    const user = (await supabase.auth.getSession()).data.session?.user
     if (!user) { setError('Session expirée, reconnecte-toi.'); setUploading(false); return }
     const ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
     // Chaque utilisateur écrit dans son propre dossier (règle de sécurité du stockage)
