@@ -44,6 +44,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-10-27 | Bug : caméra bloquée sur « Ouverture » après plusieurs scans ; bouton Réessayer, caméra coupée en arrière-plan | `73a6959` |
 | 2026-10-27 | Migration `005_rgpd.sql` lancée dans Supabase | — |
 | 2026-10-27 | Contact RGPD et région d'hébergement (Irlande) dans la politique | `2f0fc5f` |
 | 2026-10-27 | RGPD : politique de confidentialité, accord santé, export et suppression du compte (migration 005) | `cc8cf27` |
