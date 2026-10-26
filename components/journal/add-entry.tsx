@@ -32,6 +32,9 @@ interface Props {
   trigger?: 'button' | 'icon' | 'wide'
 }
 
+/** Clé stable d'une entrée récente : après un ajout, la liste se rafraîchit et l'entrée change d'id. */
+const recentKey = (r: RecentEntry) => `${r.label}|${r.detail}`
+
 function defaultMealForNow(): Meal {
   const h = new Date().getHours()
   if (h < 10) return 'breakfast'
@@ -92,7 +95,7 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
     setError(null)
     const res = await addAgain({ logId: r.logId, date: day, meal: selectedMeal })
     if (res.error) { setError(res.error); return }
-    setAdded((s) => new Set(s).add(r.logId))
+    setAdded((s) => new Set(s).add(recentKey(r)))
   })
 
   const submit = () => {
@@ -191,9 +194,9 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
               {tab === 'recent' && (
                 <ul className="space-y-1.5">
                   {recents.map((r) => {
-                    const done = added.has(r.logId)
+                    const done = added.has(recentKey(r))
                     return (
-                      <li key={r.logId}>
+                      <li key={recentKey(r)}>
                         <button type="button" disabled={pending || done} onClick={() => addRecent(r)}
                           className="flex w-full min-h-12 items-center gap-3 rounded-2xl bg-background px-3 py-2 text-left">
                           <span className="min-w-0 flex-1">

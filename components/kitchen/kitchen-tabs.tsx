@@ -17,6 +17,7 @@ export function KitchenTabs({ active }: { active: KitchenTab }) {
         <Link
           key={href}
           href={href}
+          prefetch
           aria-current={active === href ? 'page' : undefined}
           className={`flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-xl py-1.5 text-xs font-bold transition-colors sm:flex-row sm:gap-1.5 sm:text-sm ${
             active === href ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
