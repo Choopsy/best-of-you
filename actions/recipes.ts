@@ -17,27 +17,6 @@ export async function createRecipe(input: CreateRecipeInput) {
     { onConflict: 'id', ignoreDuplicates: true },
   )
 
-  let categoryId = input.category_id || null
-  if (!categoryId) {
-    const { data: existing } = await supabase
-      .from('categories')
-      .select('id')
-      .eq('author_id', user.id)
-      .eq('name', 'Mes recettes')
-      .maybeSingle()
-
-    if (existing) {
-      categoryId = existing.id
-    } else {
-      const { data: created } = await supabase
-        .from('categories')
-        .insert({ author_id: user.id, name: 'Mes recettes', visibility: 'private' })
-        .select('id')
-        .single()
-      categoryId = created?.id ?? null
-    }
-  }
-
   const { data: recipe, error } = await supabase
     .from('recipes')
     .insert({
@@ -49,7 +28,7 @@ export async function createRecipe(input: CreateRecipeInput) {
       cook_time_min: input.cook_time_min,
       base_servings: input.base_servings,
       difficulty: input.difficulty,
-      category_id: categoryId,
+      visibility: input.visibility,
     })
     .select('id')
     .single()
@@ -57,6 +36,9 @@ export async function createRecipe(input: CreateRecipeInput) {
   if (error || !recipe) return { error: error?.message ?? 'Erreur lors de la création' }
 
   await insertRelations(supabase, recipe.id, input)
+  if (input.collection_id) {
+    await supabase.from('collection_recipes').insert({ collection_id: input.collection_id, recipe_id: recipe.id })
+  }
   redirect(`/recipes/${recipe.id}`)
 }
 
@@ -77,13 +59,14 @@ export async function updateRecipe(id: string, input: CreateRecipeInput) {
       cook_time_min: input.cook_time_min,
       base_servings: input.base_servings,
       difficulty: input.difficulty,
-      category_id: input.category_id,
+      visibility: input.visibility,
     })
     .eq('id', id)
+    .eq('author_id', user.id)
 
   if (error) return { error: error.message }
 
-  // Supprime et réinsère les relations (approche simple pour un carnet familial)
+  // Supprime et réinsère les relations (approche simple)
   await Promise.all([
     supabase.from('recipe_tags').delete().eq('recipe_id', id),
     supabase.from('ingredient_groups').delete().eq('recipe_id', id), // cascade → ingredients
@@ -98,7 +81,7 @@ export async function deleteRecipe(id: string) {
   const supabase = await createClient()
   const { error } = await supabase.from('recipes').delete().eq('id', id)
   if (error) return { error: error.message }
-  redirect('/')
+  redirect('/recipes')
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -133,10 +116,13 @@ async function insertRelations(
     if (validIngredients.length > 0) {
       const { data: ingRows } = await supabase.from('ingredients').insert(
         validIngredients.map((ing, ii) => ({
+          recipe_id: recipeId,
           group_id: groupRow.id,
           name: ing.name,
-          amount: ing.amount,
+          amount: ing.amount && ing.amount > 0 ? ing.amount : null,
           unit: ing.unit || null,
+          ciqual_code: ing.ciqual_code || null,
+          weight_g: ing.weight_g && ing.weight_g > 0 ? ing.weight_g : null,
           position: ii,
         })),
       ).select('id')

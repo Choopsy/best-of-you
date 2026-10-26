@@ -1,24 +1,24 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Heart, BookmarkPlus, Check, Plus, Globe, Lock } from 'lucide-react'
+import { Heart, BookmarkPlus, Check, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import type { Category } from '@/lib/types'
+import type { Collection } from '@/lib/types'
 
 interface Props {
   recipeId: string
   initialLiked: boolean
-  userCategories: Category[]
+  userCollections: Collection[]
 }
 
-export function RecipeActions({ recipeId, initialLiked, userCategories }: Props) {
+export function RecipeActions({ recipeId, initialLiked, userCollections }: Props) {
   const [liked, setLiked] = useState(initialLiked)
   const [likeLoading, setLikeLoading] = useState(false)
 
-  // Catégories locales (prop + nouvelles créées inline)
-  const [localCategories, setLocalCategories] = useState<Category[]>(userCategories)
+  // Collections locales (prop + nouvelles créées inline)
+  const [localCollections, setLocalCollections] = useState<Collection[]>(userCollections)
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [loadingSaves, setLoadingSaves] = useState(false)
@@ -30,27 +30,26 @@ export function RecipeActions({ recipeId, initialLiked, userCategories }: Props)
   // Formulaire de création inline
   const [showCreate, setShowCreate] = useState(false)
   const [newName, setNewName] = useState('')
-  const [newIsPublic, setNewIsPublic] = useState(false)
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!dialogOpen || localCategories.length === 0) return
+    if (!dialogOpen || localCollections.length === 0) return
     setLoadingSaves(true)
     setSaveError(null)
     const supabase = createClient()
     supabase
-      .from('category_saves')
-      .select('category_id')
+      .from('collection_recipes')
+      .select('collection_id')
       .eq('recipe_id', recipeId)
-      .in('category_id', localCategories.map((c) => c.id))
+      .in('collection_id', localCollections.map((c) => c.id))
       .then(({ data }) => {
-        const ids = new Set(data?.map((d) => d.category_id) ?? [])
+        const ids = new Set(data?.map((d) => d.collection_id) ?? [])
         setSavedIds(ids)
         setPendingIds(new Set(ids))
         setLoadingSaves(false)
       })
-  }, [dialogOpen, recipeId, localCategories])
+  }, [dialogOpen, recipeId, localCollections])
 
   const toggleLike = async () => {
     setLikeLoading(true)
@@ -92,12 +91,12 @@ export function RecipeActions({ recipeId, initialLiked, userCategories }: Props)
     const toRemove = [...savedIds].filter((id) => !pendingIds.has(id))
 
     const ops = [
-      ...toAdd.map((category_id) =>
-        supabase.from('category_saves').insert({ category_id, recipe_id: recipeId }).then((r) => r.error)
+      ...toAdd.map((collection_id) =>
+        supabase.from('collection_recipes').insert({ collection_id, recipe_id: recipeId }).then((r) => r.error)
       ),
-      ...toRemove.map((category_id) =>
-        supabase.from('category_saves').delete()
-          .eq('category_id', category_id).eq('recipe_id', recipeId).then((r) => r.error)
+      ...toRemove.map((collection_id) =>
+        supabase.from('collection_recipes').delete()
+          .eq('collection_id', collection_id).eq('recipe_id', recipeId).then((r) => r.error)
       ),
     ]
 
@@ -113,7 +112,7 @@ export function RecipeActions({ recipeId, initialLiked, userCategories }: Props)
     setSaving(false)
   }
 
-  const handleCreateCategory = async () => {
+  const handleCreateCollection = async () => {
     if (!newName.trim()) return setCreateError('Le nom est obligatoire.')
     setCreating(true)
     setCreateError(null)
@@ -121,27 +120,20 @@ export function RecipeActions({ recipeId, initialLiked, userCategories }: Props)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setCreating(false); return }
 
-    // S'assurer que le profil existe
-    await supabase.from('profiles').upsert(
-      { id: user.id, full_name: user.user_metadata?.full_name ?? null },
-      { onConflict: 'id', ignoreDuplicates: true },
-    )
-
     const { data, error } = await supabase
-      .from('categories')
-      .insert({ author_id: user.id, name: newName.trim(), visibility: 'private' })
-      .select('id, author_id, name, visibility, cover_image_url, created_at')
+      .from('collections')
+      .insert({ owner_id: user.id, name: newName.trim() })
+      .select('id, owner_id, name, cover_image_url, created_at')
       .single()
 
     if (error || !data) {
       setCreateError(error?.message ?? 'Erreur lors de la création.')
     } else {
-      const newCat = data as Category
-      setLocalCategories((prev) => [...prev, newCat])
+      const newCat = data as Collection
+      setLocalCollections((prev) => [...prev, newCat])
       setPendingIds((prev) => new Set([...prev, newCat.id]))
       setShowCreate(false)
       setNewName('')
-      setNewIsPublic(false)
     }
     setCreating(false)
   }
@@ -161,7 +153,7 @@ export function RecipeActions({ recipeId, initialLiked, userCategories }: Props)
       <Button
         variant="ghost" size="icon" className="h-9 w-9"
         onClick={() => setDialogOpen(true)}
-        aria-label="Ajouter à une catégorie"
+        aria-label="Ajouter à une collection"
       >
         <BookmarkPlus className="h-4 w-4" />
       </Button>
@@ -173,18 +165,18 @@ export function RecipeActions({ recipeId, initialLiked, userCategories }: Props)
 
           <div className="absolute inset-x-4 top-14 mx-auto max-w-sm bg-background rounded-2xl shadow-xl overflow-hidden">
             <div className="px-5 pt-5 pb-4 space-y-4">
-              <h3 className="font-semibold text-base">Ajouter à une catégorie</h3>
+              <h3 className="font-semibold text-base">Ajouter à une collection</h3>
 
-              {/* Liste des catégories */}
+              {/* Liste des collections */}
               {loadingSaves ? (
                 <p className="text-sm text-muted-foreground py-4 text-center">Chargement…</p>
-              ) : localCategories.length === 0 && !showCreate ? (
+              ) : localCollections.length === 0 && !showCreate ? (
                 <p className="text-sm text-muted-foreground text-center py-2">
-                  Tu n&apos;as pas encore de catégorie.
+                  Tu n&apos;as pas encore de collection.
                 </p>
               ) : (
                 <ul className="space-y-1 max-h-52 overflow-y-auto -mx-1 px-1">
-                  {localCategories.map((cat) => {
+                  {localCollections.map((cat) => {
                     const selected = pendingIds.has(cat.id)
                     return (
                       <li key={cat.id}>
@@ -197,9 +189,6 @@ export function RecipeActions({ recipeId, initialLiked, userCategories }: Props)
                             {selected && <Check className="h-3 w-3 text-primary-foreground" strokeWidth={3} />}
                           </span>
                           <span className="text-sm font-medium flex-1">{cat.name}</span>
-                          {cat.visibility === 'public'
-                            ? <Globe className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
-                            : <Lock className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />}
                         </button>
                       </li>
                     )
@@ -210,36 +199,20 @@ export function RecipeActions({ recipeId, initialLiked, userCategories }: Props)
               {/* Formulaire de création inline */}
               {showCreate ? (
                 <div className="border rounded-xl p-3 space-y-3">
-                  <p className="text-sm font-medium">Nouvelle catégorie</p>
+                  <p className="text-sm font-medium">Nouvelle collection</p>
                   <Input
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
-                    placeholder="Nom de la catégorie"
-                    onKeyDown={(e) => e.key === 'Enter' && handleCreateCategory()}
+                    placeholder="Nom de la collection"
+                    onKeyDown={(e) => e.key === 'Enter' && handleCreateCollection()}
                     autoFocus
                   />
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setNewIsPublic(false)}
-                      className={`flex items-center justify-center gap-1.5 rounded-lg border py-2 text-xs font-medium transition-colors ${!newIsPublic ? 'border-foreground bg-muted' : 'border-border'}`}
-                    >
-                      <Lock className="h-3.5 w-3.5" /> Privée
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewIsPublic(true)}
-                      className={`flex items-center justify-center gap-1.5 rounded-lg border py-2 text-xs font-medium transition-colors ${newIsPublic ? 'border-foreground bg-muted' : 'border-border'}`}
-                    >
-                      <Globe className="h-3.5 w-3.5" /> Publique
-                    </button>
-                  </div>
                   {createError && <p className="text-xs text-destructive">{createError}</p>}
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" className="flex-1" onClick={() => { setShowCreate(false); setNewName(''); setCreateError(null) }}>
                       Annuler
                     </Button>
-                    <Button size="sm" className="flex-1" onClick={handleCreateCategory} disabled={creating}>
+                    <Button size="sm" className="flex-1" onClick={handleCreateCollection} disabled={creating}>
                       {creating ? 'Création…' : 'Créer'}
                     </Button>
                   </div>
@@ -251,7 +224,7 @@ export function RecipeActions({ recipeId, initialLiked, userCategories }: Props)
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-xl border border-dashed text-sm text-muted-foreground hover:bg-muted transition-colors"
                 >
                   <Plus className="h-4 w-4" />
-                  Nouvelle catégorie
+                  Nouvelle collection
                 </button>
               )}
 

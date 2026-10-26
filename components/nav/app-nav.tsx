@@ -7,7 +7,7 @@ export async function AppNav() {
   if (!user) return null
 
   const [{ data: profile }, { count: pendingCount }] = await Promise.all([
-    supabase.from('profiles').select('full_name, avatar_url').eq('id', user.id).single(),
+    supabase.from('profiles').select('full_name, avatar_url').eq('id', user.id).maybeSingle(),
     supabase
       .from('friendships')
       .select('*', { count: 'exact', head: true })
@@ -15,10 +15,8 @@ export async function AppNav() {
       .eq('status', 'pending'),
   ])
 
-  const isAdmin = user.email === process.env.ADMIN_EMAIL
   return (
     <NavContent
-      isAdmin={isAdmin}
       avatarUrl={profile?.avatar_url ?? null}
       fullName={profile?.full_name ?? null}
       pendingFriendsCount={pendingCount ?? 0}

@@ -21,8 +21,11 @@ export function ImagePicker({ value, onChange, aspectRatio = 'video', compact = 
     setError(null)
 
     const supabase = createClient()
-    const ext = file.name.split('.').pop() ?? 'jpg'
-    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setError('Session expirée, reconnecte-toi.'); setUploading(false); return }
+    const ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
+    // Chaque utilisateur écrit dans son propre dossier (règle de sécurité du stockage)
+    const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
     const { error: uploadError } = await supabase.storage
       .from('recipe-images')

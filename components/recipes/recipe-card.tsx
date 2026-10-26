@@ -4,9 +4,9 @@ import { Badge } from '@/components/ui/badge'
 import { DifficultyBadge } from './difficulty-badge'
 import type { RecipeSummary } from '@/lib/types'
 
-export function RecipeCard({ recipe, fromCategoryId }: { recipe: RecipeSummary; fromCategoryId?: string }) {
+export function RecipeCard({ recipe, from, showAuthor = true }: { recipe: RecipeSummary; from?: string; showAuthor?: boolean }) {
   const totalTime = (recipe.prep_time_min ?? 0) + (recipe.cook_time_min ?? 0)
-  const href = fromCategoryId ? `/recipes/${recipe.id}?from=${fromCategoryId}` : `/recipes/${recipe.id}`
+  const href = from ? `/recipes/${recipe.id}?from=${encodeURIComponent(from)}` : `/recipes/${recipe.id}`
 
   return (
     <Link href={href} className="group block">
@@ -65,7 +65,7 @@ export function RecipeCard({ recipe, fromCategoryId }: { recipe: RecipeSummary; 
             )}
           </div>
 
-          {recipe.author && (
+          {showAuthor && recipe.author && (
             <div className="flex items-center gap-1.5 pt-1 border-t">
               {recipe.author.avatar_url ? (
                 <img src={recipe.author.avatar_url} alt="" className="h-4 w-4 rounded-full object-cover" />

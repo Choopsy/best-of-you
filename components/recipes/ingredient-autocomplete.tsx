@@ -1,26 +1,36 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { CircleCheck, CircleAlert } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import type { FoodSuggestion } from '@/lib/types'
 
 interface Props {
   value: string
-  onChange: (value: string) => void
+  ciqualCode: string | null
+  /** code = null quand le texte ne correspond plus à un aliment Ciqual choisi */
+  onChange: (name: string, code: string | null) => void
+  onPick?: (food: FoodSuggestion) => void
   placeholder?: string
   className?: string
+  /** Affiche l'état « lié / non lié » à droite du champ */
+  showStatus?: boolean
+  autoFocus?: boolean
 }
 
-export function IngredientAutocomplete({ value, onChange, placeholder, className }: Props) {
-  const [suggestions, setSuggestions] = useState<string[]>([])
+export function IngredientAutocomplete({
+  value, ciqualCode, onChange, onPick, placeholder, className, showStatus = true, autoFocus,
+}: Props) {
+  const [suggestions, setSuggestions] = useState<FoodSuggestion[]>([])
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const search = useCallback(async (q: string) => {
-    if (q.length < 2) { setSuggestions([]); setOpen(false); return }
+    if (q.trim().length < 2) { setSuggestions([]); setOpen(false); return }
     const res = await fetch(`/api/ingredients/search?q=${encodeURIComponent(q)}`)
-    const data: string[] = await res.json()
+    const data: FoodSuggestion[] = res.ok ? await res.json() : []
     setSuggestions(data)
     setOpen(data.length > 0)
     setActiveIndex(-1)
@@ -28,13 +38,14 @@ export function IngredientAutocomplete({ value, onChange, placeholder, className
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value
-    onChange(v)
+    onChange(v, null)
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => search(v), 220)
   }
 
-  const select = (name: string) => {
-    onChange(name)
+  const select = (food: FoodSuggestion) => {
+    onChange(food.name, food.code)
+    onPick?.(food)
     setSuggestions([])
     setOpen(false)
     setActiveIndex(-1)
@@ -56,17 +67,15 @@ export function IngredientAutocomplete({ value, onChange, placeholder, className
     }
   }
 
-  // Ferme au clic extérieur
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false)
-      }
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
+  const linked = !!ciqualCode
   return (
     <div ref={containerRef} className="relative">
       <Input
@@ -75,21 +84,35 @@ export function IngredientAutocomplete({ value, onChange, placeholder, className
         onKeyDown={handleKeyDown}
         onFocus={() => suggestions.length > 0 && setOpen(true)}
         placeholder={placeholder}
-        className={className}
+        className={`${className ?? ''} ${showStatus ? 'pr-7' : ''}`}
         autoComplete="off"
+        autoFocus={autoFocus}
       />
+      {showStatus && value.trim() && (
+        <span
+          className="absolute right-2 top-1/2 -translate-y-1/2"
+          title={linked ? 'Aliment Ciqual : compté dans la nutrition' : 'Choisis un aliment dans la liste pour le compter dans la nutrition'}
+        >
+          {linked
+            ? <CircleCheck className="h-3.5 w-3.5 text-green-600" />
+            : <CircleAlert className="h-3.5 w-3.5 text-amber-500" />}
+        </span>
+      )}
       {open && suggestions.length > 0 && (
-        <ul className="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border bg-popover shadow-lg overflow-hidden text-sm">
+        <ul className="absolute left-0 right-0 top-full z-50 mt-1 min-w-64 rounded-xl border bg-popover shadow-lg overflow-hidden text-sm">
           {suggestions.map((s, i) => (
-            <li key={s}>
+            <li key={s.code}>
               <button
                 type="button"
                 onMouseDown={(e) => { e.preventDefault(); select(s) }}
-                className={`w-full text-left px-3 py-2 transition-colors truncate ${
+                className={`w-full text-left px-3 py-2 transition-colors flex items-baseline justify-between gap-3 ${
                   i === activeIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'
                 }`}
               >
-                {s}
+                <span className="truncate">{s.name}</span>
+                {s.kcal != null && (
+                  <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">{Math.round(s.kcal)} kcal/100 g</span>
+                )}
               </button>
             </li>
           ))}

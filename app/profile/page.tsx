@@ -1,9 +1,11 @@
-import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { redirect } from 'next/navigation'
+import { ChevronRight, Target, Users, Library, Heart } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { Button } from '@/components/ui/button'
+import { Notice, PageHeader } from '@/components/layout/page-header'
 import { ProfileForm } from '@/components/profile/profile-form'
+import { signOut } from '@/actions/auth'
+import { Button } from '@/components/ui/button'
 
 interface Props {
   searchParams: Promise<{ error?: string; message?: string }>
@@ -13,42 +15,44 @@ export default async function ProfilePage({ searchParams }: Props) {
   const { error, message } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) notFound()
+  if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name, avatar_url')
-    .eq('id', user.id)
-    .single()
+  const [{ data: profile }, { count: pending }] = await Promise.all([
+    supabase.from('profiles').select('full_name, avatar_url').eq('id', user.id).maybeSingle(),
+    supabase.from('friendships').select('*', { count: 'exact', head: true }).eq('addressee_id', user.id).eq('status', 'pending'),
+  ])
+
+  const links = [
+    { href: '/profile/health', icon: Target, label: 'Mes objectifs et mon profil santé' },
+    { href: '/friends', icon: Users, label: 'Amis', badge: pending ?? 0 },
+    { href: '/collections', icon: Library, label: 'Mes collections' },
+    { href: '/favorites', icon: Heart, label: 'Recettes aimées' },
+  ]
 
   return (
-    <div className="min-h-svh pb-8">
-      <header className="sticky top-0 md:top-14 z-10 bg-background/80 backdrop-blur-sm border-b px-2 py-2 flex items-center gap-2">
-        <Link href="/">
-          <Button variant="ghost" size="icon" className="h-9 w-9">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
-        <h1 className="font-semibold">Mon profil</h1>
-      </header>
+    <div className="min-h-svh pb-24">
+      <PageHeader title="Mon profil" />
+      <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
+        <Notice error={error} message={message} />
 
-      <div className="px-4 py-6 max-w-lg mx-auto space-y-4">
-        {error && (
-          <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm px-4 py-3 rounded-lg">
-            {error}
-          </div>
-        )}
-        {message && (
-          <div className="bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-3 rounded-lg">
-            {message}
-          </div>
-        )}
+        <nav className="rounded-2xl border divide-y overflow-hidden">
+          {links.map(({ href, icon: Icon, label, badge }) => (
+            <Link key={href} href={href} className="flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors">
+              <Icon className="h-4 w-4 text-primary" />
+              <span className="flex-1 text-sm font-medium">{label}</span>
+              {badge ? (
+                <span className="min-w-5 h-5 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center px-1.5">{badge}</span>
+              ) : null}
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          ))}
+        </nav>
 
-        <ProfileForm
-          fullName={profile?.full_name ?? ''}
-          email={user.email ?? ''}
-          avatarUrl={profile?.avatar_url ?? ''}
-        />
+        <ProfileForm fullName={profile?.full_name ?? ''} email={user.email ?? ''} avatarUrl={profile?.avatar_url ?? ''} />
+
+        <form action={signOut}>
+          <Button variant="outline" type="submit" className="w-full">Se déconnecter</Button>
+        </form>
       </div>
     </div>
   )

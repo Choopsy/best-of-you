@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppNav } from "@/components/nav/app-nav";
 import "./globals.css";
+import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Lignée Gourmande",
-  description: "Les recettes de la famille",
+  title: APP_NAME,
+  description: APP_TAGLINE,
 };
 
 export default function RootLayout({

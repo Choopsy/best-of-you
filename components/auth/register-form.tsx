@@ -5,6 +5,7 @@ import { Check, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { SubmitButton } from './submit-button'
+import { signUp } from '@/actions/auth'
 
 const RULES = [
   {
@@ -38,7 +39,7 @@ export function RegisterForm() {
   const canSubmit = allRulesValid && confirmMatches
 
   return (
-    <form className="space-y-4">
+    <form action={signUp} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="full_name">Prénom et nom</Label>
         <Input
@@ -47,7 +48,7 @@ export function RegisterForm() {
           type="text"
           autoComplete="name"
           required
-          placeholder="Marie Dupont"
+          placeholder="Camille Martin"
         />
       </div>
 
@@ -59,7 +60,7 @@ export function RegisterForm() {
           type="email"
           autoComplete="email"
           required
-          placeholder="marie@famille.fr"
+          placeholder="toi@exemple.fr"
         />
       </div>
 

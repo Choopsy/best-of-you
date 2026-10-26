@@ -192,3 +192,16 @@ export interface CreateRecipeInput {
   }[]
   steps: { content: string; image_url: string; ingredient_positions: Array<{ gi: number; ii: number }> }[]
 }
+
+export interface FoodSuggestion {
+  code: string
+  name: string
+  kcal: number | null
+  proteins: number | null
+}
+
+export interface PickableRecipe {
+  id: string
+  title: string
+  cover_image_url: string | null
+}

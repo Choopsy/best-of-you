@@ -27,20 +27,24 @@ import {
 import { createRecipe, updateRecipe, deleteRecipe } from '@/actions/recipes'
 import { ImagePicker } from '@/components/recipes/image-picker'
 import { IngredientAutocomplete } from '@/components/recipes/ingredient-autocomplete'
-import type { Tag, Category, RecipeDetail, Difficulty, CreateRecipeInput } from '@/lib/types'
+import { UNITS, needsWeight } from '@/lib/nutrition'
+import { VISIBILITY_LABELS } from '@/lib/types'
+import type { Tag, Collection, RecipeDetail, Difficulty, CreateRecipeInput, RecipeVisibility } from '@/lib/types'
 
 // ── Types locaux ──────────────────────────────────────────────────────────────
 
-interface IngRow { id: string; name: string; amount: string; unit: string }
+interface IngRow { id: string; name: string; amount: string; unit: string; ciqual_code: string | null; weight_g: string }
 interface GroupRow { id: string; name: string; ingredients: IngRow[] }
 interface StepRow { id: string; content: string; image_url: string; ingredient_local_ids: string[] }
 
 const uid = () => Math.random().toString(36).slice(2)
 
+const emptyIng = (): IngRow => ({ id: uid(), name: '', amount: '', unit: '', ciqual_code: null, weight_g: '' })
+
 const emptyGroup = (): GroupRow => ({
   id: uid(),
   name: '',
-  ingredients: [{ id: uid(), name: '', amount: '', unit: '' }],
+  ingredients: [emptyIng()],
 })
 
 const emptyStep = (): StepRow => ({ id: uid(), content: '', image_url: '', ingredient_local_ids: [] })
@@ -58,8 +62,10 @@ function initGroups(data?: RecipeDetail): GroupRow[] {
           name: i.name,
           amount: i.amount != null ? String(i.amount) : '',
           unit: i.unit ?? '',
+          ciqual_code: i.ciqual_code ?? null,
+          weight_g: i.weight_g != null ? String(i.weight_g) : '',
         }))
-      : [{ id: uid(), name: '', amount: '', unit: '' }],
+      : [emptyIng()],
   }))
 }
 
@@ -77,12 +83,12 @@ function initSteps(data?: RecipeDetail): StepRow[] {
 
 interface Props {
   tags: Tag[]
-  categories: Category[]
-  defaultCategoryId?: string | null
+  collections: Collection[]
+  defaultCollectionId?: string | null
   initialData?: RecipeDetail
 }
 
-export function RecipeForm({ tags, categories, defaultCategoryId, initialData }: Props) {
+export function RecipeForm({ tags, collections, defaultCollectionId, initialData }: Props) {
   const [isPending, startTransition] = useTransition()
   const [formError, setFormError] = useState<string | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -95,7 +101,8 @@ export function RecipeForm({ tags, categories, defaultCategoryId, initialData }:
   const [cookTime, setCookTime] = useState(String(initialData?.cook_time_min ?? ''))
   const [servings, setServings] = useState(String(initialData?.base_servings ?? '4'))
   const [difficulty, setDifficulty] = useState<Difficulty | ''>(initialData?.difficulty ?? '')
-  const [categoryId, setCategoryId] = useState<string>(initialData?.category_id ?? defaultCategoryId ?? '')
+  const [collectionId, setCollectionId] = useState<string>(defaultCollectionId ?? '')
+  const [visibility, setVisibility] = useState<RecipeVisibility>(initialData?.visibility ?? 'private')
   const [tagIds, setTagIds] = useState<string[]>(initialData?.tags.map((t) => t.id) ?? [])
 
   // Listes dynamiques
@@ -118,7 +125,7 @@ export function RecipeForm({ tags, categories, defaultCategoryId, initialData }:
     setGroups((gs) =>
       gs.map((g) =>
         g.id === gid
-          ? { ...g, ingredients: [...g.ingredients, { id: uid(), name: '', amount: '', unit: '' }] }
+          ? { ...g, ingredients: [...g.ingredients, emptyIng()] }
           : g,
       ),
     )
@@ -135,7 +142,16 @@ export function RecipeForm({ tags, categories, defaultCategoryId, initialData }:
     })))
   }
 
-  const setIngField = (gid: string, iid: string, field: keyof IngRow, value: string) =>
+  const setIngName = (gid: string, iid: string, name: string, code: string | null) =>
+    setGroups((gs) =>
+      gs.map((g) =>
+        g.id === gid
+          ? { ...g, ingredients: g.ingredients.map((i) => (i.id === iid ? { ...i, name, ciqual_code: code } : i)) }
+          : g,
+      ),
+    )
+
+  const setIngField = (gid: string, iid: string, field: 'amount' | 'unit' | 'weight_g', value: string) =>
     setGroups((gs) =>
       gs.map((g) =>
         g.id === gid
@@ -177,7 +193,8 @@ export function RecipeForm({ tags, categories, defaultCategoryId, initialData }:
       cook_time_min: cookTime ? parseInt(cookTime) : null,
       base_servings: parseInt(servings) || 4,
       difficulty: difficulty as Difficulty,
-      category_id: categoryId || null,
+      visibility,
+      collection_id: collectionId || null,
       tag_ids: tagIds,
       groups: groups.map((g) => ({
         name: g.name.trim(),
@@ -187,6 +204,8 @@ export function RecipeForm({ tags, categories, defaultCategoryId, initialData }:
             name: i.name.trim(),
             amount: i.amount ? parseFloat(i.amount.replace(',', '.')) : null,
             unit: i.unit.trim(),
+            ciqual_code: i.ciqual_code,
+            weight_g: i.weight_g && needsWeight(i.unit) ? parseFloat(i.weight_g.replace(',', '.')) || null : null,
           })),
       })),
       steps: (() => {
@@ -284,27 +303,39 @@ export function RecipeForm({ tags, categories, defaultCategoryId, initialData }:
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Catégorie</Label>
-          {categories.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Tu n&apos;as pas encore de catégorie.{' '}
-              <a href="/categories/new" className="underline underline-offset-4">
-                En créer une
-              </a>
-            </p>
-          ) : (
-            <Select value={categoryId} onValueChange={(v) => setCategoryId(v ?? '')}>
+          <Label>Qui peut voir cette recette ?</Label>
+          <div className="grid grid-cols-3 gap-2">
+            {(Object.keys(VISIBILITY_LABELS) as RecipeVisibility[]).map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setVisibility(v)}
+                className={`rounded-xl border px-2 py-2 text-left transition-colors ${
+                  visibility === v ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:bg-muted'
+                }`}
+              >
+                <p className="text-sm font-medium">{VISIBILITY_LABELS[v].label}</p>
+                <p className="text-[11px] text-muted-foreground">{VISIBILITY_LABELS[v].hint}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+        {!initialData && collections.length > 0 && (
+          <div className="space-y-2">
+            <Label>Ajouter à une collection (facultatif)</Label>
+            <Select value={collectionId} onValueChange={(v) => setCollectionId(v ?? '')}>
               <SelectTrigger>
-                <SelectValue placeholder="Choisir une catégorie..." />
+                <SelectValue placeholder="Aucune" />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((c) => (
+                <SelectItem value="">Aucune</SelectItem>
+                {collections.map((c) => (
                   <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          )}
-        </div>
+          </div>
+        )}
       </section>
 
       {/* Tags */}
@@ -340,6 +371,9 @@ export function RecipeForm({ tags, categories, defaultCategoryId, initialData }:
       {/* Ingrédients */}
       <section className="space-y-3">
         <h2 className="font-semibold text-base">Ingrédients</h2>
+        <p className="text-xs text-muted-foreground -mt-1">
+          Choisis chaque ingrédient dans la liste (base Ciqual) pour qu&apos;il soit compté dans les valeurs nutritionnelles.
+        </p>
         {groups.map((group, gi) => (
           <div key={group.id} className="rounded-lg border p-3 space-y-2">
             <div className="flex items-center gap-2">
@@ -365,29 +399,40 @@ export function RecipeForm({ tags, categories, defaultCategoryId, initialData }:
                 <span />
               </div>
               {group.ingredients.map((ing) => (
-                <div key={ing.id} className="grid grid-cols-[1fr_3.5rem_5rem_2rem] gap-1 items-center">
-                  <IngredientAutocomplete
-                    value={ing.name}
-                    onChange={(v) => setIngField(group.id, ing.id, 'name', v)}
-                    placeholder="Farine"
-                    className="h-8 text-sm"
-                  />
-                  <Input value={ing.amount} onChange={(e) => setIngField(group.id, ing.id, 'amount', e.target.value)}
-                    placeholder="200" className="h-8 text-sm text-center px-1" type="number" min={0} step="any" />
-                  <Select value={ing.unit} onValueChange={(v) => setIngField(group.id, ing.id, 'unit', v ?? '')}>
-                    <SelectTrigger className="h-8 text-xs px-1">
-                      <SelectValue placeholder="—" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {['g','kg','mg','ml','cl','dl','L','c.c','c.s','tasse','verre','pincée','sachet','yaourt','botte','tranche','feuille','gousse','brin',''].map((u) => (
-                        <SelectItem key={u || '__none__'} value={u}>{u || '—'}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button type="button" variant="ghost" size="icon" className="h-8 w-8 hover:text-destructive"
-                    onClick={() => removeIngredient(group.id, ing.id)} disabled={group.ingredients.length === 1}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
+                <div key={ing.id} className="space-y-1">
+                  <div className="grid grid-cols-[1fr_3.5rem_5rem_2rem] gap-1 items-center">
+                    <IngredientAutocomplete
+                      value={ing.name}
+                      ciqualCode={ing.ciqual_code}
+                      onChange={(name, code) => setIngName(group.id, ing.id, name, code)}
+                      placeholder="Farine de blé"
+                      className="h-8 text-sm"
+                    />
+                    <Input value={ing.amount} onChange={(e) => setIngField(group.id, ing.id, 'amount', e.target.value)}
+                      placeholder="200" className="h-8 text-sm text-center px-1" type="number" min={0} step="any" />
+                    <Select value={ing.unit} onValueChange={(v) => setIngField(group.id, ing.id, 'unit', v ?? '')}>
+                      <SelectTrigger className="h-8 text-xs px-1">
+                        <SelectValue placeholder="—" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {UNITS.map((u) => (
+                          <SelectItem key={u || '__none__'} value={u}>{u || '—'}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8 hover:text-destructive"
+                      onClick={() => removeIngredient(group.id, ing.id)} disabled={group.ingredients.length === 1}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                  {ing.name.trim() && ing.ciqual_code && needsWeight(ing.unit) && (
+                    <div className="flex items-center gap-2 pl-1 text-xs text-muted-foreground">
+                      <span>Poids total pour la nutrition :</span>
+                      <Input value={ing.weight_g} onChange={(e) => setIngField(group.id, ing.id, 'weight_g', e.target.value)}
+                        placeholder="≈ 150" className="h-7 w-20 text-xs text-center px-1" type="number" min={0} step="any" />
+                      <span>g</span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
