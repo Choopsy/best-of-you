@@ -13,7 +13,7 @@ const OPTIONS: { value: Theme; label: string; Icon: typeof Sun }[] = [
 
 function readTheme(): Theme {
   const m = document.cookie.match(/(?:^|; )theme=(light|dark|system)/)
-  return (m?.[1] as Theme) ?? 'system'
+  return (m?.[1] as Theme) ?? 'light'
 }
 
 function apply(theme: Theme) {
@@ -23,7 +23,7 @@ function apply(theme: Theme) {
 }
 
 export function ThemeSwitcher() {
-  const [theme, setTheme] = useState<Theme>('system')
+  const [theme, setTheme] = useState<Theme>('light')
 
   useEffect(() => {
     setTheme(readTheme())
