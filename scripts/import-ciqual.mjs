@@ -2,7 +2,7 @@
  * Import CIQUAL 2025 → canonical_ingredients
  *
  * Usage : node scripts/import-ciqual.mjs
- * Génère : scripts/ciqual_migration.sql (à coller dans Supabase SQL Editor)
+ * Génère : supabase/migrations/001_ciqual.sql (à coller dans Supabase SQL Editor)
  */
 
 import { readFileSync, writeFileSync } from 'fs'
@@ -175,7 +175,7 @@ values
 
   const sql = createTable + rows.join(',\n') + '\non conflict (ciqual_code) do nothing;\n'
 
-  const outPath = 'scripts/ciqual_migration.sql'
+  const outPath = 'supabase/migrations/001_ciqual.sql'
   writeFileSync(outPath, sql, 'utf8')
 
   console.log(`✅ ${rows.length} aliments exportés → ${outPath}`)
