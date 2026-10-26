@@ -143,7 +143,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 # Facultatif, affichés dans la politique de confidentialité
 NEXT_PUBLIC_CONTACT_EMAIL=toi@exemple.fr
-NEXT_PUBLIC_DATABASE_REGION=Union européenne (Francfort)
+NEXT_PUBLIC_DATABASE_REGION=Irlande (Union européenne)
 ```
 
 ### 3. Démarrer

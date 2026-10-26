@@ -72,8 +72,9 @@ export default function PrivacyPage() {
           <li><span className="font-bold">Vercel</span> : hébergement du site.</li>
         </ul>
         <p>
-          Ces sociétés sont américaines. Les transferts éventuels hors de l&apos;Union européenne sont encadrés par les clauses contractuelles
-          types de la Commission européenne prévues dans leurs contrats de traitement des données.
+          Ces sociétés sont américaines : même si la base est stockée en Europe, un accès depuis les États-Unis (maintenance, support)
+          reste possible. Ces transferts sont encadrés par les clauses contractuelles types de la Commission européenne, prévues
+          dans leurs contrats de traitement des données.
         </p>
         <p>
           Quand tu scannes un code-barres, seul le code (les chiffres) est envoyé à <span className="font-bold">Open Food Facts</span> pour
