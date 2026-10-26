@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { PlusCircle, BookOpen, FolderPlus, NotebookPen, X } from 'lucide-react'
+import { PlusCircle, BookOpen, FolderPlus, NotebookPen, Refrigerator, X } from 'lucide-react'
 
 export function NewItemSheet() {
   const [open, setOpen] = useState(false)
@@ -53,7 +53,7 @@ export function NewItemSheet() {
             </button>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => go('/journal?add=1')}
@@ -79,6 +79,20 @@ export function NewItemSheet() {
               <div className="text-center">
                 <p className="font-semibold text-sm">Une recette</p>
                 <p className="text-xs text-muted-foreground mt-0.5">À cuisiner</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => go('/frigo?add=1')}
+              className="flex flex-col items-center gap-3 rounded-2xl bg-background px-2 py-5 hover:bg-muted transition-colors"
+            >
+              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10">
+                <Refrigerator className="h-6 w-6 text-primary" />
+              </div>
+              <div className="text-center">
+                <p className="font-semibold text-sm">Au frigo</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Avec sa date</p>
               </div>
             </button>
 

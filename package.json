@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "tsx scripts/test-targets.ts"
+    "test": "tsx scripts/test-targets.ts && tsx scripts/test-shopping.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

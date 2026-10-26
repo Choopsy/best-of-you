@@ -13,6 +13,7 @@ import { RecipeNutrition } from '@/components/recipes/recipe-nutrition'
 import { RecipeReviews } from '@/components/recipes/recipe-reviews'
 import { ShareRecipe, type FriendOption } from '@/components/recipes/share-recipe'
 import { AddEntry } from '@/components/journal/add-entry'
+import { PlanSheet } from '@/components/kitchen/plan-sheet'
 import { calcRecipeNutrition } from '@/lib/nutrition'
 import { getHealthContext } from '@/lib/health'
 import { loadRecipe } from '@/lib/recipes'
@@ -192,6 +193,13 @@ export default async function RecipeDetailPage({ params, searchParams }: Props) 
                 {isOwner && ' Modifie la recette et choisis les ingrédients dans la liste proposée.'}
               </p>
             )}
+            <PlanSheet
+              date={todayISO()}
+              recipes={[]}
+              recipe={{ id: recipe.id, title: recipe.title, cover_image_url: recipe.cover_image_url }}
+              defaultServings={recipe.base_servings ?? 2}
+              trigger="wide"
+            />
             {nutrition && (
               <AddEntry
                 date={todayISO()}

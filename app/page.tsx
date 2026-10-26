@@ -1,12 +1,14 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowRight, Plus, User } from 'lucide-react'
+import { AlarmClock, ArrowRight, ChevronRight, Plus, User } from 'lucide-react'
 import { getSession } from '@/lib/auth'
 import { DaySummary } from '@/components/journal/day-summary'
 import { WeekRings } from '@/components/journal/week-rings'
 import { RecipeCard } from '@/components/recipes/recipe-card'
 import { getHealthContext } from '@/lib/health'
 import { getDayLogs, getWeekTotals } from '@/lib/journal'
+import { getExpiringSoon } from '@/lib/household'
+import { expiryInfo } from '@/components/kitchen/expiry'
 import { formatDateFr, todayISO } from '@/lib/dates'
 import { RECIPE_SUMMARY_SELECT, toSummary } from '@/lib/recipes'
 import { MEALS, MEAL_LABELS } from '@/lib/types'
@@ -24,13 +26,15 @@ export default async function HomePage() {
   if (!user) redirect('/login')
 
   const today = todayISO()
-  const [ctx, { logs, totals }, week, { data: profile }, { data: rawRecipes }] = await Promise.all([
+  const [ctx, { logs, totals }, week, { data: profile }, { data: rawRecipes }, expiring, { count: friendRequests }] = await Promise.all([
     getHealthContext(supabase, user.id),
     getDayLogs(supabase, user.id, today),
     getWeekTotals(supabase, user.id, today),
     supabase.from('profiles').select('full_name, avatar_url').eq('id', user.id).maybeSingle(),
     supabase.from('recipes').select(RECIPE_SUMMARY_SELECT).eq('author_id', user.id)
       .order('created_at', { ascending: false }).limit(4),
+    getExpiringSoon(supabase, today),
+    supabase.from('friendships').select('*', { count: 'exact', head: true }).eq('addressee_id', user.id).eq('status', 'pending'),
   ])
 
   // Première connexion : profil santé jamais rempli
@@ -50,12 +54,31 @@ export default async function HomePage() {
           <p className="text-sm text-muted-foreground first-letter:uppercase">{formatDateFr(today)}</p>
           <h1 className="text-[30px] leading-tight">Bonjour{firstName ? ` ${firstName}` : ''}</h1>
         </div>
-        <Link href="/profile" aria-label="Mon profil" className="md:hidden h-11 w-11 shrink-0 overflow-hidden rounded-full bg-muted flex items-center justify-center">
-          {profile?.avatar_url
-            ? <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
-            : <User className="h-5 w-5" />}
+        <Link href="/profile" aria-label={friendRequests ? 'Mon profil (demandes d\'amis en attente)' : 'Mon profil'} className="md:hidden relative h-11 w-11 shrink-0">
+          <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-muted">
+            {profile?.avatar_url
+              ? <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+              : <User className="h-5 w-5" />}
+          </span>
+          {!!friendRequests && <span className="absolute top-0 right-0 h-3 w-3 rounded-full border-2 border-background bg-red-500" />}
         </Link>
       </header>
+
+      {expiring.length > 0 && (
+        <Link href="/frigo" className="flex items-center gap-3 rounded-3xl bg-honey/20 px-4 py-3.5">
+          <AlarmClock className="h-5 w-5 shrink-0 text-foreground" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15px] font-bold">
+              {expiring.length === 1 ? '1 aliment à consommer vite' : `${expiring.length} aliments à consommer vite`}
+            </span>
+            <span className="block truncate text-sm text-muted-foreground">
+              {expiring.slice(0, 3).map((e) => `${e.name} (${expiryInfo(e.expires_on, today).label.toLowerCase()})`).join(', ')}
+              {expiring.length > 3 ? '…' : ''}
+            </span>
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0" />
+        </Link>
+      )}
 
       <WeekRings days={week} target={ctx.targets?.energyKcal ?? null} today={today} />
 

@@ -20,3 +20,20 @@ export function formatDateFr(iso: string): string {
   return new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })
     .format(new Date(iso + 'T12:00:00Z'))
 }
+
+/** Lundi de la semaine qui contient cette date */
+export function weekStart(iso: string): string {
+  const d = new Date(iso + 'T12:00:00Z')
+  const dow = (d.getUTCDay() + 6) % 7 // lundi = 0
+  return shiftDate(iso, -dow)
+}
+
+/** Nombre de jours entre deux dates (b − a) */
+export function daysBetween(a: string, b: string): number {
+  return Math.round((Date.parse(b + 'T12:00:00Z') - Date.parse(a + 'T12:00:00Z')) / 86400000)
+}
+
+export function formatShortFr(iso: string): string {
+  return new Intl.DateTimeFormat('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })
+    .format(new Date(iso + 'T12:00:00Z'))
+}
