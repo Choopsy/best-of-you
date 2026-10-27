@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Nunito_Sans } from "next/font/google";
 import { AppNav } from "@/components/nav/app-nav";
+import { Splash, SPLASH_SCRIPT } from "@/components/brand/splash";
 import "./globals.css";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 
@@ -45,8 +46,10 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: SPLASH_SCRIPT }} />
       </head>
       <body className="min-h-full flex flex-col">
+        <Splash />
         <AppNav />
         <div className="flex-1 md:pt-14 pb-20 md:pb-0">
           {children}

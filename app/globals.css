@@ -167,3 +167,35 @@
     font-size: 16px !important;
   }
 }
+/* ── Animation d'ouverture (components/brand/splash.tsx) ───────────────────── */
+.splash { display: none; }
+html.splash-on .splash {
+  position: fixed; inset: 0; z-index: 100; display: grid; place-items: center;
+  background: var(--background); pointer-events: none;
+  animation: splash-out .45s ease 1.35s forwards;
+}
+.splash-inner { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 24px; }
+.splash-mark { width: clamp(132px, 34vw, 180px); height: auto; overflow: visible;
+  filter: drop-shadow(0 14px 22px color-mix(in oklab, var(--primary) 18%, transparent)); }
+.splash-part { transform-box: view-box; transform-origin: 100px 100px; opacity: 0;
+  animation: splash-part .6s cubic-bezier(.2,.8,.2,1) forwards; }
+.splash-green { --from: translate(-26px, -22px) rotate(-8deg); animation-delay: .05s; }
+.splash-blue { --from: translate(26px, -22px) rotate(8deg); animation-delay: .15s; }
+.splash-orange { --from: translate(0, 30px) rotate(-4deg); animation-delay: .25s; }
+.splash-seams { opacity: 0; animation: splash-fade .3s ease .55s forwards; }
+.splash-medal { transform-box: view-box; transform-origin: 100px 100px; opacity: 0;
+  animation: splash-pop .45s cubic-bezier(.3,1.4,.5,1) .45s forwards; }
+.splash-leaf { transform-box: view-box; transform-origin: 100px 113px; opacity: 0;
+  animation: splash-leaf .45s ease forwards; }
+.splash-leaf-l { animation-delay: .65s; }
+.splash-leaf-r { animation-delay: .75s; }
+.splash-name { margin: 6px 0 0; font-family: var(--font-heading, var(--font-display)); font-size: clamp(28px, 7vw, 36px);
+  font-weight: 600; color: var(--foreground); opacity: 0; animation: splash-rise .45s ease .6s forwards; }
+.splash-tag { margin: 0; font-size: 14px; color: var(--muted-foreground); opacity: 0; animation: splash-rise .45s ease .75s forwards; }
+
+@keyframes splash-part { from { opacity: 0; transform: var(--from) scale(.85); } to { opacity: 1; transform: none; } }
+@keyframes splash-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+@keyframes splash-leaf { from { opacity: 0; transform: scale(.2) rotate(-25deg); } to { opacity: 1; transform: none; } }
+@keyframes splash-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes splash-fade { to { opacity: 1; } }
+@keyframes splash-out { to { opacity: 0; visibility: hidden; transform: scale(1.02); } }
