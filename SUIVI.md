@@ -11,10 +11,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 ## À faire
 
 ### Mise en ligne
-- [ ] `[Supabase]` Envoi des emails par Gmail (SMTP + mot de passe d'application) : sans SMTP, Supabase n'envoie qu'aux membres de l'organisation
 - [ ] `[Supabase]` Authentication : vérifier que **Confirm email** est activé et que la Site URL est l'adresse du site
-- [ ] `[Supabase]` Email Templates → Confirm signup : `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email&next=/onboarding`
-- [ ] `[Supabase]` Email Templates → Reset password : `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery`
 - [ ] `[RGPD]` Tester la suppression de compte en ligne avec un compte jetable (avec une photo de recette)
 
 ### Données et vie privée
@@ -46,6 +43,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-10-27 | Emails envoyés par Gmail (SMTP) et modèles en français avec liens `token_hash` (marchent sur un autre appareil) | — |
 | 2026-10-27 | Navigation instantanée : site à Dublin près de la base, onglets préchargés ; coche « Récents » qui disparaissait | `3749a74` |
 | 2026-10-27 | Bug : caméra bloquée sur « Ouverture » après plusieurs scans ; bouton Réessayer, caméra coupée en arrière-plan | `73a6959` |
 | 2026-10-27 | Migration `005_rgpd.sql` lancée dans Supabase | — |
