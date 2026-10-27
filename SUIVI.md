@@ -42,6 +42,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-10-27 | Scan fiable : Open Food Facts interrogé depuis le téléphone (limite par IP), Réessayer, double lecture du code | `d234573` |
 | 2026-10-27 | Courses triées par rayon (auto, corrigeable, ordre du magasin) et utilisables hors connexion ; bilan de la semaine | `e8e32af` |
 | 2026-10-27 | Confirmation de l'email activée, Site URL vérifiée | — |
 | 2026-10-27 | Emails envoyés par Gmail (SMTP) et modèles en français avec liens `token_hash` (marchent sur un autre appareil) | — |
