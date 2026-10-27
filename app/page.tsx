@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Activity, AlarmClock, ArrowRight, ChevronRight, Plus, Sparkles, User } from 'lucide-react'
+import { Activity, AlarmClock, ArrowRight, CalendarCheck, ChevronRight, Plus, Sparkles, User } from 'lucide-react'
 import { weekSummary, WHO_WEEKLY_MINUTES } from '@/lib/activities'
 import { getSession } from '@/lib/auth'
 import { DaySummary } from '@/components/journal/day-summary'
@@ -10,7 +10,8 @@ import { getHealthContext } from '@/lib/health'
 import { getDayLogs, getWeekTotals } from '@/lib/journal'
 import { getExpiringSoon } from '@/lib/household'
 import { expiryInfo } from '@/components/kitchen/expiry'
-import { formatDateFr, todayISO, weekStart } from '@/lib/dates'
+import { formatDateFr, shiftDate, todayISO, weekStart } from '@/lib/dates'
+import { getWeekData } from '@/lib/weekly-data'
 import { RECIPE_SUMMARY_SELECT, toSummary } from '@/lib/recipes'
 import { MEALS, MEAL_LABELS } from '@/lib/types'
 
@@ -38,6 +39,9 @@ export default async function HomePage() {
     supabase.from('friendships').select('*', { count: 'exact', head: true }).eq('addressee_id', user.id).eq('status', 'pending'),
     supabase.from('activities').select('done_on, duration_min, met, activity_key').eq('user_id', user.id).gte('done_on', weekStart(today)),
   ])
+  // Le lundi : un résumé de la semaine passée, qui mène au bilan complet
+  const isMonday = new Date(today + 'T12:00:00Z').getUTCDay() === 1
+  const lastWeek = isMonday ? await getWeekData(supabase, user.id, shiftDate(weekStart(today), -7), today, ctx) : null
   const sport = weekSummary((acts ?? []).map((a) => ({ ...a, met: Number(a.met) })))
   const sessionsGoal = ctx.health?.weekly_sessions_goal ?? null
 
@@ -78,6 +82,21 @@ export default async function HomePage() {
             <span className="block truncate text-sm text-muted-foreground">
               {expiring.slice(0, 3).map((e) => `${e.name} (${expiryInfo(e.expires_on, today).label.toLowerCase()})`).join(', ')}
               {expiring.length > 3 ? '…' : ''}
+            </span>
+          </span>
+          <ChevronRight className="h-4 w-4 shrink-0" />
+        </Link>
+      )}
+
+      {lastWeek && (
+        <Link href="/bilan" className="flex items-center gap-3 rounded-3xl bg-card px-4 py-3.5 shadow-[0_1px_0_var(--border)]">
+          <CalendarCheck className="h-5 w-5 shrink-0 text-sage" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15px] font-bold">Ta semaine dernière</span>
+            <span className="block truncate text-sm text-muted-foreground tabular-nums">
+              {lastWeek.review.loggedDays} jour{lastWeek.review.loggedDays > 1 ? 's' : ''} noté{lastWeek.review.loggedDays > 1 ? 's' : ''}
+              {' · '}{lastWeek.review.sessions} séance{lastWeek.review.sessions > 1 ? 's' : ''}
+              {lastWeek.review.avgProtein != null ? ` · ${Math.round(lastWeek.review.avgProtein)} g de protéines / jour` : ''}
             </span>
           </span>
           <ChevronRight className="h-4 w-4 shrink-0" />

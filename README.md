@@ -37,6 +37,7 @@
 - Au choix : ton niveau d'activité inclut déjà ton sport, ou **tes séances s'ajoutent à ton objectif calories du jour**.
 - **Ta semaine en ronds** : séances par rapport à ton objectif, minutes actives (repère OMS de 150 min) et jours de renforcement (2 par semaine).
 - **Courbe de poids** avec une tendance lissée, le rythme par semaine et le poids cible.
+- **Bilan de la semaine** : moyennes sur les jours notés, jours proches de l'objectif, protéines, fibres, sport et poids, comparés à la semaine d'avant, avec une piste concrète. Une carte sur l'accueil le lundi.
 
 ### 🧺 Cuisine du foyer
 - **Frigo** : ce que tu as, avec sa quantité et sa date limite ; les aliments à consommer vite remontent en haut.
@@ -44,6 +45,8 @@
 - **Qu'est-ce qu'on mange ?** : des idées de recettes avec ce qu'il y a au frigo, en priorité celles qui sauvent un aliment qui périme. Avec les ingrédients manquants et les calories par portion.
 - **Semaine** : planifie tes recettes jour par jour, avec le nombre de portions.
 - **Courses** : la liste se calcule à partir de la semaine, **moins ce qu'il y a déjà au frigo** (quantités comparées, unités converties). Coche en magasin, puis « Ranger au frigo ».
+- **Triées par rayon** : chaque article est rangé automatiquement (fruits et légumes, crèmerie, entretien…), corrigeable d'un geste et retenu pour le foyer ; l'ordre des rayons suit ton magasin.
+- **Hors connexion** : la liste s'ouvre même sans réseau en magasin ; les coches et ajouts sont gardés sur le téléphone puis envoyés au retour du réseau.
 - **Foyer partagé** : invite ton ou ta partenaire, et le frigo, le planning et la liste de courses deviennent communs. Les données de santé restent privées.
 
 ### 🔒 Données et vie privée
@@ -100,6 +103,7 @@ app/                   Pages (App Router)
   frigo/ semaine/ courses/ foyer/   Cuisine partagée du foyer
   idees/               « Qu'est-ce qu'on mange ? »
   forme/               Séances, semaine active et courbe de poids
+  bilan/               Bilan de la semaine
   api/products/        Recherche d'un code-barres (Open Food Facts)
   recipes/             Liste, détail, création et mode cuisine des recettes
   profile/health/      Profil santé et explication des objectifs
@@ -113,6 +117,10 @@ lib/
   suggest.ts           Idées de recettes selon le frigo
   activities.ts        Activités, MET et repères OMS
   weight.ts            Tendance du poids
+  aisles.ts            Rayons du magasin et rangement automatique
+  offline-list.ts      Liste de courses hors connexion (file d'attente)
+  weekly.ts            Bilan de la semaine
+public/sw.js           Service worker : liste de courses sans réseau
   auth.ts              Session côté serveur
 supabase/migrations/   Schéma SQL et données Ciqual
 scripts/               Import Ciqual et tests
@@ -130,7 +138,8 @@ scripts/               Import Ciqual et tests
    - `supabase/migrations/002_schema.sql` : les tables, les règles de sécurité et le stockage des photos ;
    - `supabase/migrations/003_foyer.sql` : le foyer partagé, le frigo, le planning et la liste de courses ;
    - `supabase/migrations/004_sport_produits.sql` : les séances de sport et les produits scannés ;
-   - `supabase/migrations/005_rgpd.sql` : l'accord pour les données de santé, son retrait et la suppression du compte.
+   - `supabase/migrations/005_rgpd.sql` : l'accord pour les données de santé, son retrait et la suppression du compte ;
+   - `supabase/migrations/006_rayons.sql` : les rayons des courses (corrections et ordre du magasin).
 3. Dans **Authentication > URL Configuration**, indique `http://localhost:3000` en Site URL et ajoute `http://localhost:3000/auth/callback` aux Redirect URLs.
 
 ### 2. Variables d'environnement
@@ -191,8 +200,8 @@ Le script gère les particularités du format : virgule décimale, « traces »,
 
 ## Tests et sécurité
 
-- `npm test` vérifie le calcul des objectifs (chaque cas recalculé à la main à partir des formules publiées), la liste de courses, les idées de recettes, la dépense des séances et la tendance du poids.
-- **Sécurité de la base (Row Level Security)** : chaque utilisateur ne voit que ses propres données de santé, son poids, son journal et ses collections. Une recette n'est visible que de son auteur, de ses amis (si elle est en mode « amis »), de tout le monde (si elle est publique) ou des amis avec qui elle est partagée. Les membres d'un foyer partagent seulement le frigo, le planning et les courses. Ces règles sont testées dans [`supabase/tests/`](supabase/tests/) (75 vérifications, dont le retrait de l'accord et la suppression d'un compte).
+- `npm test` vérifie le calcul des objectifs (chaque cas recalculé à la main à partir des formules publiées), la liste de courses, les rayons, la liste hors connexion, les idées de recettes, la dépense des séances, la tendance du poids et le bilan de la semaine.
+- **Sécurité de la base (Row Level Security)** : chaque utilisateur ne voit que ses propres données de santé, son poids, son journal et ses collections. Une recette n'est visible que de son auteur, de ses amis (si elle est en mode « amis »), de tout le monde (si elle est publique) ou des amis avec qui elle est partagée. Les membres d'un foyer partagent seulement le frigo, le planning et les courses. Ces règles sont testées dans [`supabase/tests/`](supabase/tests/) (81 vérifications, dont le retrait de l'accord, la suppression d'un compte et les rayons du foyer).
 
 ---
 
@@ -211,6 +220,8 @@ Le détail de ce qui reste à faire et des idées est dans [`SUIVI.md`](SUIVI.md
 - [x] Courbe de poids et poids cible
 - [x] Scan de code-barres, « Récents » et « Comme hier »
 - [x] « Qu'est-ce qu'on mange ? » selon le frigo
+- [x] Courses triées par rayon et utilisables hors connexion
+- [x] Bilan de la semaine
 - [ ] Import de recettes depuis un site
 
 ---

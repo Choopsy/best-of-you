@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { ShoppingBasket } from 'lucide-react'
 import { getSession } from '@/lib/auth'
+import { getHouseholdId } from '@/lib/household'
 import { shiftDate, todayISO, weekStart } from '@/lib/dates'
 import { PageHeader } from '@/components/layout/page-header'
 import { KitchenTabs } from '@/components/kitchen/kitchen-tabs'
@@ -13,12 +14,15 @@ export default async function ShoppingPage() {
 
   const today = todayISO()
   const nextMonday = shiftDate(weekStart(today), 7)
-  const { data } = await supabase
-    .from('shopping_items')
-    .select('id, name, quantity, unit, note, checked')
-    .order('checked')
-    .order('name')
-  const items = (data ?? []) as ShoppingItem[]
+  const householdId = await getHouseholdId(supabase)
+  const [{ data }, { data: overridesRows }, { data: household }] = await Promise.all([
+    supabase.from('shopping_items').select('id, name, quantity, unit, note, checked').order('checked').order('name'),
+    supabase.from('aisle_overrides').select('name_norm, aisle'),
+    supabase.from('households').select('aisle_order').eq('id', householdId ?? '').maybeSingle(),
+  ])
+  const items = (data ?? []).map((i) => ({ ...i, quantity: i.quantity != null ? Number(i.quantity) : null })) as ShoppingItem[]
+  const overrides = Object.fromEntries((overridesRows ?? []).map((o) => [o.name_norm, o.aisle]))
+  const renderedAt = Date.now()
 
   return (
     <div className="min-h-svh pb-24">
@@ -26,16 +30,23 @@ export default async function ShoppingPage() {
       <main className="px-4 py-4 max-w-xl mx-auto space-y-4">
         <KitchenTabs active="/courses" />
 
-        <div className="rounded-3xl bg-card p-4 space-y-3 shadow-[0_1px_0_var(--border)]">
-          <p className="text-sm">
-            La liste reprend les recettes prévues dans <span className="font-bold">Semaine</span> et enlève
-            ce que tu as déjà au <span className="font-bold">Frigo</span>.
-          </p>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <GenerateButton from={today} to={shiftDate(nextMonday, -1)} label="Jusqu'à dimanche" />
-            <GenerateButton from={nextMonday} to={shiftDate(nextMonday, 6)} label="Semaine prochaine" variant="outline" />
+        {/* En magasin, la liste passe d'abord : la génération se replie quand la liste n'est pas vide */}
+        <details open={items.length === 0} className="group rounded-3xl bg-card shadow-[0_1px_0_var(--border)]">
+          <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between px-4 text-sm font-bold">
+            Générer depuis la semaine
+            <span className="text-muted-foreground transition-transform group-open:rotate-180" aria-hidden="true">▾</span>
+          </summary>
+          <div className="px-4 pb-4 space-y-3">
+            <p className="text-sm">
+              La liste reprend les recettes prévues dans <span className="font-bold">Semaine</span> et enlève
+              ce que tu as déjà au <span className="font-bold">Frigo</span>.
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <GenerateButton from={today} to={shiftDate(nextMonday, -1)} label="Jusqu'à dimanche" />
+              <GenerateButton from={nextMonday} to={shiftDate(nextMonday, 6)} label="Semaine prochaine" variant="outline" />
+            </div>
           </div>
-        </div>
+        </details>
 
         {items.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-8 text-center">
@@ -43,7 +54,8 @@ export default async function ShoppingPage() {
             <p className="text-sm text-muted-foreground">Ta liste est vide.</p>
           </div>
         ) : null}
-        <ShoppingList items={items} />
+        <ShoppingList items={items} overrides={overrides} order={household?.aisle_order ?? null}
+          householdId={householdId ?? 'aucun'} renderedAt={renderedAt} />
       </main>
     </div>
   )

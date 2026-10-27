@@ -11,7 +11,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 ## À faire
 
 ### Mise en ligne
-- [ ] `[Supabase]` Authentication : vérifier que **Confirm email** est activé et que la Site URL est l'adresse du site
+- [ ] `[Supabase]` Lancer `supabase/migrations/006_rayons.sql` dans le SQL Editor (avant le push)
 - [ ] `[RGPD]` Tester la suppression de compte en ligne avec un compte jetable (avec une photo de recette)
 
 ### Données et vie privée
@@ -27,10 +27,9 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 ## Idées
 
-- [ ] `[Cuisine]` Courses hors connexion, triées par rayon
-- [ ] `[Journal]` Bilan de la semaine (calories et protéines moyennes, séances, tendance du poids), dans l'appli
 - [ ] `[Journal]` Vitamines et minéraux (fer, calcium, B12, vitamine D) depuis la table Ciqual
 - [ ] `[Cuisine]` Import de recettes depuis un site (projet à part)
+- [ ] `[Cuisine]` Courses : plusieurs magasins avec chacun son ordre de rayons
 - [ ] `[Cuisine]` « Qu'est-ce qu'on mange ? » : compter le sucre et la farine comme placard de base ?
 
 ### Mis de côté
@@ -43,6 +42,8 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-10-27 | Courses triées par rayon (auto, corrigeable, ordre du magasin) et utilisables hors connexion ; bilan de la semaine | `COMMIT` |
+| 2026-10-27 | Confirmation de l'email activée, Site URL vérifiée | — |
 | 2026-10-27 | Emails envoyés par Gmail (SMTP) et modèles en français avec liens `token_hash` (marchent sur un autre appareil) | — |
 | 2026-10-27 | Navigation instantanée : site à Dublin près de la base, onglets préchargés ; coche « Récents » qui disparaissait | `3749a74` |
 | 2026-10-27 | Bug : caméra bloquée sur « Ouverture » après plusieurs scans ; bouton Réessayer, caméra coupée en arrière-plan | `73a6959` |

@@ -6,6 +6,7 @@ import { Home, NotebookPen, Users, User, Leaf, Plus, ChefHat, Activity } from 'l
 import { signOut } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { NewItemSheet } from './new-item-sheet'
+import { ServiceWorker } from '@/components/pwa/service-worker'
 import { APP_NAME } from '@/lib/brand'
 
 interface Props {
@@ -52,6 +53,7 @@ export function NavContent({ avatarUrl, fullName, pendingFriendsCount, kitchenAl
 
   return (
     <>
+      <ServiceWorker />
       {/* ── Ordinateur : barre du haut ── */}
       <nav className="hidden md:flex fixed top-0 left-0 right-0 z-40 h-14 bg-card border-b items-center px-6 gap-4">
         <Link href="/" className="flex items-center gap-2 font-heading text-lg font-semibold shrink-0 mr-2">

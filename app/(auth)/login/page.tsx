@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label'
 import { SubmitButton } from '@/components/auth/submit-button'
 import { AuthAlerts, AuthHeader } from '@/components/auth/auth-header'
 import { APP_TAGLINE } from '@/lib/brand'
+import { ClearOfflineData } from '@/components/pwa/service-worker'
 
 interface Props {
   searchParams: Promise<{ error?: string; message?: string }>
@@ -15,6 +16,7 @@ export default async function LoginPage({ searchParams }: Props) {
 
   return (
     <div className="w-full max-w-sm space-y-8">
+      <ClearOfflineData />
       <AuthHeader subtitle={APP_TAGLINE} />
       <AuthAlerts error={error} message={message} />
 

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Dumbbell, Info } from 'lucide-react'
+import { ChevronRight, Dumbbell, Info } from 'lucide-react'
 import { getSession } from '@/lib/auth'
 import { getHealthContext } from '@/lib/health'
 import { formatShortFr, shiftDate, todayISO, weekStart } from '@/lib/dates'
@@ -86,7 +86,12 @@ export default async function FormePage({ searchParams }: Props) {
       <main className="px-4 py-4 max-w-xl mx-auto space-y-6">
         {/* ── Semaine ── */}
         <section className="space-y-2">
-          <h2 className="text-lg">Cette semaine</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg">Cette semaine</h2>
+            <Link href={`/bilan?semaine=${monday}`} className="flex min-h-10 items-center gap-1 text-sm font-bold text-primary">
+              Bilan complet <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
           <div className="rounded-3xl bg-card px-3 py-5 shadow-[0_1px_0_var(--border)] space-y-4">
             <div className="grid grid-cols-3 gap-2">
               <WeekRing label="Séances" value={summary.sessions} max={sessionsGoal ?? 3} unit="séances"

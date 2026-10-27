@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { getFridge, getHouseholdId } from '@/lib/household'
-import { buildShoppingList, type PlannedRecipe } from '@/lib/shopping'
+import { buildShoppingList, normalizeName, type PlannedRecipe } from '@/lib/shopping'
+import { isAisleKey, resolveOrder } from '@/lib/aisles'
 import { isISODate, todayISO } from '@/lib/dates'
 
 type Result = { error: string | null; count?: number }
@@ -52,15 +53,22 @@ export async function generateShoppingList(from: string, to: string): Promise<Re
   return { error: null, count: lines.length }
 }
 
-export async function addShoppingItem(name: string): Promise<Result> {
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+/**
+ * Ajoute un article. `id` peut être choisi par le téléphone (ajout hors connexion) :
+ * renvoyé deux fois après une coupure, il n'est créé qu'une fois.
+ */
+export async function addShoppingItem(name: string, id?: string): Promise<Result> {
   const supabase = await createClient()
   const label = name.trim()
   if (!label) return { error: 'Indique un article.' }
   if (label.length > 120) return { error: 'Article trop long.' }
+  if (id !== undefined && !UUID.test(id)) return { error: 'Identifiant invalide.' }
   const household_id = await getHouseholdId(supabase)
   if (!household_id) return { error: 'Foyer introuvable.' }
-  const { error } = await supabase.from('shopping_items').insert({ household_id, name: label, source: 'manual' })
-  if (error) return { error: error.message }
+  const { error } = await supabase.from('shopping_items').insert({ ...(id ? { id } : {}), household_id, name: label, source: 'manual' })
+  if (error && error.code !== '23505') return { error: error.message }
   revalidatePath('/courses')
   return { error: null }
 }
@@ -105,6 +113,38 @@ export async function storeCheckedInFridge(): Promise<Result> {
 export async function clearChecked(): Promise<Result> {
   const supabase = await createClient()
   const { error } = await supabase.from('shopping_items').delete().eq('checked', true)
+  if (error) return { error: error.message }
+  revalidatePath('/courses')
+  return { error: null }
+}
+
+/** Range un article dans un autre rayon ; mémorisé pour tout le foyer (« auto » = revenir à la devinette). */
+export async function setItemAisle(name: string, aisle: string): Promise<Result> {
+  const supabase = await createClient()
+  const name_norm = normalizeName(name).slice(0, 120)
+  if (!name_norm) return { error: 'Article invalide.' }
+  const household_id = await getHouseholdId(supabase)
+  if (!household_id) return { error: 'Foyer introuvable.' }
+  if (aisle === 'auto') {
+    const { error } = await supabase.from('aisle_overrides').delete().eq('household_id', household_id).eq('name_norm', name_norm)
+    if (error) return { error: error.message }
+  } else {
+    if (!isAisleKey(aisle)) return { error: 'Rayon inconnu.' }
+    const { error } = await supabase.from('aisle_overrides')
+      .upsert({ household_id, name_norm, aisle, updated_at: new Date().toISOString() }, { onConflict: 'household_id,name_norm' })
+    if (error) return { error: error.message }
+  }
+  revalidatePath('/courses')
+  return { error: null }
+}
+
+/** Ordre des rayons de ton magasin (pour tout le foyer). */
+export async function setAisleOrder(order: string[]): Promise<Result> {
+  const supabase = await createClient()
+  const clean = resolveOrder(order)
+  const household_id = await getHouseholdId(supabase)
+  if (!household_id) return { error: 'Foyer introuvable.' }
+  const { error } = await supabase.from('households').update({ aisle_order: clean }).eq('id', household_id)
   if (error) return { error: error.message }
   revalidatePath('/courses')
   return { error: null }
