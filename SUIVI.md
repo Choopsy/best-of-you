@@ -29,6 +29,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 ## Idées
 
 - [ ] `[Design]` Icône aux couleurs de Dignis (ou garder l'actuelle)
+- [ ] `[Journal]` Plats composés courants à ajouter à la base (tartiflette maison, salades traiteur…) : aujourd'hui Ciqual n'a que des versions industrielles
 - [ ] `[Journal]` Vitamines et minéraux (fer, calcium, B12, vitamine D) depuis la table Ciqual
 - [ ] `[Cuisine]` Import de recettes depuis un site (projet à part)
 - [ ] `[Cuisine]` Courses : plusieurs magasins avec chacun son ordre de rayons
@@ -44,6 +45,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-10-27 | Journal : « Créer un aliment » sans code-barres (plat maison, restaurant) | `db7d58b` |
 | 2026-10-27 | Nouvelle identité : Dignis, « Prends soin de ta valeur. » | `e4349a9` |
 | 2026-10-27 | Animation d'ouverture reprise de l'icône (1,7 s, une fois par lancement) | `c32a0fa` |
 | 2026-10-27 | Scan fiable : Open Food Facts interrogé depuis le téléphone (limite par IP), Réessayer, double lecture du code | `d234573` |
