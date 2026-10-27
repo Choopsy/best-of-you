@@ -66,6 +66,7 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
   const [grams, setGrams] = useState('100')
   const [scanning, setScanning] = useState(defaultScan)
   const [barcode, setBarcode] = useState<string | null>(defaultBarcode ?? null)
+  const [creating, setCreating] = useState(false)
 
   // Recette
   const [query, setQuery] = useState('')
@@ -73,7 +74,7 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
   const [servings, setServings] = useState('1')
 
   const reset = () => {
-    setFoodText(''); setFood(null); setGrams('100'); setBarcode(null); setScanning(false)
+    setFoodText(''); setFood(null); setGrams('100'); setBarcode(null); setScanning(false); setCreating(false)
     setQuery(''); setPicked(recipe ?? null); setServings('1'); setError(null); setAdded(new Set())
     setTab(firstTab)
   }
@@ -124,7 +125,7 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
     { key: 'food', label: 'Aliment', Icon: Apple },
     { key: 'recipe', label: 'Recette', Icon: BookOpen },
   ]
-  const showFooter = !(tab === 'recent') && !(tab === 'food' && barcode)
+  const showFooter = !(tab === 'recent') && !(tab === 'food' && (barcode || creating))
 
   return (
     <>
@@ -218,6 +219,9 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
               {tab === 'food' && (barcode ? (
                 <ScannedProduct barcode={barcode} date={day} meal={selectedMeal} onDone={onScanned}
                   onRescan={() => { setBarcode(null); setScanning(true) }} />
+              ) : creating ? (
+                <ScannedProduct barcode={null} initialName={foodText} date={day} meal={selectedMeal} onDone={onScanned}
+                  onRescan={() => setCreating(false)} />
               ) : (
                 <div className="space-y-3">
                   <Button type="button" variant="outline" className="w-full h-12 rounded-2xl gap-2" onClick={() => setScanning(true)}>
@@ -233,6 +237,10 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
                       placeholder="Ex : yaourt nature, pomme, riz cuit…"
                       includeProducts
                     />
+                    <button type="button" onClick={() => setCreating(true)}
+                      className="min-h-10 text-sm font-bold text-primary underline-offset-2 hover:underline">
+                      Pas dans la liste ? Créer un aliment
+                    </button>
                   </div>
                   <div className="flex items-end gap-3">
                     <div className="space-y-2 w-32">

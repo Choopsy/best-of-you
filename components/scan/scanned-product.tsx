@@ -12,7 +12,10 @@ import type { Meal } from '@/lib/types'
 import { lookupProduct, type ProductLookup } from '@/lib/off'
 
 interface Props {
-  barcode: string
+  /** null = créer un aliment à la main, sans code-barres (plat maison, restaurant…) */
+  barcode: string | null
+  /** Nom proposé quand on crée un aliment (texte déjà tapé dans la recherche) */
+  initialName?: string
   date: string
   meal: Meal
   onDone: () => void
@@ -25,7 +28,7 @@ const emptyPer100 = (): Record<keyof Nutrients, string> =>
 /** Produit scanné : trouvé (Open Food Facts ou déjà enregistré) ou à recopier depuis l'étiquette. */
 const fr = (v: number) => v.toLocaleString('fr-FR', { maximumFractionDigits: 1 })
 
-export function ScannedProduct({ barcode, date, meal, onDone, onRescan }: Props) {
+export function ScannedProduct({ barcode, initialName = '', date, meal, onDone, onRescan }: Props) {
   const [lookup, setLookup] = useState<ProductLookup | null>(null)
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState('')
@@ -38,6 +41,10 @@ export function ScannedProduct({ barcode, date, meal, onDone, onRescan }: Props)
 
   useEffect(() => {
     let cancelled = false
+    if (!barcode) {
+      setLookup({ found: false, barcode: '' }); setEditing(true); setName(initialName)
+      return
+    }
     setLookup(null)
     lookupProduct(barcode).then((data: ProductLookup) => {
       if (cancelled) return
@@ -53,7 +60,7 @@ export function ScannedProduct({ barcode, date, meal, onDone, onRescan }: Props)
       }
     }).catch(() => { if (!cancelled) { setLookup({ found: false, barcode }); setEditing(true) } })
     return () => { cancelled = true }
-  }, [barcode, attempt])
+  }, [barcode, attempt]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const num = (v: string) => Number(v.replace(',', '.')) || 0
   const kcal100 = num(per100.energy_kcal)
@@ -68,7 +75,7 @@ export function ScannedProduct({ barcode, date, meal, onDone, onRescan }: Props)
     // Enregistre (ou met à jour si on a corrigé les valeurs) pour la prochaine fois
     if (!id || editing) {
       const res = await saveProduct({
-        barcode, name, brand: brand || null, image_url: lookup?.image_url ?? null,
+        barcode: barcode || null, name, brand: brand || null, image_url: lookup?.image_url ?? null,
         source: lookup?.source === 'off' ? 'off' : 'manual',
         per100: Object.fromEntries(NUTRIENT_KEYS.map((k) => [k, num(per100[k])])) as Nutrients,
       })
@@ -121,16 +128,18 @@ export function ScannedProduct({ barcode, date, meal, onDone, onRescan }: Props)
       ) : (
         <div className="space-y-3">
           <p className="rounded-2xl bg-secondary px-3 py-2.5 text-sm text-secondary-foreground">
-            {lookup.found
+            {!barcode
+              ? 'Recopie les valeurs pour 100 g (étiquette, site de la marque…). L\'aliment sera enregistré : tu le retrouveras ensuite dans la recherche.'
+              : lookup.found
               ? 'Certaines valeurs manquent : complète-les avec l\'étiquette (pour 100 g).'
               : lookup.error
                 ? 'Recopie l\'étiquette (valeurs pour 100 g) : le produit sera reconnu la prochaine fois.'
                 : 'Produit inconnu d\'Open Food Facts. Recopie l\'étiquette une fois (valeurs pour 100 g) : il sera reconnu la prochaine fois.'}
           </p>
-          <p className="text-xs text-muted-foreground">
+          {barcode && <p className="text-xs text-muted-foreground">
             Code lu : <span className="font-bold tabular-nums">{barcode}</span>. Ce n&apos;est pas celui de l&apos;emballage ?{' '}
             <button type="button" onClick={onRescan} className="underline underline-offset-2">Scanner à nouveau</button>
-          </p>
+          </p>}
           <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2 space-y-1">
               <Label htmlFor="pn">Nom</Label>
@@ -169,7 +178,7 @@ export function ScannedProduct({ barcode, date, meal, onDone, onRescan }: Props)
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       <div className="flex gap-3">
-        <Button variant="outline" className="flex-1" onClick={onRescan} disabled={pending}>Scanner un autre</Button>
+        <Button variant="outline" className="flex-1" onClick={onRescan} disabled={pending}>{barcode ? 'Scanner un autre' : 'Retour'}</Button>
         <Button className="flex-1" onClick={submit} disabled={pending}>{pending ? 'Ajout…' : 'Ajouter'}</Button>
       </div>
       {lookup.source === 'off' && (
