@@ -78,8 +78,8 @@ export default function PrivacyPage() {
           dans leurs contrats de traitement des données.
         </p>
         <p>
-          Quand tu scannes un code-barres, seul le code (les chiffres) est envoyé à <span className="font-bold">Open Food Facts</span> pour
-          trouver le produit, sans aucune donnée personnelle.
+          Quand tu scannes un code-barres, ton téléphone demande directement le produit à <span className="font-bold">Open Food Facts</span> :
+          il reçoit le code (les chiffres) et, comme tout site consulté, l&apos;adresse IP de ta connexion. Aucune autre donnée ne lui est envoyée.
         </p>
       </Section>
 

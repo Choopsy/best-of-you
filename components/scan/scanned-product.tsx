@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
-import { Loader2, Package } from 'lucide-react'
+import { Loader2, Package, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,7 +9,7 @@ import { saveProduct } from '@/actions/products'
 import { addFoodToLog } from '@/actions/journal'
 import { NUTRIENT_KEYS, NUTRIENT_LABELS, type Nutrients } from '@/lib/nutrition'
 import type { Meal } from '@/lib/types'
-import type { ProductLookup } from '@/app/api/products/[barcode]/route'
+import { lookupProduct, type ProductLookup } from '@/lib/off'
 
 interface Props {
   barcode: string
@@ -34,12 +34,15 @@ export function ScannedProduct({ barcode, date, meal, onDone, onRescan }: Props)
   const [grams, setGrams] = useState('100')
   const [error, setError] = useState<string | null>(null)
   const [pending, start] = useTransition()
+  const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
     let cancelled = false
-    fetch(`/api/products/${barcode}`).then((r) => r.json()).then((data: ProductLookup) => {
+    setLookup(null)
+    lookupProduct(barcode).then((data: ProductLookup) => {
       if (cancelled) return
       setLookup(data)
+      if (data.error) return // on propose de réessayer avant la saisie à la main
       if (data.found && data.per100) {
         setName(data.name ?? '')
         setBrand(data.brand ?? '')
@@ -50,7 +53,7 @@ export function ScannedProduct({ barcode, date, meal, onDone, onRescan }: Props)
       }
     }).catch(() => { if (!cancelled) { setLookup({ found: false, barcode }); setEditing(true) } })
     return () => { cancelled = true }
-  }, [barcode])
+  }, [barcode, attempt])
 
   const num = (v: string) => Number(v.replace(',', '.')) || 0
   const kcal100 = num(per100.energy_kcal)
@@ -85,6 +88,21 @@ export function ScannedProduct({ barcode, date, meal, onDone, onRescan }: Props)
     )
   }
 
+  // Open Food Facts ne répond pas : ce n'est pas un produit inconnu, on peut réessayer
+  if (lookup.error && !editing) {
+    return (
+      <div className="space-y-3">
+        <p className="rounded-2xl bg-secondary px-3 py-2.5 text-sm text-secondary-foreground">
+          Open Food Facts ne répond pas pour le moment (code {barcode}). Réessaie dans quelques secondes, ou recopie l&apos;étiquette.
+        </p>
+        <div className="flex gap-3">
+          <Button variant="outline" className="flex-1" onClick={() => setEditing(true)}>Saisir à la main</Button>
+          <Button className="flex-1 gap-1.5" onClick={() => setAttempt((a) => a + 1)}><RotateCcw className="h-4 w-4" /> Réessayer</Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       {lookup.found && !editing ? (
@@ -105,7 +123,13 @@ export function ScannedProduct({ barcode, date, meal, onDone, onRescan }: Props)
           <p className="rounded-2xl bg-secondary px-3 py-2.5 text-sm text-secondary-foreground">
             {lookup.found
               ? 'Certaines valeurs manquent : complète-les avec l\'étiquette (pour 100 g).'
-              : 'Produit inconnu. Recopie l\'étiquette une fois (valeurs pour 100 g) : il sera reconnu la prochaine fois.'}
+              : lookup.error
+                ? 'Recopie l\'étiquette (valeurs pour 100 g) : le produit sera reconnu la prochaine fois.'
+                : 'Produit inconnu d\'Open Food Facts. Recopie l\'étiquette une fois (valeurs pour 100 g) : il sera reconnu la prochaine fois.'}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Code lu : <span className="font-bold tabular-nums">{barcode}</span>. Ce n&apos;est pas celui de l&apos;emballage ?{' '}
+            <button type="button" onClick={onRescan} className="underline underline-offset-2">Scanner à nouveau</button>
           </p>
           <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2 space-y-1">

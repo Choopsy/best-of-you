@@ -75,15 +75,22 @@ export function BarcodeScanner({ onDetected, onClose }: Props) {
         ])
         if (cancelled) return
         const hints = new Map()
-        hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.UPC_E])
+        // Pas d'UPC-E : ce format court se « lit » souvent par erreur dans un bout de code EAN-13
+        hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A])
         const reader = new BrowserMultiFormatReader(hints, { delayBetweenScanAttempts: 120 })
+        // Un code n'est accepté que lu 2 fois de suite à l'identique : évite les lectures partielles
+        let candidate: string | null = null
+        let candidateAt = 0
         const c = await reader.decodeFromVideoElement(video, (result) => {
           if (!result || cancelled) return
+          const text = result.getText()
+          const now = Date.now()
+          if (text !== candidate || now - candidateAt > 1500) { candidate = text; candidateAt = now; return }
           cancelled = true
           clearTimeout(watchdog)
           navigator.vibrate?.(60)
           release()
-          detectedRef.current(result.getText())
+          detectedRef.current(text)
         })
         if (cancelled) { c.stop(); return }
         controls = c

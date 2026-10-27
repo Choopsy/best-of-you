@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, X, Pencil, ScanBarcode } from 'lucide-react'
 import { BarcodeScanner } from '@/components/scan/barcode-scanner'
+import { lookupProduct } from '@/lib/off'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -46,13 +47,12 @@ export function FridgeSheet({ today, item, trigger = 'button', defaultOpen = fal
   const onDetected = async (barcode: string) => {
     setScanning(false); setError(null); setLookup('Recherche du produit…')
     try {
-      const r = await fetch(`/api/products/${barcode}`)
-      const p = await r.json()
+      const p = await lookupProduct(barcode)
       if (p.found && p.name) {
         setName(p.brand ? `${p.name} (${p.brand})` : p.name); setCode(null)
         setLookup(null)
       } else {
-        setLookup('Produit inconnu : écris son nom à la main.')
+        setLookup(p.error ? 'Open Food Facts ne répond pas : écris son nom à la main.' : 'Produit inconnu : écris son nom à la main.')
       }
     } catch {
       setLookup('Pas de connexion : écris son nom à la main.')
