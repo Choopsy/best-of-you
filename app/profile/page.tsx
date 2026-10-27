@@ -7,6 +7,7 @@ import { ProfileForm } from '@/components/profile/profile-form'
 import { signOut } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { ThemeSwitcher } from '@/components/theme/theme-switcher'
+import { APP_MEANING } from '@/lib/brand'
 
 interface Props {
   searchParams: Promise<{ error?: string; message?: string }>
@@ -59,6 +60,8 @@ export default async function ProfilePage({ searchParams }: Props) {
         <form action={signOut}>
           <Button variant="outline" type="submit" className="w-full">Se déconnecter</Button>
         </form>
+
+        <p className="px-4 pt-2 text-center text-xs italic text-muted-foreground">{APP_MEANING}</p>
       </div>
     </div>
   )

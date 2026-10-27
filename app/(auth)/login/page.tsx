@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { SubmitButton } from '@/components/auth/submit-button'
 import { AuthAlerts, AuthHeader } from '@/components/auth/auth-header'
-import { APP_TAGLINE } from '@/lib/brand'
+import { APP_MEANING, APP_SIGNATURE } from '@/lib/brand'
 import { ClearOfflineData } from '@/components/pwa/service-worker'
 
 interface Props {
@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: Props) {
   return (
     <div className="w-full max-w-sm space-y-8">
       <ClearOfflineData />
-      <AuthHeader subtitle={APP_TAGLINE} />
+      <AuthHeader subtitle={APP_SIGNATURE} />
       <AuthAlerts error={error} message={message} />
 
       <form action={signIn} className="space-y-4">
@@ -46,6 +46,7 @@ export default async function LoginPage({ searchParams }: Props) {
       <p className="text-center text-xs text-muted-foreground">
         <Link href="/confidentialite" className="underline underline-offset-4">Confidentialité et données</Link>
       </p>
+      <p className="text-center text-xs italic text-muted-foreground/80 px-4">{APP_MEANING}</p>
     </div>
   )
 }

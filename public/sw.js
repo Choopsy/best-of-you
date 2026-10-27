@@ -1,5 +1,5 @@
 /*
- * Service worker d'Équilibre : seulement pour pouvoir ouvrir la liste de courses
+ * Service worker de Dignis : seulement pour pouvoir ouvrir la liste de courses
  * sans réseau (en magasin). Le reste de l'appli fonctionne normalement en ligne.
  *
  * - /courses : réseau d'abord, copie gardée ; sans réseau, on sert la copie.
@@ -58,7 +58,7 @@ async function storeCourses(res) {
 
 function offlinePage() {
   const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>Hors connexion · Équilibre</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Hors connexion · Dignis</title>
 <style>body{margin:0;min-height:100svh;display:flex;align-items:center;justify-content:center;background:#F6EEE3;color:#3B2A20;font-family:system-ui,sans-serif;padding:24px}
 .c{max-width:360px;text-align:center}h1{font-size:22px;margin:0 0 8px}p{color:#6B5A4E;line-height:1.5}
 a{display:inline-block;margin-top:16px;background:#B9552F;color:#fff;text-decoration:none;padding:14px 22px;border-radius:999px;font-weight:700}

@@ -71,7 +71,7 @@ export async function GET() {
     return new Response(JSON.stringify(body, null, 2), {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
-        'Content-Disposition': `attachment; filename="equilibre-mes-donnees-${todayISO()}.json"`,
+        'Content-Disposition': `attachment; filename="dignis-mes-donnees-${todayISO()}.json"`,
         'Cache-Control': 'no-store',
       },
     })

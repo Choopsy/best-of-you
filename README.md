@@ -1,8 +1,10 @@
-# Équilibre
+# Dignis
 
 **Cuisine perso, nutrition et bien-être — une appli web pensée pour le téléphone.**
 
-Équilibre réunit tes recettes, ce que tu manges et tes objectifs du jour au même endroit. Les objectifs ne sortent pas d'un chapeau : chaque chiffre est calculé à partir de références scientifiques publiées (ANSES, EFSA, OMS…), et l'appli montre d'où il vient.
+> *Prends soin de ta valeur.* — Dignis vient du latin *dignus*, « digne » : tu mérites autant de soin que tu en donnes.
+
+Dignis réunit tes recettes, ce que tu manges et tes objectifs du jour au même endroit. Les objectifs ne sortent pas d'un chapeau : chaque chiffre est calculé à partir de références scientifiques publiées (ANSES, EFSA, OMS…), et l'appli montre d'où il vient.
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-149ECA?logo=react)

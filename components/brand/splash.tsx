@@ -1,4 +1,4 @@
-import { APP_NAME } from '@/lib/brand'
+import { APP_NAME, APP_SIGNATURE } from '@/lib/brand'
 
 /**
  * Animation d'ouverture, reprise de l'icône de l'appli : les trois zones (cuisine,
@@ -40,7 +40,7 @@ export function Splash() {
           </g>
         </svg>
         <p className="splash-name">{APP_NAME}</p>
-        <p className="splash-tag">Mieux manger, bouger, se sentir bien</p>
+        <p className="splash-tag">{APP_SIGNATURE}</p>
       </div>
     </div>
   )

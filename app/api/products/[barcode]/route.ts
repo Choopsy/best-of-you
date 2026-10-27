@@ -8,7 +8,7 @@ export type { ProductLookup }
 
 // Open Food Facts demande d'identifier l'appli : « NomAppli/Version (contact) »
 const OFF_BASE = process.env.OPENFOODFACTS_URL ?? OFF_URL
-const USER_AGENT = `Equilibre/1.0 (${LEGAL.contactEmail})`
+const USER_AGENT = `Dignis/1.0 (${LEGAL.contactEmail})`
 
 export async function GET(req: NextRequest, ctx: { params: Promise<{ barcode: string }> }) {
   const { barcode } = await ctx.params
