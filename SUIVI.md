@@ -11,6 +11,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 ## À faire
 
 ### Mise en ligne
+- [ ] `[Supabase]` Envoi des emails par Gmail (SMTP + mot de passe d'application) : sans SMTP, Supabase n'envoie qu'aux membres de l'organisation
 - [ ] `[Supabase]` Authentication : vérifier que **Confirm email** est activé et que la Site URL est l'adresse du site
 - [ ] `[Supabase]` Email Templates → Confirm signup : `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email&next=/onboarding`
 - [ ] `[Supabase]` Email Templates → Reset password : `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery`
@@ -19,6 +20,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 ### Données et vie privée
 - [ ] `[RGPD]` Télécharger et garder une copie des accords de traitement (DPA) de Supabase et de Vercel
 - [ ] `[RGPD]` Décider si les photos des recettes privées passent dans un stockage privé (aujourd'hui : visibles par qui a le lien)
+- [ ] `[RGPD]` Avant d'ouvrir au-delà des proches : remplacer Gmail par un service d'envoi avec accord de traitement (Brevo ou Resend, nom de domaine)
 - [ ] `[RGPD]` Si l'appli s'ouvre au-delà des proches : refaire le point sur l'analyse d'impact (AIPD) et relire le registre des traitements
 
 ### Protection

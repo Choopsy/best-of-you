@@ -66,10 +66,11 @@ export default function PrivacyPage() {
       </Section>
 
       <Section title="Où sont-elles hébergées ?">
-        <p>Nous faisons appel à deux prestataires, qui traitent les données pour notre compte :</p>
+        <p>Nous faisons appel à trois prestataires, qui traitent les données pour notre compte :</p>
         <ul className="list-disc pl-5 space-y-1">
           <li><span className="font-bold">Supabase</span> : base de données, comptes et photos{LEGAL.databaseRegion ? <>, hébergés en {LEGAL.databaseRegion}</> : null}.</li>
-          <li><span className="font-bold">Vercel</span> : hébergement du site.</li>
+          <li><span className="font-bold">Vercel</span> : hébergement du site, exécuté en Irlande.</li>
+          <li><span className="font-bold">Google (Gmail)</span> : envoi des emails du compte (confirmation de l&apos;inscription, mot de passe oublié). Il reçoit ton adresse email et le contenu de ces messages, dont une copie reste dans la boîte d&apos;envoi du responsable.</li>
         </ul>
         <p>
           Ces sociétés sont américaines : même si la base est stockée en Europe, un accès depuis les États-Unis (maintenance, support)
