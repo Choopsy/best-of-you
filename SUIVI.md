@@ -11,6 +11,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 ## À faire
 
 ### Mise en ligne
+- [ ] `[Supabase]` Emails : remplacer « Équilibre » par « Dignis » dans les deux modèles (Confirm signup, Reset password) et dans le nom d'expéditeur SMTP
 - [ ] `[Supabase]` Lancer `supabase/migrations/006_rayons.sql` dans le SQL Editor (avant le push)
 - [ ] `[RGPD]` Tester la suppression de compte en ligne avec un compte jetable (avec une photo de recette)
 
@@ -27,6 +28,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 ## Idées
 
+- [ ] `[Design]` Icône aux couleurs de Dignis (ou garder l'actuelle)
 - [ ] `[Journal]` Vitamines et minéraux (fer, calcium, B12, vitamine D) depuis la table Ciqual
 - [ ] `[Cuisine]` Import de recettes depuis un site (projet à part)
 - [ ] `[Cuisine]` Courses : plusieurs magasins avec chacun son ordre de rayons
@@ -42,6 +44,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-10-27 | Nouvelle identité : Dignis, « Prends soin de ta valeur. » | `e4349a9` |
 | 2026-10-27 | Animation d'ouverture reprise de l'icône (1,7 s, une fois par lancement) | `c32a0fa` |
 | 2026-10-27 | Scan fiable : Open Food Facts interrogé depuis le téléphone (limite par IP), Réessayer, double lecture du code | `d234573` |
 | 2026-10-27 | Courses triées par rayon (auto, corrigeable, ordre du magasin) et utilisables hors connexion ; bilan de la semaine | `e8e32af` |
