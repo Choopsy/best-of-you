@@ -11,7 +11,7 @@ const f = (v: number) => Math.round(Number(v)).toLocaleString('fr-FR')
 export function EntryRow({ entry }: { entry: FoodLog }) {
   const [pending, start] = useTransition()
   const qty = entry.servings != null
-    ? `${Number(entry.servings).toLocaleString('fr-FR')} portion${Number(entry.servings) > 1 ? 's' : ''}`
+    ? `${Number(entry.servings).toLocaleString('fr-FR')} portion${Number(entry.servings) > 1 ? 's' : ''}${entry.grams != null ? ` (${f(entry.grams)} g)` : ''}`
     : entry.grams != null ? `${f(entry.grams)} g` : ''
 
   const title = entry.recipe_id

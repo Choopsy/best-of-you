@@ -118,7 +118,7 @@ export function IngredientAutocomplete({
                   {s.name}
                 </span>
                 {s.kcal != null && (
-                  <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">{Math.round(s.kcal)} kcal/100 g</span>
+                  <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">{Math.round(s.kcal)} kcal/{s.perPortion ? 'portion' : '100 g'}</span>
                 )}
               </button>
             </li>

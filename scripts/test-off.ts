@@ -19,6 +19,12 @@ await test('Lecture d\'un produit trouvé', () => {
   assert.equal(p.incomplete, false)
 })
 
+await test('Poids d\'une portion repris d\'Open Food Facts (serving_quantity)', () => {
+  const p = parseOff({ ...product, product: { ...product.product, serving_quantity: '125' } }, '5690527000014')
+  assert.equal(p.portionGrams, 125); assert.equal(p.perPortion, false)
+  assert.equal(parseOff(product, '5690527000014').portionGrams, null)
+})
+
 await test('Produit absent : « inconnu », sans erreur ni nouvel essai', async () => {
   const calls = mockFetch(() => respond(404, { status: 0 }))
   const p = await fetchOff('1234567890128')

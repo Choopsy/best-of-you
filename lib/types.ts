@@ -203,6 +203,9 @@ export interface FoodSuggestion {
   kcal: number | null
   proteins: number | null
   kind?: 'ciqual' | 'custom'
+  /** Produits du foyer : kcal pour 1 portion au lieu de 100 g */
+  perPortion?: boolean
+  portionGrams?: number | null
 }
 
 export interface PickableRecipe {

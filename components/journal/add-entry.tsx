@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label'
 import { IngredientAutocomplete } from '@/components/recipes/ingredient-autocomplete'
 import { BarcodeScanner } from '@/components/scan/barcode-scanner'
 import { ScannedProduct } from '@/components/scan/scanned-product'
+import { QuantityField, defaultQty, parseQty } from '@/components/journal/quantity-field'
+import { defaultUnit, type PortionInfo, type QtyUnit } from '@/lib/portions'
 import { addAgain, addFoodToLog, addRecipeToLog } from '@/actions/journal'
 import { MEALS, MEAL_LABELS, type FoodSuggestion, type Meal, type PickableRecipe } from '@/lib/types'
 import type { RecentEntry } from '@/lib/journal'
@@ -64,6 +66,7 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
   const [foodText, setFoodText] = useState('')
   const [food, setFood] = useState<FoodSuggestion | null>(null)
   const [grams, setGrams] = useState('100')
+  const [unit, setUnit] = useState<QtyUnit>('g')
   const [scanning, setScanning] = useState(defaultScan)
   const [barcode, setBarcode] = useState<string | null>(defaultBarcode ?? null)
   const [creating, setCreating] = useState(false)
@@ -74,7 +77,7 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
   const [servings, setServings] = useState('1')
 
   const reset = () => {
-    setFoodText(''); setFood(null); setGrams('100'); setBarcode(null); setScanning(false); setCreating(false)
+    setFoodText(''); setFood(null); setGrams('100'); setUnit('g'); setBarcode(null); setScanning(false); setCreating(false)
     setQuery(''); setPicked(recipe ?? null); setServings('1'); setError(null); setAdded(new Set())
     setTab(firstTab)
   }
@@ -102,12 +105,13 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
   const submit = () => {
     setError(null)
     start(async () => {
-      const g = Number(grams.replace(',', '.'))
+      const amount = parseQty(grams)
+      const qty = unit === 'portion' ? { portions: amount } : { grams: amount }
       const res = tab === 'food'
         ? food
           ? await addFoodToLog(food.kind === 'custom'
-            ? { date: day, meal: selectedMeal, customId: food.code, grams: g }
-            : { date: day, meal: selectedMeal, code: food.code, grams: g })
+            ? { date: day, meal: selectedMeal, customId: food.code, ...qty }
+            : { date: day, meal: selectedMeal, code: food.code, ...qty })
           : { error: 'Choisis un aliment dans la liste, ou scanne-le.' }
         : picked
           ? await addRecipeToLog({ date: day, meal: selectedMeal, recipeId: picked.id, servings: Number(servings.replace(',', '.')) })
@@ -119,7 +123,12 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
   }
 
   const filtered = recipes.filter((r) => r.title.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 30)
-  const kcalPreview = food?.kcal != null ? Math.round((food.kcal * Number(grams.replace(',', '.') || 0)) / 100) : null
+  const portion: PortionInfo = { perPortion: !!food?.perPortion, portionGrams: food?.portionGrams ?? null }
+  const pickFood = (f: FoodSuggestion) => {
+    setFood(f)
+    const u = defaultUnit({ perPortion: !!f.perPortion, portionGrams: f.portionGrams ?? null })
+    setUnit(u); setGrams(defaultQty(u))
+  }
   const tabs: { key: Tab; label: string; Icon: typeof Apple }[] = [
     ...(recents.length ? [{ key: 'recent' as const, label: 'Récents', Icon: History }] : []),
     { key: 'food', label: 'Aliment', Icon: Apple },
@@ -232,8 +241,8 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
                     <IngredientAutocomplete
                       value={foodText}
                       ciqualCode={food?.code ?? null}
-                      onChange={(name, code) => { setFoodText(name); if (!code) setFood(null) }}
-                      onPick={setFood}
+                      onChange={(name, code) => { setFoodText(name); if (!code && food) { setFood(null); setUnit('g'); setGrams('100') } }}
+                      onPick={pickFood}
                       placeholder="Ex : yaourt nature, pomme, riz cuit…"
                       includeProducts
                     />
@@ -242,15 +251,8 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
                       Pas dans la liste ? Créer un aliment
                     </button>
                   </div>
-                  <div className="flex items-end gap-3">
-                    <div className="space-y-2 w-32">
-                      <Label htmlFor="grams">Quantité (g)</Label>
-                      <Input id="grams" type="number" inputMode="decimal" min={1} max={5000} value={grams} onChange={(e) => setGrams(e.target.value)} />
-                    </div>
-                    {kcalPreview != null && (
-                      <p className="pb-2 text-sm text-muted-foreground tabular-nums">≈ {kcalPreview.toLocaleString('fr-FR')} kcal</p>
-                    )}
-                  </div>
+                  <QuantityField id="grams" portion={portion} unit={unit} onUnit={setUnit}
+                    value={grams} onValue={setGrams} kcal={food?.kcal ?? null} />
                 </div>
               ))}
 

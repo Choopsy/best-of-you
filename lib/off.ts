@@ -19,7 +19,11 @@ export interface ProductLookup {
   name?: string
   brand?: string | null
   image_url?: string | null
+  /** Valeurs pour 100 g, ou pour 1 portion si perPortion */
   per100?: Nutrients
+  perPortion?: boolean
+  /** Poids d'une portion en grammes (Open Food Facts : serving_quantity) */
+  portionGrams?: number | null
   /** Valeurs manquantes chez Open Food Facts (à compléter) */
   incomplete?: boolean
   /** Open Food Facts n'a pas répondu (différent de « produit inconnu ») */
@@ -27,7 +31,7 @@ export interface ProductLookup {
 }
 
 export const OFF_URL = 'https://world.openfoodfacts.org'
-export const OFF_QUERY = 'fields=product_name,product_name_fr,brands,image_front_small_url,nutriments'
+export const OFF_QUERY = 'fields=product_name,product_name_fr,brands,image_front_small_url,nutriments,serving_quantity'
 
 const OFF_FIELDS: Record<keyof Nutrients, string> = {
   energy_kcal: 'energy-kcal_100g',
@@ -48,12 +52,15 @@ export function parseOff(json: unknown, barcode: string): ProductLookup {
   if (j?.status !== 1 || !p || !name) return { found: false, barcode }
   const n = (p.nutriments ?? {}) as Record<string, unknown>
   const missing = NUTRIENT_KEYS.filter((k) => n[OFF_FIELDS[k]] == null)
+  const serving = Number(p.serving_quantity)
   return {
     found: true, source: 'off', barcode, name: String(name).trim(),
     brand: p.brands ? String(p.brands).split(',')[0].trim() : null,
     image_url: (p.image_front_small_url as string | undefined) ?? null,
     per100: Object.fromEntries(NUTRIENT_KEYS.map((k) => [k, Number(n[OFF_FIELDS[k]] ?? 0) || 0])) as Nutrients,
     incomplete: missing.includes('energy_kcal') || missing.length > 3,
+    perPortion: false,
+    portionGrams: serving > 0 && serving <= 3000 ? Math.round(serving * 10) / 10 : null,
   }
 }
 
