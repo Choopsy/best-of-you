@@ -13,6 +13,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 ### Mise en ligne
 - [ ] `[Supabase]` Emails : remplacer « Équilibre » par « Dignis » dans les deux modèles (Confirm signup, Reset password) et dans le nom d'expéditeur SMTP
 - [ ] `[Supabase]` Lancer `supabase/migrations/006_rayons.sql` dans le SQL Editor (avant le push)
+- [ ] `[Supabase]` Lancer `supabase/migrations/007_portions.sql` dans le SQL Editor (avant le push)
 - [ ] `[RGPD]` Tester la suppression de compte en ligne avec un compte jetable (avec une photo de recette)
 
 ### Données et vie privée
@@ -45,6 +46,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-10-28 | Journal : aliments comptés en portions (burger, menu) ou en pots, parts…, poids de portion repris du scan | `2dafde1` |
 | 2026-10-27 | Journal : « Créer un aliment » sans code-barres (plat maison, restaurant) | `db7d58b` |
 | 2026-10-27 | Nouvelle identité : Dignis, « Prends soin de ta valeur. » | `e4349a9` |
 | 2026-10-27 | Animation d'ouverture reprise de l'icône (1,7 s, une fois par lancement) | `c32a0fa` |
