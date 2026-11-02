@@ -11,6 +11,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 ## À faire
 
 ### Mise en ligne
+- [ ] `[Vercel]` Ajouter la variable `MEAL_IMPORT_USERS` = ton identifiant (Supabase > Authentication > Users > User UID), puis redéployer : sans elle, l'import de repas est caché pour tout le monde
 - [ ] `[RGPD]` Tester la suppression de compte en ligne avec un compte jetable (avec une photo de recette)
 
 ### Données et vie privée
@@ -27,6 +28,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 ## Idées
 
+- [ ] `[Infra]` Tests e2e : rares délais dépassés au premier passage juste après un build (scénario différent à chaque fois) ; relancer avec `--no-build` passe
 - [ ] `[Design]` Écarts restants avec les maquettes : icône par rayon dans les courses, photos des aliments dans le journal, en-tête « Dignis » avec cloche, autres pages (recettes, frigo, semaine, profil) à harmoniser
 - [ ] `[Design]` Icône aux couleurs de Dignis (ou garder l'actuelle)
 - [ ] `[Journal]` Plats composés courants à ajouter à la base (tartiflette maison, salades traiteur…) : aujourd'hui Ciqual n'a que des versions industrielles
@@ -47,6 +49,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-02 | Import de repas réservé à mon compte (MEAL_IMPORT_USERS) ; page « introuvable » en français | `3b55986` |
 | 2026-11-02 | Importer un repas depuis un fichier JSON (Profil > Mes données) | `54e66d0` |
 | 2026-11-02 | Journal repensé (semaine pour choisir le jour, ligne d'énergie fixe, détail replié) ; tests de nouveau stables (lien dans un lien sur l'accueil) | `19d68fc` |
 | 2026-11-02 | Nouveau design, étapes 2 et 3 : ronds, cartes, barre du bas, feuilles, boutons ; écrans Accueil, Journal, Ajouter, Courses, Forme | `4013359`, `0c797ad` |
