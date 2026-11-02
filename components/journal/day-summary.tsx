@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ChevronDown, ChevronRight, Dumbbell, Target, Utensils } from 'lucide-react'
+import { ChevronRight, Dumbbell, Target, Utensils } from 'lucide-react'
 import type { DailyTargets } from '@/lib/targets'
 import type { Nutrients } from '@/lib/nutrition'
 import { Ring, ringColor } from './ring'
@@ -141,18 +141,20 @@ export function DayBar({ totals, targets }: { totals: Nutrients; targets: DailyT
           <div className="h-full rounded-full transition-[width] duration-500" style={{ width: `${width}%`, background: ringColor('goal', kcal, goal) }} />
         </div>
       )}
+      {targets && targets.exerciseKcal > 0 && (
+        <Link href="/forme" className="flex min-h-8 items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+          <Dumbbell className="h-3.5 w-3.5 text-sage" aria-hidden="true" /> dont +{f(targets.exerciseKcal)} kcal grâce au sport
+        </Link>
+      )}
     </div>
   )
 }
 
-/** Journal : macros et repères (sucres, gras saturés, sel), repliés pour qui veut creuser */
+/** Journal : macros et repères (sucres, gras saturés, sel), toujours visibles sous les repas */
 export function DayDetail({ totals, targets }: { totals: Nutrients; targets: DailyTargets | null }) {
   return (
-    <details className="group rounded-3xl bg-card shadow-card">
-      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between px-5 font-heading text-base font-semibold">
-        Détail du jour
-        <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" aria-hidden="true" />
-      </summary>
+    <section aria-label="Détail du jour" className="rounded-3xl bg-card shadow-card">
+      <h2 className="px-5 pt-4 pb-3 text-lg">Détail du jour</h2>
       <div className="px-4 pb-5 space-y-4">
         {targets ? (
           <>
@@ -168,6 +170,6 @@ export function DayDetail({ totals, targets }: { totals: Nutrients; targets: Dai
           </>
         ) : <ProfileHint />}
       </div>
-    </details>
+    </section>
   )
 }
