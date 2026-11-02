@@ -41,12 +41,12 @@ export function NavContent({ avatarUrl, fullName, pendingFriendsCount, kitchenAl
     const active = isActive(href === '/frigo' ? '/recipes' : href)
     return (
       // prefetch : la page entière (données comprises) est chargée en arrière-plan, l'appui est instantané
-      <Link href={href} prefetch aria-current={active ? 'page' : undefined} className="flex min-w-14 flex-col items-center gap-1 py-2 px-2">
+      <Link href={href} prefetch aria-current={active ? 'page' : undefined} className="flex min-h-11 min-w-14 flex-col items-center gap-1 py-2 px-2">
         <span className="relative inline-flex">
           <Icon className={`h-6 w-6 transition-colors ${active ? 'text-primary' : 'text-muted-foreground'}`} strokeWidth={active ? 2.2 : 1.8} />
           {dot && <span className="absolute -top-0.5 -right-1 h-2 w-2 rounded-full bg-red-500" />}
         </span>
-        <span className={`text-[11px] transition-colors ${active ? 'text-primary font-bold' : 'text-muted-foreground font-semibold'}`}>{label}</span>
+        <span className={`text-[11px] tracking-wide transition-colors ${active ? 'text-primary font-bold' : 'text-muted-foreground font-semibold'}`}>{label}</span>
       </Link>
     )
   }
@@ -55,7 +55,7 @@ export function NavContent({ avatarUrl, fullName, pendingFriendsCount, kitchenAl
     <>
       <ServiceWorker />
       {/* ── Ordinateur : barre du haut ── */}
-      <nav className="hidden md:flex fixed top-0 left-0 right-0 z-40 h-14 bg-card border-b items-center px-6 gap-4">
+      <nav className="hidden md:flex fixed top-0 left-0 right-0 z-40 h-14 bg-card shadow-card items-center px-6 gap-4">
         <Link href="/" className="flex items-center gap-2 font-heading text-lg font-semibold shrink-0 mr-2">
           <Leaf className="h-5 w-5 text-primary" />
           {APP_NAME}
@@ -98,7 +98,7 @@ export function NavContent({ avatarUrl, fullName, pendingFriendsCount, kitchenAl
       </nav>
 
       {/* ── Téléphone : barre du bas ── */}
-      <nav aria-label="Navigation principale" className="md:hidden fixed bottom-0 left-0 right-0 z-40 h-[76px] bg-card border-t flex items-center pb-[env(safe-area-inset-bottom)]">
+      <nav aria-label="Navigation principale" className="md:hidden fixed bottom-0 left-0 right-0 z-40 h-[76px] bg-card shadow-float flex items-center pb-[env(safe-area-inset-bottom)]">
         <div className="flex flex-1 items-center justify-around">
           <MobileLink href="/" icon={Home} label="Accueil" />
           <MobileLink href="/journal" icon={NotebookPen} label="Journal" />

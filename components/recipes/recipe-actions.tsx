@@ -145,7 +145,7 @@ export function RecipeActions({ recipeId, initialLiked, userCollections }: Props
     <>
       {/* Bouton cœur */}
       <Button
-        variant="ghost" size="icon" className="h-9 w-9"
+        variant="ghost" size="icon" className="h-11 w-11"
         onClick={toggleLike} disabled={likeLoading}
         aria-label={liked ? 'Retirer des favoris' : 'Ajouter aux favoris'}
       >
@@ -154,7 +154,7 @@ export function RecipeActions({ recipeId, initialLiked, userCollections }: Props
 
       {/* Bouton sauvegarder */}
       <Button
-        variant="ghost" size="icon" className="h-9 w-9"
+        variant="ghost" size="icon" className="h-11 w-11"
         onClick={() => setDialogOpen(true)}
         aria-label="Ajouter à une collection"
       >

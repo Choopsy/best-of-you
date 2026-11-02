@@ -91,7 +91,7 @@ export default async function HomePage() {
       )}
 
       {lastWeek && (
-        <Link href="/bilan" className="flex items-center gap-3 rounded-3xl bg-card px-4 py-3.5 shadow-[0_1px_0_var(--border)]">
+        <Link href="/bilan" className="flex items-center gap-3 rounded-3xl bg-card px-4 py-3.5 shadow-card">
           <CalendarCheck className="h-5 w-5 shrink-0 text-sage" />
           <span className="min-w-0 flex-1">
             <span className="block text-[15px] font-bold">Ta semaine dernière</span>
@@ -144,12 +144,12 @@ export default async function HomePage() {
       </section>
 
       <div className="grid grid-cols-2 gap-3">
-        <Link href="/idees" className="flex flex-col gap-2 rounded-3xl bg-card px-4 py-3.5 shadow-[0_1px_0_var(--border)]">
+        <Link href="/idees" className="flex flex-col gap-2 rounded-3xl bg-card px-4 py-3.5 shadow-card">
           <Sparkles className="h-5 w-5 text-primary" />
           <span className="text-[15px] font-bold leading-snug">Qu&apos;est-ce qu&apos;on mange ce soir ?</span>
           <span className="text-xs text-muted-foreground">Idées avec ton frigo</span>
         </Link>
-        <Link href="/forme" className="flex flex-col gap-2 rounded-3xl bg-card px-4 py-3.5 shadow-[0_1px_0_var(--border)]">
+        <Link href="/forme" className="flex flex-col gap-2 rounded-3xl bg-card px-4 py-3.5 shadow-card">
           <Activity className="h-5 w-5 text-sage" />
           <span className="text-[15px] font-bold leading-snug tabular-nums">
             {sport.sessions} séance{sport.sessions > 1 ? 's' : ''}{sessionsGoal ? ` / ${sessionsGoal}` : ''}

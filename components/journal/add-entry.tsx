@@ -159,7 +159,7 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
         <div className="fixed inset-0 z-50 flex items-end sm:items-start sm:pt-20 justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={close} />
           <div role="dialog" aria-modal="true" aria-label="Ajouter au journal"
-            className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-xl max-h-[90svh] overflow-y-auto">
+            className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-float max-h-[90svh] overflow-y-auto">
             <div className="px-5 pt-5 pb-4 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg">Ajouter au journal</h3>
@@ -233,7 +233,7 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
                   onRescan={() => setCreating(false)} />
               ) : (
                 <div className="space-y-3">
-                  <Button type="button" variant="outline" className="w-full h-12 rounded-2xl gap-2" onClick={() => setScanning(true)}>
+                  <Button type="button" variant="outline" className="w-full h-12 rounded-full gap-2" onClick={() => setScanning(true)}>
                     <ScanBarcode className="h-5 w-5" /> Scanner un code-barres
                   </Button>
                   <div className="space-y-2">

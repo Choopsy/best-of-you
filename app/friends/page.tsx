@@ -57,7 +57,7 @@ export default async function FriendsPage({ searchParams }: Props) {
     <div className="min-h-svh pb-8">
       <header className="sticky top-0 md:top-14 z-10 bg-background border-b px-2 py-2 flex items-center gap-2">
         <Link href="/profile">
-          <Button variant="ghost" size="icon" className="h-9 w-9">
+          <Button variant="ghost" size="icon" className="h-11 w-11">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>

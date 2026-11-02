@@ -13,7 +13,7 @@ interface Props {
 const fmt = (iso: string) =>
   new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Paris' }).format(new Date(iso))
 
-const card = 'rounded-3xl bg-card px-5 py-5 shadow-[0_1px_0_var(--border)] space-y-3'
+const card = 'rounded-3xl bg-card px-5 py-5 shadow-card space-y-3'
 
 export default async function MyDataPage({ searchParams }: Props) {
   const { error, message } = await searchParams

@@ -35,7 +35,7 @@ export function WeightSheet({ today, last, defaultOpen = false }: { today: strin
           <div className="fixed inset-0 z-50 flex items-end sm:items-start sm:pt-20 justify-center">
             <div className="absolute inset-0 bg-black/50" onClick={close} />
             <div role="dialog" aria-modal="true" aria-label="Noter mon poids"
-              className="relative w-full sm:max-w-sm bg-card rounded-t-3xl sm:rounded-3xl shadow-xl">
+              className="relative w-full sm:max-w-sm bg-card rounded-t-3xl sm:rounded-3xl shadow-float">
               <form className="px-5 pt-5 pb-6 space-y-4" onSubmit={(e) => { e.preventDefault(); submit() }}>
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg">Noter mon poids</h3>

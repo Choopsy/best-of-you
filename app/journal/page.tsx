@@ -67,7 +67,7 @@ export default async function JournalPage({ searchParams }: Props) {
         {MEALS.map((meal) => {
           const entries = logs.filter((l) => l.meal === meal)
           return (
-            <section key={meal} className="rounded-3xl bg-card shadow-[0_1px_0_var(--border)] px-4 py-3">
+            <section key={meal} className="rounded-3xl bg-card shadow-card px-4 py-3">
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-sm">
                   {MEAL_LABELS[meal]}

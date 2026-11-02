@@ -43,7 +43,7 @@ export default async function ProfilePage({ searchParams }: Props) {
           <ThemeSwitcher />
         </section>
 
-        <nav className="rounded-3xl bg-card divide-y overflow-hidden shadow-[0_1px_0_var(--border)]">
+        <nav className="rounded-3xl bg-card divide-y overflow-hidden shadow-card">
           {links.map(({ href, icon: Icon, label, badge }) => (
             <Link key={href} href={href} className="flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors">
               <Icon className="h-4 w-4 text-primary" />

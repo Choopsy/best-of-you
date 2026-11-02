@@ -27,7 +27,7 @@ export function ServingAdjuster({ baseServings, groups }: Props) {
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8 rounded-full"
+            className="h-11 w-11 rounded-full"
             onClick={() => setServings((s) => Math.max(1, s - 1))}
           >
             <Minus className="h-3.5 w-3.5" />
@@ -38,7 +38,7 @@ export function ServingAdjuster({ baseServings, groups }: Props) {
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8 rounded-full"
+            className="h-11 w-11 rounded-full"
             onClick={() => setServings((s) => s + 1)}
           >
             <Plus className="h-3.5 w-3.5" />
@@ -48,7 +48,7 @@ export function ServingAdjuster({ baseServings, groups }: Props) {
 
       <div className="space-y-3">
         {groups.map((group) => (
-          <div key={group.id} className="rounded-3xl bg-card px-4 py-1 shadow-[0_1px_0_var(--border)]">
+          <div key={group.id} className="rounded-3xl bg-card px-4 py-1 shadow-card">
             {group.name && (
               <p className="pt-3 pb-1 text-xs font-bold uppercase tracking-wide text-muted-foreground">{group.name}</p>
             )}

@@ -34,7 +34,7 @@ export function ItemMenu({ item, overrides, online, onDelete, onClose }: {
       <div className="fixed inset-0 z-50 flex items-end sm:items-start sm:pt-20 justify-center">
         <div className="absolute inset-0 bg-black/50" onClick={onClose} />
         <div role="dialog" aria-modal="true" aria-label={`Options pour ${item.name}`}
-          className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-xl max-h-[90svh] overflow-y-auto">
+          className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-float max-h-[90svh] overflow-y-auto">
           <div className="px-5 pt-5 pb-6 space-y-4">
             <div className="flex items-start justify-between gap-3">
               <h3 className="text-lg leading-snug">{item.name}</h3>

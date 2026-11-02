@@ -67,7 +67,7 @@ export default async function WeekPage({ searchParams }: Props) {
           const list = entries.filter((e) => e.planned_on === d).sort((a, b) => mealOrder(a.meal) - mealOrder(b.meal))
           const isToday = d === today
           return (
-            <section key={d} className={`rounded-3xl bg-card px-4 py-3 shadow-[0_1px_0_var(--border)] ${d < today ? 'opacity-70' : ''}`}>
+            <section key={d} className={`rounded-3xl bg-card px-4 py-3 shadow-card ${d < today ? 'opacity-70' : ''}`}>
               <div className="flex items-center justify-between">
                 <h2 className={`text-base first-letter:uppercase ${isToday ? 'text-primary' : ''}`}>
                   {isToday ? `Aujourd'hui · ${formatDateFr(d).split(' ').slice(1).join(' ')}` : formatDateFr(d)}

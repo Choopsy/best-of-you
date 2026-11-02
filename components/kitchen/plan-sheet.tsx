@@ -63,7 +63,7 @@ export function PlanSheet({ date, recipes, recipe, defaultServings = 2, trigger 
           <div className="fixed inset-0 z-50 flex items-end sm:items-start sm:pt-20 justify-center">
             <div className="absolute inset-0 bg-black/50" onClick={close} />
             <div role="dialog" aria-modal="true" aria-label="Prévoir une recette"
-              className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-xl max-h-[90svh] overflow-y-auto">
+              className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-float max-h-[90svh] overflow-y-auto">
               <div className="px-5 pt-5 pb-4 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg">Prévoir une recette</h3>

@@ -51,7 +51,7 @@ export default async function HouseholdPage() {
             <h2 className="text-lg">Invitations reçues</h2>
             <ul className="space-y-2">
               {received.map((i: any) => (
-                <li key={i.id} className="rounded-3xl bg-card p-4 space-y-3 shadow-[0_1px_0_var(--border)]">
+                <li key={i.id} className="rounded-3xl bg-card p-4 space-y-3 shadow-card">
                   <p className="text-sm">
                     <b>{i.inviter?.full_name ?? 'Quelqu\'un'}</b> t&apos;invite dans « {i.households?.name ?? 'son foyer'} ».
                     Ton frigo et ta liste actuels y seront ajoutés si tu es seul dans ton foyer.
@@ -67,7 +67,7 @@ export default async function HouseholdPage() {
 
         <section className="space-y-2">
           <h2 className="text-lg">Membres</h2>
-          <ul className="rounded-3xl bg-card divide-y shadow-[0_1px_0_var(--border)]">
+          <ul className="rounded-3xl bg-card divide-y shadow-card">
             {(members ?? []).map((m: any) => (
               <li key={m.user_id} className="flex items-center gap-3 px-4 py-3">
                 <Avatar url={m.profiles?.avatar_url ?? null} />
@@ -91,7 +91,7 @@ export default async function HouseholdPage() {
               On ne peut inviter que ses amis. <Link href="/friends" className="underline font-bold">Ajoute d&apos;abord la personne en ami</Link>.
             </p>
           ) : (
-            <ul className="rounded-3xl bg-card divide-y shadow-[0_1px_0_var(--border)]">
+            <ul className="rounded-3xl bg-card divide-y shadow-card">
               {friends.map((f: any) => (
                 <li key={f.id} className="flex items-center gap-3 px-4 py-3">
                   <Avatar url={f.avatar_url} />

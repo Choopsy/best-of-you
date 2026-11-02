@@ -70,7 +70,7 @@ export default async function FridgePage({ searchParams }: Props) {
           groups.map((g) => (
             <section key={g.title} className="space-y-2">
               <h2 className="text-lg">{g.title}</h2>
-              <ul className="rounded-3xl bg-card divide-y shadow-[0_1px_0_var(--border)]">
+              <ul className="rounded-3xl bg-card divide-y shadow-card">
                 {g.items.map((i) => (
                   <li key={i.id} className="flex items-center gap-3 pl-4 pr-2 py-2.5">
                     <div className="min-w-0 flex-1">

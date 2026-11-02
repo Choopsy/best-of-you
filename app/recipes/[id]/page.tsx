@@ -86,7 +86,7 @@ export default async function RecipeDetailPage({ params, searchParams }: Props) 
         {isOwner && <ShareRecipe recipeId={id} friends={friends} sharedWith={sharedWith} />}
         {isOwner && (
           <Link href={`/recipes/${id}/edit`}>
-            <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Modifier">
+            <Button variant="ghost" size="icon" className="h-11 w-11" aria-label="Modifier">
               <Pencil className="h-4 w-4" />
             </Button>
           </Link>
@@ -240,7 +240,7 @@ export default async function RecipeDetailPage({ params, searchParams }: Props) 
 
             <Separator />
             <Link href={`/recipes/${id}/cook`}>
-              <Button className="w-full h-14 text-lg rounded-2xl font-bold flex gap-2">
+              <Button className="w-full h-14 text-lg rounded-full font-bold flex gap-2">
                 <ChefHat className="h-5 w-5" />
                 Cuisiner
               </Button>

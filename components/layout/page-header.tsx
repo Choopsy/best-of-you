@@ -8,7 +8,7 @@ export function PageHeader({ title, back, children }: { title: React.ReactNode; 
       <div className="flex items-center gap-1 min-w-0">
         {back && (
           <Link href={back}>
-            <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Retour">
+            <Button variant="ghost" size="icon" className="h-11 w-11" aria-label="Retour">
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>

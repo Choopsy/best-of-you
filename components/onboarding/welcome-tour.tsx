@@ -142,7 +142,7 @@ export function WelcomeTour({ userId, seen }: { userId: string; seen: boolean })
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/55" />
       <div role="dialog" aria-modal="true" aria-label={`Découvrir ${APP_NAME}`}
-        className="relative flex w-full sm:max-w-md max-h-[100svh] flex-col rounded-t-3xl sm:rounded-3xl bg-card shadow-xl pb-[env(safe-area-inset-bottom)]">
+        className="relative flex w-full sm:max-w-md max-h-[100svh] flex-col rounded-t-3xl sm:rounded-3xl bg-card shadow-float pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-between px-5 pt-4">
           <p className="text-xs font-bold text-muted-foreground tabular-nums" aria-live="polite">{index + 1} / {CARDS.length}</p>
           <button type="button" onClick={close} className="flex h-10 items-center gap-1 rounded-full px-3 text-sm font-bold text-muted-foreground hover:bg-muted">

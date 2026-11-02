@@ -31,7 +31,7 @@ function Delta({ value, unit = '', digits = 0 }: { value: number | null; unit?: 
 
 function Stat({ label, value, sub, children }: { label: string; value: string; sub?: string; children?: React.ReactNode }) {
   return (
-    <div className="rounded-2xl bg-card px-3.5 py-3 flex flex-col gap-0.5 min-w-0 shadow-[0_1px_0_var(--border)]">
+    <div className="rounded-2xl bg-card px-3.5 py-3 flex flex-col gap-0.5 min-w-0 shadow-card">
       <span className="text-xs font-bold text-muted-foreground">{label}</span>
       <span className="font-heading text-[22px] leading-tight tabular-nums">{value}</span>
       {sub && <span className="text-xs text-muted-foreground tabular-nums">{sub}</span>}
@@ -78,7 +78,7 @@ export default async function WeeklyReviewPage({ searchParams }: Props) {
           )}
         </nav>
 
-        <section className="rounded-3xl bg-card px-4 py-5 shadow-[0_1px_0_var(--border)] space-y-4">
+        <section className="rounded-3xl bg-card px-4 py-5 shadow-card space-y-4">
           <div className="px-1">
             <p className="font-heading text-[26px] leading-tight">
               {r.loggedDays} jour{r.loggedDays > 1 ? 's' : ''} noté{r.loggedDays > 1 ? 's' : ''} sur {r.elapsedDays}
@@ -129,7 +129,7 @@ export default async function WeeklyReviewPage({ searchParams }: Props) {
 
         <section className="space-y-2">
           <h2 className="text-lg">Poids</h2>
-          <div className="rounded-2xl bg-card px-4 py-3 shadow-[0_1px_0_var(--border)] text-sm">
+          <div className="rounded-2xl bg-card px-4 py-3 shadow-card text-sm">
             {r.weightChange == null
               ? <span className="text-muted-foreground">Pas assez de pesées cette semaine pour suivre la tendance.</span>
               : <>Tendance <span className="font-bold tabular-nums">{r.weightChange === 0 ? 'stable' : `${r.weightChange > 0 ? '+' : '−'}${f(Math.abs(r.weightChange), 1)} kg`}</span> sur la semaine

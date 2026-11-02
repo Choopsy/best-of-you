@@ -27,7 +27,7 @@ export function RenameHousehold({ name }: { name: string }) {
       <label htmlFor="hname" className="text-sm font-bold">Nom du foyer</label>
       <div className="flex gap-2">
         <Input id="hname" value={value} onChange={(e) => setValue(e.target.value)} className="h-11 rounded-2xl" />
-        <Button type="submit" className="h-11 rounded-2xl" disabled={pending || !value.trim() || value === name}>OK</Button>
+        <Button type="submit" className="h-11 rounded-full" disabled={pending || !value.trim() || value === name}>OK</Button>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
     </form>
@@ -66,7 +66,7 @@ export function LeaveHousehold() {
   const { error, pending, run } = useAction()
   return (
     <div className="space-y-1">
-      <Button variant="outline" className="w-full rounded-2xl text-destructive" disabled={pending}
+      <Button variant="outline" className="w-full rounded-full text-destructive" disabled={pending}
         onClick={() => {
           if (window.confirm('Quitter le foyer ? Tu repartiras avec un frigo, un planning et une liste de courses vides.')) run(() => leaveHousehold())
         }}>

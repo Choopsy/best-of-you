@@ -91,7 +91,7 @@ export function FridgeSheet({ today, item, trigger = 'button', defaultOpen = fal
           <Pencil className="h-4 w-4" />
         </button>
       ) : trigger === 'wide' ? (
-        <Button className="w-full h-12 rounded-2xl gap-2" onClick={() => setOpen(true)}>
+        <Button className="w-full h-12 rounded-full gap-2" onClick={() => setOpen(true)}>
           <Plus className="h-4 w-4" /> Ajouter un aliment
         </Button>
       ) : (
@@ -107,7 +107,7 @@ export function FridgeSheet({ today, item, trigger = 'button', defaultOpen = fal
           <div className="fixed inset-0 z-50 flex items-end sm:items-start sm:pt-20 justify-center">
             <div className="absolute inset-0 bg-black/50" onClick={close} />
             <div role="dialog" aria-modal="true" aria-label={item ? 'Modifier un aliment' : 'Ajouter au frigo'}
-              className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-xl max-h-[90svh] overflow-y-auto">
+              className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-float max-h-[90svh] overflow-y-auto">
               <div className="px-5 pt-5 pb-4 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg">{item ? 'Modifier' : 'Ajouter au frigo'}</h3>

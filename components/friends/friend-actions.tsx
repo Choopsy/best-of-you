@@ -43,7 +43,7 @@ export function FriendActions(props: Props) {
       <div className="flex gap-1.5">
         <Button
           size="icon"
-          className="h-8 w-8"
+          className="h-11 w-11"
           disabled={isPending}
           onClick={() => startTransition(async () => { await acceptFriendRequest(props.friendshipId) })}
         >
@@ -55,7 +55,7 @@ export function FriendActions(props: Props) {
               <Button
                 size="icon"
                 variant="ghost"
-                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="h-11 w-11 text-destructive hover:text-destructive hover:bg-destructive/10"
                 disabled={isPending}
               />
             }
@@ -113,7 +113,7 @@ export function FriendActions(props: Props) {
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+            className="h-11 w-11 text-destructive hover:text-destructive hover:bg-destructive/10"
             disabled={isPending}
           />
         }

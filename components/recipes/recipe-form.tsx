@@ -430,7 +430,7 @@ export function RecipeForm({ tags, collections, defaultCollectionId, initialData
                 className="h-8 text-sm font-medium"
               />
               {groups.length > 1 && (
-                <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0 hover:text-destructive"
+                <Button type="button" variant="ghost" size="icon" className="h-11 w-11 shrink-0 hover:text-destructive"
                   onClick={() => removeGroup(group.id)}>
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -468,7 +468,7 @@ export function RecipeForm({ tags, collections, defaultCollectionId, initialData
                         ))}
                       </SelectContent>
                     </Select>
-                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8 hover:text-destructive"
+                    <Button type="button" variant="ghost" size="icon" className="h-11 w-11 hover:text-destructive"
                       onClick={() => removeIngredient(group.id, ing.id)} disabled={group.ingredients.length === 1}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>

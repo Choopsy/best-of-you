@@ -92,7 +92,7 @@ export default async function FormePage({ searchParams }: Props) {
               Bilan complet <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="rounded-3xl bg-card px-3 py-5 shadow-[0_1px_0_var(--border)] space-y-4">
+          <div className="rounded-3xl bg-card px-3 py-5 shadow-card space-y-4">
             <div className="grid grid-cols-3 gap-2">
               <WeekRing label="Séances" value={summary.sessions} max={sessionsGoal ?? 3} unit="séances"
                 hint={sessionsGoal ? 'ton objectif' : 'objectif à choisir'} />
@@ -130,7 +130,7 @@ export default async function FormePage({ searchParams }: Props) {
         <section className="space-y-2">
           <h2 className="text-lg">Mes séances</h2>
           {activities.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 rounded-3xl bg-card px-6 py-8 text-center shadow-[0_1px_0_var(--border)]">
+            <div className="flex flex-col items-center gap-3 rounded-3xl bg-card px-6 py-8 text-center shadow-card">
               <Dumbbell className="h-10 w-10 text-muted-foreground/40" />
               <p className="text-sm text-muted-foreground max-w-xs">
                 Marche, vélo, muscu… Note tes séances pour suivre ta semaine.
@@ -140,7 +140,7 @@ export default async function FormePage({ searchParams }: Props) {
               </div>
             </div>
           ) : (
-            <ul className="rounded-3xl bg-card divide-y shadow-[0_1px_0_var(--border)]">
+            <ul className="rounded-3xl bg-card divide-y shadow-card">
               {activities.slice(0, 15).map((a) => (
                 <li key={a.id} className="flex items-center gap-3 pl-4 pr-2 py-2.5">
                   <div className="min-w-0 flex-1">
@@ -159,7 +159,7 @@ export default async function FormePage({ searchParams }: Props) {
         {/* ── Poids ── */}
         <section className="space-y-2">
           <h2 className="text-lg">Mon poids</h2>
-          <div className="rounded-3xl bg-card px-4 py-4 shadow-[0_1px_0_var(--border)] space-y-4">
+          <div className="rounded-3xl bg-card px-4 py-4 shadow-card space-y-4">
             <div className="grid grid-cols-3 gap-2 text-center">
               <div>
                 <p className="font-heading text-2xl tabular-nums">{trendNow != null ? f(trendNow, 1) : '—'}</p>
@@ -200,7 +200,7 @@ export default async function FormePage({ searchParams }: Props) {
           </div>
 
           {weighIns.length > 0 && (
-            <details className="rounded-3xl bg-card shadow-[0_1px_0_var(--border)] group">
+            <details className="rounded-3xl bg-card shadow-card group">
               <summary className="cursor-pointer list-none px-4 py-3 text-sm font-bold flex items-center justify-between min-h-12">
                 Mes pesées <span className="text-muted-foreground font-normal">{weighIns.length}</span>
               </summary>

@@ -26,7 +26,7 @@ export function RecipeNutrition({ nutrition, goals }: Props) {
   const n = nutrition.perServing
 
   return (
-    <div className="rounded-3xl bg-card shadow-[0_1px_0_var(--border)] overflow-hidden">
+    <div className="rounded-3xl bg-card shadow-card overflow-hidden">
       <div className="px-4 pt-4 pb-3 space-y-3">
         <div className="flex items-baseline justify-between">
           <span className="text-sm font-bold">Par portion</span>

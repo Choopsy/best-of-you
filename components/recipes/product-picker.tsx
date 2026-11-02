@@ -35,7 +35,7 @@ export function ProductPicker({ onPicked, label = 'Scanner un produit' }: { onPi
           <div className="fixed inset-0 z-50 flex items-end sm:items-start sm:pt-20 justify-center">
             <div className="absolute inset-0 bg-black/50" onClick={close} />
             <div role="dialog" aria-modal="true" aria-label="Produit pour la recette"
-              className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-xl max-h-[90svh] overflow-y-auto">
+              className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-float max-h-[90svh] overflow-y-auto">
               <div className="px-5 pt-5 pb-5 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg">Produit pour la recette</h3>
@@ -71,7 +71,7 @@ export function ProductCreator({ onPicked, initialName = '' }: { onPicked: (p: P
           <div className="fixed inset-0 z-50 flex items-end sm:items-start sm:pt-20 justify-center">
             <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
             <div role="dialog" aria-modal="true" aria-label="Créer un produit"
-              className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-xl max-h-[90svh] overflow-y-auto">
+              className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-float max-h-[90svh] overflow-y-auto">
               <div className="px-5 pt-5 pb-5 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg">Créer un produit</h3>

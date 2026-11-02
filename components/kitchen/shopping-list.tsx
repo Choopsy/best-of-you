@@ -163,7 +163,7 @@ export function ShoppingList({ items, overrides, order, householdId, renderedAt 
       <form onSubmit={add} className="flex gap-2">
         <label htmlFor="new-item" className="sr-only">Ajouter un article</label>
         <Input id="new-item" value={text} onChange={(e) => setText(e.target.value)} placeholder="Ajouter un article (pain, lessive…)" className="h-11 rounded-2xl" />
-        <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-2xl" aria-label="Ajouter" disabled={!text.trim()}>
+        <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-full" aria-label="Ajouter" disabled={!text.trim()}>
           <Plus className="h-5 w-5" />
         </Button>
       </form>
@@ -182,7 +182,7 @@ export function ShoppingList({ items, overrides, order, householdId, renderedAt 
           <h2 className="px-1 text-[13px] font-bold uppercase tracking-wide text-muted-foreground">
             {g.label} <span className="font-normal">· {g.items.length}</span>
           </h2>
-          <ul className="rounded-3xl bg-card divide-y shadow-[0_1px_0_var(--border)]">
+          <ul className="rounded-3xl bg-card divide-y shadow-card">
             {g.items.map((i) => <Row key={i.id} i={i} />)}
           </ul>
         </section>
@@ -195,15 +195,15 @@ export function ShoppingList({ items, overrides, order, householdId, renderedAt 
       {done.length > 0 && (
         <section className="space-y-2">
           <h2 className="text-base text-muted-foreground">Dans le panier ({done.length})</h2>
-          <ul className="rounded-3xl bg-card divide-y shadow-[0_1px_0_var(--border)]">
+          <ul className="rounded-3xl bg-card divide-y shadow-card">
             {done.map((i) => <Row key={i.id} i={i} />)}
           </ul>
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" className="rounded-2xl gap-1.5" disabled={pending || !online || ops.length > 0}
+            <Button variant="outline" className="rounded-full gap-1.5" disabled={pending || !online || ops.length > 0}
               onClick={() => start(async () => { await clearChecked(); router.refresh() })}>
               Retirer de la liste
             </Button>
-            <Button className="rounded-2xl gap-1.5" disabled={pending || !online || ops.length > 0}
+            <Button className="rounded-full gap-1.5" disabled={pending || !online || ops.length > 0}
               onClick={() => start(async () => {
                 const res = await storeCheckedInFridge()
                 setMessage(res.error ?? `${res.count} article${(res.count ?? 0) > 1 ? 's' : ''} rangé${(res.count ?? 0) > 1 ? 's' : ''} au frigo. Pense à ajouter les dates.`)

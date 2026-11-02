@@ -97,7 +97,7 @@ export default async function IdeasPage() {
                 const fits = kcal != null && remaining != null && kcal <= remaining
                 const time = (r.prep_time_min ?? 0) + (r.cook_time_min ?? 0)
                 return (
-                  <li key={s.id} className="rounded-3xl bg-card overflow-hidden shadow-[0_1px_0_var(--border)]">
+                  <li key={s.id} className="rounded-3xl bg-card overflow-hidden shadow-card">
                     <Link href={`/recipes/${s.id}`} className="flex gap-3 p-3">
                       <div className="h-20 w-20 shrink-0 rounded-2xl bg-muted overflow-hidden flex items-center justify-center">
                         {r.cover_image_url

@@ -14,7 +14,7 @@ export function GenerateButton({ from, to, label = 'Faire la liste de courses', 
   const [pending, start] = useTransition()
   return (
     <div className="space-y-2">
-      <Button variant={variant} className="w-full h-12 rounded-2xl gap-2" disabled={pending}
+      <Button variant={variant} className="w-full h-12 rounded-full gap-2" disabled={pending}
         onClick={() => start(async () => {
           setError(null)
           const res = await generateShoppingList(from, to)

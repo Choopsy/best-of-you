@@ -32,7 +32,7 @@ export default function PrivacyPage() {
         <p className="text-sm text-muted-foreground">Mise à jour le {LEGAL.updatedOn}</p>
       </header>
 
-      <div className="rounded-3xl bg-card px-5 py-4 shadow-[0_1px_0_var(--border)] space-y-2 text-[15px] leading-relaxed">
+      <div className="rounded-3xl bg-card px-5 py-4 shadow-card space-y-2 text-[15px] leading-relaxed">
         <p className="font-bold">L&apos;essentiel</p>
         <ul className="list-disc pl-5 space-y-1">
           <li>Tes données servent uniquement à faire fonctionner {APP_NAME} pour toi.</li>

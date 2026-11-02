@@ -171,7 +171,7 @@ export function BarcodeScanner({ onDetected, onClose }: Props) {
                 <Input id="manual-code" inputMode="numeric" autoComplete="off" autoFocus value={code}
                   onChange={(e) => setCode(e.target.value)} placeholder="3017620422003"
                   className="h-12 rounded-2xl bg-white/10 text-white border-white/20 placeholder:text-white/40" />
-                <Button type="submit" className="h-12 rounded-2xl" disabled={code.replace(/\D/g, '').length < 8}>OK</Button>
+                <Button type="submit" className="h-12 rounded-full" disabled={code.replace(/\D/g, '').length < 8}>OK</Button>
               </div>
             </form>
           ) : (

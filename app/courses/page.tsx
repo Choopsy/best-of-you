@@ -31,7 +31,7 @@ export default async function ShoppingPage() {
         <KitchenTabs active="/courses" />
 
         {/* En magasin, la liste passe d'abord : la génération se replie quand la liste n'est pas vide */}
-        <details open={items.length === 0} className="group rounded-3xl bg-card shadow-[0_1px_0_var(--border)]">
+        <details open={items.length === 0} className="group rounded-3xl bg-card shadow-card">
           <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between px-4 text-sm font-bold">
             Générer depuis la semaine
             <span className="text-muted-foreground transition-transform group-open:rotate-180" aria-hidden="true">▾</span>

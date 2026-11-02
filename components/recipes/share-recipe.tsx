@@ -34,7 +34,7 @@ export function ShareRecipe({ recipeId, friends, sharedWith }: { recipeId: strin
 
   return (
     <>
-      <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setOpen(true)} aria-label="Partager avec des amis">
+      <Button variant="ghost" size="icon" className="h-11 w-11" onClick={() => setOpen(true)} aria-label="Partager avec des amis">
         <Share2 className="h-4 w-4" />
       </Button>
       <Portal>

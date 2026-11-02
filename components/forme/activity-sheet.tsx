@@ -66,7 +66,7 @@ export function ActivitySheet({ today, bmr, recentKeys, defaultOpen = false, tri
   return (
     <>
       {trigger === 'wide' ? (
-        <Button className="w-full h-12 rounded-2xl gap-2" onClick={() => setOpen(true)}>
+        <Button className="w-full h-12 rounded-full gap-2" onClick={() => setOpen(true)}>
           <Plus className="h-4 w-4" /> Noter une séance
         </Button>
       ) : (
@@ -80,7 +80,7 @@ export function ActivitySheet({ today, bmr, recentKeys, defaultOpen = false, tri
           <div className="fixed inset-0 z-50 flex items-end sm:items-start sm:pt-16 justify-center">
             <div className="absolute inset-0 bg-black/50" onClick={close} />
             <div role="dialog" aria-modal="true" aria-label="Noter une séance"
-              className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-xl max-h-[92svh] overflow-y-auto">
+              className="relative w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-3xl shadow-float max-h-[92svh] overflow-y-auto">
               <div className="px-5 pt-5 pb-4 space-y-5">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg">Noter une séance</h3>

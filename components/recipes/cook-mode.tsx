@@ -172,7 +172,7 @@ function ChecklistScreen({
 
       <div className="shrink-0 px-5 pb-8 pt-4 border-t flex flex-col items-center gap-3">
         <Button
-          className="w-full h-16 text-xl rounded-2xl font-bold tracking-wide"
+          className="w-full h-16 text-xl rounded-full font-bold tracking-wide"
           onClick={onStart}
         >
           Commencer
@@ -204,7 +204,7 @@ function DoneScreen({ recipeId, title }: { recipeId: string; title: string }) {
         </p>
       </div>
       <Link href={`/recipes/${recipeId}`} className="w-full max-w-xs">
-        <Button variant="outline" className="w-full h-14 text-lg rounded-2xl font-medium">
+        <Button variant="outline" className="w-full h-14 text-lg rounded-full font-medium">
           Retour à la recette
         </Button>
       </Link>
@@ -337,7 +337,7 @@ function StepScreen({
       <div className="shrink-0 px-5 pb-8 pt-4 border-t space-y-3">
         <Button
           variant="outline"
-          className="w-full h-14 text-lg rounded-2xl font-medium"
+          className="w-full h-14 text-lg rounded-full font-medium"
           onClick={onPrev}
         >
           <ChevronLeft className="h-5 w-5 mr-1" />
@@ -345,7 +345,7 @@ function StepScreen({
         </Button>
 
         <Button
-          className="w-full h-16 text-xl rounded-2xl font-bold"
+          className="w-full h-16 text-xl rounded-full font-bold"
           onClick={onNext}
         >
           {isLast ? (

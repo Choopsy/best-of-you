@@ -26,7 +26,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ id:
     <div className="min-h-svh pb-24">
       <PageHeader title={collection.name} back="/collections">
         <Link href={`/collections/${id}/edit`}>
-          <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Modifier"><Pencil className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" className="h-11 w-11" aria-label="Modifier"><Pencil className="h-4 w-4" /></Button>
         </Link>
       </PageHeader>
 
