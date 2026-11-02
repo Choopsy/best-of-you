@@ -11,11 +11,12 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 ## À faire
 
 ### Mise en ligne
+- [ ] `[Supabase]` Lancer `supabase/migrations/009_frigo_journal.sql` dans le SQL Editor (avant le push)
 - [ ] `[Vercel]` Ajouter la variable `MEAL_IMPORT_USERS` = ton identifiant (Supabase > Authentication > Users > User UID), puis redéployer : sans elle, l'import de repas est caché pour tout le monde
 - [ ] `[RGPD]` Tester la suppression de compte en ligne avec un compte jetable (avec une photo de recette)
 
 ### Données et vie privée
-- [ ] `[RGPD]` Compléter le registre des traitements (document privé) avec les migrations 006 à 008 : rayons, portions, produits lisibles via une recette, présentation vue
+- [ ] `[RGPD]` Compléter le registre des traitements (document privé) avec les migrations 006 à 009 : rayons, portions, produits lisibles via une recette, présentation vue, frigo qui suit le journal
 - [ ] `[RGPD]` Télécharger et garder une copie des accords de traitement (DPA) de Supabase et de Vercel
 - [ ] `[RGPD]` Décider si les photos des recettes privées passent dans un stockage privé (aujourd'hui : visibles par qui a le lien)
 - [ ] `[RGPD]` Avant d'ouvrir au-delà des proches : remplacer Gmail par un service d'envoi avec accord de traitement (Brevo ou Resend, nom de domaine)
@@ -28,6 +29,8 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 ## Idées
 
+- [ ] `[Journal]` Après un ajout ouvert par le bouton + (`/journal?add=1`), l'adresse garde `?add=1` : recharger la page rouvre la fenêtre d'ajout
+- [ ] `[Journal]` Frigo : proposer aussi le retrait pour « Ajouter à nouveau », « Comme hier » et le scan direct
 - [ ] `[Infra]` Tests e2e : rares délais dépassés au premier passage juste après un build (scénario différent à chaque fois) ; relancer avec `--no-build` passe
 - [ ] `[Design]` Écarts restants avec les maquettes : icône par rayon dans les courses, photos des aliments dans le journal, en-tête « Dignis » avec cloche, autres pages (recettes, frigo, semaine, profil) à harmoniser
 - [ ] `[Design]` Icône aux couleurs de Dignis (ou garder l'actuelle)
@@ -49,6 +52,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-02 | Frigo qui suit le journal (retrait proposé à l'ajout, remis à la suppression) ; produits scannés au frigo cherchables (migration 009) | `cba8111` |
 | 2026-11-02 | Journal : sucres, gras saturés et sel de nouveau visibles (détail du jour toujours ouvert), sport sous la ligne d'énergie | `78c53d2` |
 | 2026-11-02 | Import de repas réservé à mon compte (MEAL_IMPORT_USERS) ; page « introuvable » en français | `3b55986` |
 | 2026-11-02 | Importer un repas depuis un fichier JSON (Profil > Mes données) | `54e66d0` |
