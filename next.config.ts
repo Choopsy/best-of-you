@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Les tests dans le navigateur construisent l'appli à part (.next-e2e), sans toucher au .next du dev
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   // Le service worker doit toujours être relu (jamais gardé en cache)
   async headers() {
     return [{

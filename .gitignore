@@ -46,3 +46,12 @@ next-env.d.ts
 
 # supabase CLI temp
 supabase/.temp/
+
+# bancs d'essai (base jetable, appli de test, captures)
+tests/.tmp/
+tests/e2e/captures/
+.next-e2e/
+
+# consignes personnelles pour Claude Code
+CLAUDE.local.md
+.claude/settings.local.json

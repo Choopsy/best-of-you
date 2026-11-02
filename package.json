@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "tsx scripts/test-targets.ts && tsx scripts/test-shopping.ts && tsx scripts/test-suggest.ts && tsx scripts/test-aisles.ts && tsx scripts/test-offline-list.ts && tsx scripts/test-weekly.ts && tsx scripts/test-off.ts && tsx scripts/test-portions.ts"
+    "test": "tsx scripts/test-targets.ts && tsx scripts/test-shopping.ts && tsx scripts/test-suggest.ts && tsx scripts/test-aisles.ts && tsx scripts/test-offline-list.ts && tsx scripts/test-weekly.ts && tsx scripts/test-off.ts && tsx scripts/test-portions.ts",
+    "test:db": "node tests/db/run.mjs",
+    "test:e2e": "node tests/e2e/run.mjs",
+    "test:all": "npm test && npm run test:db && npm run test:e2e"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -27,9 +30,14 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/ws": "^8.18.1",
+    "embedded-postgres": "17.5.0-beta.15",
+    "pg": "8.23.1",
+    "playwright": "1.63.0",
+    "postgrest-dist": "12.0.2-2",
     "supabase": "^2.98.1",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",

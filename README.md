@@ -125,7 +125,9 @@ lib/
 public/sw.js           Service worker : liste de courses sans réseau
   auth.ts              Session côté serveur
 supabase/migrations/   Schéma SQL et données Ciqual
-scripts/               Import Ciqual et tests
+scripts/               Import Ciqual et tests unitaires
+tests/                 Bancs d'essai : base jetable (db) et navigateur (e2e)
+docs/                  Architecture, conventions, tests
 ```
 
 ---
@@ -203,7 +205,9 @@ Le script gère les particularités du format : virgule décimale, « traces »,
 ## Tests et sécurité
 
 - `npm test` vérifie le calcul des objectifs (chaque cas recalculé à la main à partir des formules publiées), la liste de courses, les rayons, la liste hors connexion, les idées de recettes, la dépense des séances, la tendance du poids et le bilan de la semaine.
-- **Sécurité de la base (Row Level Security)** : chaque utilisateur ne voit que ses propres données de santé, son poids, son journal et ses collections. Une recette n'est visible que de son auteur, de ses amis (si elle est en mode « amis »), de tout le monde (si elle est publique) ou des amis avec qui elle est partagée. Les membres d'un foyer partagent seulement le frigo, le planning et les courses. Ces règles sont testées dans [`supabase/tests/`](supabase/tests/) (81 vérifications, dont le retrait de l'accord, la suppression d'un compte et les rayons du foyer).
+- **Sécurité de la base (Row Level Security)** : chaque utilisateur ne voit que ses propres données de santé, son poids, son journal et ses collections. Une recette n'est visible que de son auteur, de ses amis (si elle est en mode « amis »), de tout le monde (si elle est publique) ou des amis avec qui elle est partagée. Les membres d'un foyer partagent le frigo, le planning, les courses et les produits scannés. Ces règles sont testées dans [`supabase/tests/`](supabase/tests/) (95 vérifications, dont le retrait de l'accord, la suppression d'un compte, les rayons et les produits utilisés dans une recette) : `npm run test:db`, sur une base Postgres jetable, sans rien installer.
+- **Dans le navigateur** : `npm run test:e2e` construit l'appli et la pilote dans Chromium au format téléphone, avec une fausse API Supabase (scan, aliments et portions, recettes, présentation, courses hors connexion, bilan, données personnelles). Première fois : `npx playwright install chromium`. Détails dans [`docs/TESTS.md`](docs/TESTS.md).
+- Documentation pour contribuer (ou pour Claude Code) : [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
 
 ---
 
