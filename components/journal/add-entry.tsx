@@ -13,7 +13,7 @@ import { ScannedProduct } from '@/components/scan/scanned-product'
 import { QuantityField, defaultQty, parseQty } from '@/components/journal/quantity-field'
 import { defaultUnit, type PortionInfo, type QtyUnit } from '@/lib/portions'
 import { addAgain, addFoodToLog, addRecipeToLog } from '@/actions/journal'
-import { MEALS, MEAL_LABELS, type FoodSuggestion, type Meal, type PickableRecipe } from '@/lib/types'
+import { MEALS, MEAL_LABELS, mealForHour, type FoodSuggestion, type Meal, type PickableRecipe } from '@/lib/types'
 import type { RecentEntry } from '@/lib/journal'
 
 type Tab = 'recent' | 'food' | 'recipe'
@@ -37,13 +37,7 @@ interface Props {
 /** Clé stable d'une entrée récente : après un ajout, la liste se rafraîchit et l'entrée change d'id. */
 const recentKey = (r: RecentEntry) => `${r.label}|${r.detail}`
 
-function defaultMealForNow(): Meal {
-  const h = new Date().getHours()
-  if (h < 10) return 'breakfast'
-  if (h < 15) return 'lunch'
-  if (h < 18) return 'snack'
-  return 'dinner'
-}
+const defaultMealForNow = () => mealForHour(new Date().getHours())
 
 /** « Ajouter au déjeuner », mais « Ajouter une collation » (féminin) */
 const addToMeal = (meal: keyof typeof MEAL_LABELS) =>

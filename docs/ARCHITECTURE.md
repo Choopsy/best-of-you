@@ -52,6 +52,7 @@ Tables : profiles, health_profiles, weight_logs, food_logs, activities, recipes,
 | `portions.ts` | Quantités en grammes ou en portions : un produit a ses valeurs « pour 100 g » ou « pour 1 portion », et un poids de portion facultatif. |
 | `off.ts` | Open Food Facts : appelé **depuis le téléphone** (limite de 15 produits/min par IP ; depuis Vercel toutes les IP sont partagées), serveur en secours. |
 | `journal.ts`, `weekly.ts`, `weekly-data.ts` | Journal du jour, récents, bilan de la semaine (moyennes sur les jours notés). |
+| `meal-import.ts` | Import d'un repas en JSON (`/journal/importer`, lien discret dans Mes données) : lecture et vérification, relue côté serveur. Champ `type` prévu pour les recettes. |
 | `shopping.ts`, `aisles.ts`, `offline-list.ts` | Liste de courses (semaine moins le frigo), rayons (dictionnaire + corrections du foyer), file d'attente hors connexion. |
 | `suggest.ts` | « Qu'est-ce qu'on mange ? » selon le frigo. |
 | `activities.ts`, `weight.ts` | MET (Compendium 2024), repères OMS, tendance du poids (moyenne lissée). |

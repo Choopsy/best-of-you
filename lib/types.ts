@@ -42,6 +42,14 @@ export const EXCLUSION_TAGS: Record<Exclusion, string> = {
   lactose: 'Sans lactose',
 }
 
+/** Repas proposé selon l'heure (journal, import) */
+export function mealForHour(h: number): Meal {
+  if (h < 10) return 'breakfast'
+  if (h < 15) return 'lunch'
+  if (h < 18) return 'snack'
+  return 'dinner'
+}
+
 export const MEAL_LABELS: Record<Meal, string> = {
   breakfast: 'Petit-déjeuner',
   lunch: 'Déjeuner',

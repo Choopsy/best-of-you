@@ -7,6 +7,7 @@ import { loadRecipe } from '@/lib/recipes'
 import { isISODate } from '@/lib/dates'
 import { checkQuantity, eatenGrams, nutrientFactor, type PortionInfo } from '@/lib/portions'
 import { MEALS, type Meal } from '@/lib/types'
+import { parseMealImport } from '@/lib/meal-import'
 
 type Result = { error: string | null }
 
@@ -157,4 +158,26 @@ export async function deleteFoodLog(id: string): Promise<Result> {
   if (error) return { error: error.message }
   refresh()
   return { error: null }
+}
+
+/**
+ * Import d'un repas depuis un fichier JSON : le texte brut est relu ici (jamais l'aperçu du navigateur).
+ * La date et le repas choisis à l'écran priment sur ceux du fichier.
+ */
+export async function importMealFile(input: { text: string; date: string; meal: Meal }): Promise<Result & { count?: number }> {
+  const { supabase, user } = await auth()
+  if (!user) return { error: 'Non connecté' }
+  const bad = checkCommon(input.date, input.meal)
+  if (bad) return { error: bad }
+  const parsed = parseMealImport(String(input.text ?? ''))
+  if (!parsed.ok) return { error: parsed.error }
+
+  const rows = parsed.items.map((i) => ({
+    user_id: user.id, eaten_on: input.date, meal: input.meal,
+    label: i.label, grams: i.grams, servings: i.servings, ...i.nutrients,
+  }))
+  const { error } = await supabase.from('food_logs').insert(rows)
+  if (error) return { error: error.message }
+  refresh()
+  return { error: null, count: rows.length }
 }

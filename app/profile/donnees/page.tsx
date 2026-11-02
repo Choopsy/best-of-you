@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Download, HeartPulse, ShieldCheck, Trash2 } from 'lucide-react'
+import { ChevronRight, Download, FileUp, HeartPulse, ShieldCheck, Trash2 } from 'lucide-react'
 import { getSession } from '@/lib/auth'
 import { Notice, PageHeader } from '@/components/layout/page-header'
 import { WithdrawButton } from '@/components/privacy/withdraw-button'
@@ -45,6 +45,11 @@ export default async function MyDataPage({ searchParams }: Props) {
             className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-medium text-primary-foreground">
             <Download className="h-4 w-4" /> Télécharger (JSON)
           </a>
+          <Link href="/journal/importer" className="flex min-h-11 items-center gap-2 text-sm text-muted-foreground">
+            <FileUp className="h-4 w-4" aria-hidden="true" />
+            <span className="flex-1">Importer un repas depuis un fichier</span>
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </section>
 
         <section className={card}>
