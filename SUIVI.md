@@ -12,9 +12,6 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 ### Mise en ligne
 - [ ] `[Supabase]` Emails : remplacer « Équilibre » par « Dignis » dans les deux modèles (Confirm signup, Reset password) et dans le nom d'expéditeur SMTP
-- [ ] `[Supabase]` Lancer `supabase/migrations/006_rayons.sql` dans le SQL Editor (avant le push)
-- [ ] `[Supabase]` Lancer `supabase/migrations/007_portions.sql` dans le SQL Editor (avant le push)
-- [ ] `[Supabase]` Lancer `supabase/migrations/008_produits_recettes.sql` dans le SQL Editor (après la 007, avant le push)
 - [ ] `[RGPD]` Tester la suppression de compte en ligne avec un compte jetable (avec une photo de recette)
 
 ### Données et vie privée
@@ -49,6 +46,8 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-02 | Consignes Claude Code (`CLAUDE.md`, `AGENTS.md`) sorties du dépôt public ; fichiers inutiles de `public/` supprimés | — |
+| 2026-11-02 | Migrations `006`, `007`, `008` lancées dans Supabase | — |
 | 2026-11-02 | Outils pour Claude Code : `npm run test:db`, `npm run test:e2e` (7 scénarios), docs de contexte, skills du projet | `fffff3c` |
 | 2026-11-02 | Recettes : produits scannés ou créés comme ingrédients ; présentation de l'appli au premier lancement (migration 008) | `dd65c5c` |
 | 2026-10-28 | Journal : aliments comptés en portions (burger, menu) ou en pots, parts…, poids de portion repris du scan | `2dafde1` |

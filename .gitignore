@@ -55,3 +55,7 @@ tests/e2e/captures/
 # consignes personnelles pour Claude Code
 CLAUDE.local.md
 .claude/settings.local.json
+
+# consignes pour Claude Code : gardées en local, hors du dépôt public
+AGENTS.md
+CLAUDE.md
