@@ -71,7 +71,7 @@ export default async function ({ browser, db }) {
   // 8. Déconnexion → copie effacée
   await page.goto(B + '/login').catch(() => {})
   await ctx.clearCookies(); await page.goto(B + '/login'); await page.waitForTimeout(1500)
-  const left = await page.evaluate(async () => ({ cache: !!(await caches.match('/courses')), ls: Object.keys(localStorage).filter((k) => k.startsWith('equilibre:courses:')).length }))
+  const left = await page.evaluate(async () => ({ cache: !!(await caches.match('/courses')), ls: Object.keys(localStorage).filter((k) => k.startsWith('dignis:courses:')).length }))
   check(!left.cache && left.ls === 0, `Copie effacée à la déconnexion ${JSON.stringify(left)}`)
 
   check(errors.length === 0, `aucune erreur JavaScript ${errors.slice(0, 3).join(' | ')}`)

@@ -39,8 +39,8 @@ const qty = (i: ShoppingItem) =>
 
 export function ShoppingList({ items, overrides, order, householdId, renderedAt }: Props) {
   const router = useRouter()
-  const KEY_SNAP = `equilibre:courses:${householdId}:copie`
-  const KEY_OPS = `equilibre:courses:${householdId}:attente`
+  const KEY_SNAP = `dignis:courses:${householdId}:copie`
+  const KEY_OPS = `dignis:courses:${householdId}:attente`
 
   const [base, setBase] = useState<Snapshot>({ renderedAt, items, overrides, order })
   const [ops, setOps] = useState<Op[]>([])

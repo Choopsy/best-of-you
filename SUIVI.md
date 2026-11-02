@@ -45,6 +45,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-02 | Tests dans Docker (`docker compose run --rm test`), sans rien installer sur le PC ; tests scan et RGPD fiabilisés ; clés internes renommées « dignis » | — |
 | 2026-11-02 | Emails : « Dignis » dans les modèles et le nom d'expéditeur | — |
 | 2026-11-02 | Consignes Claude Code (`CLAUDE.md`, `AGENTS.md`) sorties du dépôt public ; fichiers inutiles de `public/` supprimés | — |
 | 2026-11-02 | Migrations `006`, `007`, `008` lancées dans Supabase | — |

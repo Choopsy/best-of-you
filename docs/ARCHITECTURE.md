@@ -60,7 +60,7 @@ Tables : profiles, health_profiles, weight_logs, food_logs, activities, recipes,
 ## Comportements à connaître
 
 - **Navigation rapide** : `staleTimes` (next.config.ts) et `Link prefetch` sur la barre du bas et les onglets Cuisine. Après une écriture, les actions appellent `revalidatePath`.
-- **Hors connexion** : `public/sw.js` garde `/courses` (réseau d'abord) et les fichiers `/_next/static` ; la liste hors ligne est dans `localStorage` (`equilibre:courses:<foyer>:…`), envoyée au retour du réseau avec des identifiants générés côté client.
+- **Hors connexion** : `public/sw.js` garde `/courses` (réseau d'abord) et les fichiers `/_next/static` ; la liste hors ligne est dans `localStorage` (`dignis:courses:<foyer>:…`), envoyée au retour du réseau avec des identifiants générés côté client.
 - **Scan** : `components/scan/barcode-scanner.tsx` (zxing, double lecture pour éviter les erreurs, saisie manuelle de secours) puis `scanned-product.tsx` (trouvé / à compléter / à recopier ; mode `onPicked` pour les recettes).
 - **Bouton +** (`components/nav/new-item-sheet.tsx`) : raccourcis repas, scan, séance, frigo, recette, pesée.
 - **Premier lancement** : inscription → `/onboarding` (profil santé) → accueil, où `components/onboarding/welcome-tour.tsx` montre la présentation (vue = `localStorage` + `user_metadata.tour_done`). Animation d'ouverture : `components/brand/splash.tsx` (une fois par session).

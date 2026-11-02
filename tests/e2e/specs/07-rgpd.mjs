@@ -66,7 +66,8 @@ export default async function ({ browser, db }) {
     await page.locator('#confirm-delete').fill('supprimer')
     await page.getByRole('button', { name: 'Supprimer définitivement mon compte' }).click()
     await page.waitForURL('**/login**'); check(true, 'Compte supprimé → page de connexion')
-    check(await page.getByText('Ton compte et toutes tes données ont été supprimés').count() > 0, 'Message de confirmation')
+    // L'adresse change avant que la page soit affichée : on attend le message
+    check(await page.getByText('Ton compte et toutes tes données ont été supprimés').waitFor({ timeout: 10000 }).then(() => true, () => false), 'Message de confirmation')
     const b = await one(`SELECT (SELECT count(*) FROM auth.users WHERE id = $1) u, (SELECT count(*) FROM profiles WHERE id = $1) p`, ['bbbbbbbb-0000-0000-0000-000000000002'])
     check(b.u == 0 && b.p == 0, 'Bob effacé de la base')
   }

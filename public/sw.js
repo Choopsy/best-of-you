@@ -7,8 +7,8 @@
  * - Autres pages sans réseau : une petite page « Hors connexion » avec un lien vers les courses.
  * - Le message « clear » (envoyé à la déconnexion) efface la copie de la liste.
  */
-const PAGES = 'equilibre-pages-v1'
-const ASSETS = 'equilibre-assets-v1'
+const PAGES = 'dignis-pages-v1'
+const ASSETS = 'dignis-assets-v1'
 const KEEP = [PAGES, ASSETS]
 const COURSES = '/courses'
 const MAX_ASSETS = 250

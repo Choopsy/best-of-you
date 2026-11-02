@@ -8,6 +8,17 @@
 | `npm run test:e2e` | L'appli dans Chromium au format téléphone, scénario par scénario (`tests/e2e/specs`) | 3-4 min |
 | `npm run test:all` | Les trois derniers | |
 
+## Avec Docker (conseillé)
+
+Rien à installer sur la machine à part Docker Desktop : Node, paquets et Chromium sont dans le conteneur `test` (image officielle Playwright, voir `docker-compose.yml`).
+
+- `docker compose run --rm test` : tout (typage + `test:all`).
+- `docker compose run --rm test npm run test:e2e -- courses` : une commande précise.
+- Les paquets sont réinstallés seulement quand `package-lock.json` change. Les captures arrivent dans `tests/e2e/captures/` comme d'habitude.
+- La version de l'image (`v1.63.0`) doit suivre celle de `playwright` dans `package.json`.
+
+## Sans Docker
+
 Rien à installer à part `npm install` : Postgres (`embedded-postgres`) et PostgREST (`postgrest-dist`) arrivent par npm. Une seule fois : `npx playwright install chromium`. Sur Mac Apple Silicon, PostgREST n'existe pas dans `postgrest-dist` : `brew install postgrest` puis `POSTGREST_BIN=$(which postgrest)`.
 
 ## Tests e2e

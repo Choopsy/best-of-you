@@ -13,10 +13,10 @@ export function ServiceWorker() {
       .then(() => navigator.serviceWorker.ready)
       .then((reg) => {
         let warmed = false
-        try { warmed = sessionStorage.getItem('equilibre:courses-copie') === '1' } catch { /* rien */ }
+        try { warmed = sessionStorage.getItem('dignis:courses-copie') === '1' } catch { /* rien */ }
         if (warmed || !navigator.onLine) return
         reg.active?.postMessage({ type: 'warm-courses' })
-        try { sessionStorage.setItem('equilibre:courses-copie', '1') } catch { /* rien */ }
+        try { sessionStorage.setItem('dignis:courses-copie', '1') } catch { /* rien */ }
       })
       .catch(() => { /* sans service worker, l'appli marche quand même en ligne */ })
   }, [])
@@ -27,10 +27,10 @@ export function ServiceWorker() {
 export function ClearOfflineData() {
   useEffect(() => {
     try {
-      for (const k of Object.keys(localStorage)) if (k.startsWith('equilibre:courses:')) localStorage.removeItem(k)
-      sessionStorage.removeItem('equilibre:courses-copie')
+      for (const k of Object.keys(localStorage)) if (k.startsWith('dignis:courses:')) localStorage.removeItem(k)
+      sessionStorage.removeItem('dignis:courses-copie')
     } catch { /* rien */ }
-    if ('caches' in window) caches.delete('equilibre-pages-v1').catch(() => {})
+    if ('caches' in window) caches.delete('dignis-pages-v1').catch(() => {})
     navigator.serviceWorker?.controller?.postMessage({ type: 'clear' })
   }, [])
   return null

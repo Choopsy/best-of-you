@@ -32,6 +32,9 @@ const env = {
   NEXT_DIST_DIR: DIST,
   NEXT_PUBLIC_SUPABASE_URL: `http://localhost:${GATEWAY_PORT}`,
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'e2e',
+  // Le secours côté serveur ne doit jamais joindre le vrai Open Food Facts : adresse injoignable,
+  // le navigateur seul est simulé par mockOff (sinon une « panne » trouve quand même le produit)
+  OPENFOODFACTS_URL: 'http://127.0.0.1:9',
   NEXT_TELEMETRY_DISABLED: '1',
 }
 
