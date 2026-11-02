@@ -27,7 +27,8 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 ## Idées
 
-- [ ] `[Design]` Nouveau design « Chaleur éditoriale » : étape 2 (composants partagés), étape 3 (écrans un par un)
+- [ ] `[Design]` Écarts restants avec les maquettes : icône par rayon dans les courses, photos des aliments dans le journal, en-tête « Dignis » avec cloche, autres pages (recettes, frigo, semaine, profil) à harmoniser
+- [ ] `[Infra]` Test e2e courses parfois instable au premier passage après un build (Lait / Entretien) : à surveiller
 - [ ] `[Design]` Icône aux couleurs de Dignis (ou garder l'actuelle)
 - [ ] `[Journal]` Plats composés courants à ajouter à la base (tartiflette maison, salades traiteur…) : aujourd'hui Ciqual n'a que des versions industrielles
 - [ ] `[Journal]` Vitamines et minéraux (fer, calcium, B12, vitamine D) depuis la table Ciqual
@@ -46,6 +47,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-02 | Nouveau design, étapes 2 et 3 : ronds, cartes, barre du bas, feuilles, boutons ; écrans Accueil, Journal, Ajouter, Courses, Forme | `4013359`, `0c797ad` |
 | 2026-11-02 | Nouveau design, étape 1 : couleurs, polices (Epilogue, Karla) et ombres en clair et en sombre | `4766c95` |
 | 2026-11-02 | Tests dans Docker (`docker compose run --rm test`), sans rien installer sur le PC ; tests scan et RGPD fiabilisés ; clés internes renommées « dignis » | — |
 | 2026-11-02 | Emails : « Dignis » dans les modèles et le nom d'expéditeur | — |
