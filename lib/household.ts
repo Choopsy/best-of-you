@@ -5,6 +5,8 @@ export interface FridgeItem {
   id: string
   name: string
   ciqual_code: string | null
+  /** Produit du foyer (scanné ou créé) relié à l'article */
+  custom_food_id: string | null
   quantity: number | null
   unit: string | null
   expires_on: string | null
@@ -21,7 +23,7 @@ export async function getHouseholdId(supabase: SupabaseClient): Promise<string |
 export async function getFridge(supabase: SupabaseClient): Promise<FridgeItem[]> {
   const { data } = await supabase
     .from('fridge_items')
-    .select('id, name, ciqual_code, quantity, unit, expires_on, created_at')
+    .select('id, name, ciqual_code, custom_food_id, quantity, unit, expires_on, created_at')
     .order('expires_on', { ascending: true, nullsFirst: false })
     .order('name')
   return ((data ?? []) as FridgeItem[]).map((f) => ({ ...f, quantity: f.quantity != null ? Number(f.quantity) : null }))

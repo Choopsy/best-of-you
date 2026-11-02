@@ -3,7 +3,7 @@
 | Commande | Ce qu'elle vérifie | Durée |
 | --- | --- | --- |
 | `npx tsc --noEmit` | Typage | 20 s |
-| `npm test` | Logique pure (`scripts/test-*.ts`) : objectifs, courses, rayons, hors connexion, idées, bilan, Open Food Facts, portions et nutrition des recettes, import de repas | 10 s |
+| `npm test` | Logique pure (`scripts/test-*.ts`) : objectifs, courses, rayons, hors connexion, idées, bilan, Open Food Facts, portions et nutrition des recettes, import de repas, frigo qui suit le journal | 10 s |
 | `npm run test:db` | Règles de sécurité de la base : toutes les migrations sur un Postgres jetable, puis `supabase/tests/*.sql` | 30 s |
 | `npm run test:e2e` | L'appli dans Chromium au format téléphone, scénario par scénario (`tests/e2e/specs`) | 3-4 min |
 | `npm run test:all` | Les trois derniers | |

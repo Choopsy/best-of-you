@@ -10,6 +10,8 @@ type Result = { error: string | null }
 export interface FridgeInput {
   name: string
   ciqual_code: string | null
+  /** Produit du foyer relié (scan) : le rend cherchable et sûr à retrouver depuis le journal */
+  custom_food_id?: string | null
   quantity: number | null
   unit: string | null
   expires_on: string | null
@@ -24,6 +26,7 @@ function clean(input: FridgeInput): FridgeInput | string {
   return {
     name,
     ciqual_code: input.ciqual_code || null,
+    custom_food_id: input.custom_food_id || null,
     quantity: input.quantity ?? null,
     unit: input.quantity != null ? (input.unit?.trim() || null) : null,
     expires_on: input.expires_on || null,

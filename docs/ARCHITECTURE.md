@@ -40,6 +40,8 @@ Qui voit quoi :
 - Fonctions `SECURITY DEFINER` (`SET search_path = public`) quand deux politiques se citent l'une l'autre (sinon Postgres : « infinite recursion detected in policy »).
 - RGPD : `withdraw_health_data()`, `delete_my_account()` (photos supprimées avant via l'API Storage), export JSON, politique `/confidentialite`, page `/profile/donnees`.
 
+Le frigo peut être relié à un produit du foyer (`fridge_items.custom_food_id`, scan au frigo) : le produit devient cherchable dans le journal et les recettes.
+
 Tables : profiles, health_profiles, weight_logs, food_logs, activities, recipes, ingredient_groups, ingredients, steps, step_ingredients, tags, recipe_tags, recipe_likes, recipe_reviews, recipe_shares, collections, collection_recipes, friendships, households, household_members, household_invites, fridge_items, meal_plan, shopping_items, aisle_overrides, custom_foods, canonical_ingredients (Ciqual).
 
 ## Modules clés de `lib/`
@@ -53,6 +55,7 @@ Tables : profiles, health_profiles, weight_logs, food_logs, activities, recipes,
 | `off.ts` | Open Food Facts : appelé **depuis le téléphone** (limite de 15 produits/min par IP ; depuis Vercel toutes les IP sont partagées), serveur en secours. |
 | `journal.ts`, `weekly.ts`, `weekly-data.ts` | Journal du jour, récents, bilan de la semaine (moyennes sur les jours notés). |
 | `meal-import.ts` | Import d'un repas en JSON (`/journal/importer`, lien discret dans Mes données) : lecture et vérification, relue côté serveur. Champ `type` prévu pour les recettes. |
+| `fridge-use.ts` | Le frigo suit le journal : correspondance (produit, Ciqual, nom), unités, restes ; retraits gardés dans `food_logs.fridge_moves` et remis à la suppression (migration 009). |
 | `shopping.ts`, `aisles.ts`, `offline-list.ts` | Liste de courses (semaine moins le frigo), rayons (dictionnaire + corrections du foyer), file d'attente hors connexion. |
 | `suggest.ts` | « Qu'est-ce qu'on mange ? » selon le frigo. |
 | `activities.ts`, `weight.ts` | MET (Compendium 2024), repères OMS, tendance du poids (moyenne lissée). |

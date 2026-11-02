@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Portal } from '@/components/ui/portal'
 import { IngredientAutocomplete } from '@/components/recipes/ingredient-autocomplete'
 import { addFridgeItem, deleteFridgeItem, updateFridgeItem } from '@/actions/fridge'
+import { saveProduct } from '@/actions/products'
 import { shiftDate } from '@/lib/dates'
 import type { FridgeItem } from '@/lib/household'
 
@@ -35,6 +36,8 @@ export function FridgeSheet({ today, item, trigger = 'button', defaultOpen = fal
   const [open, setOpen] = useState(defaultOpen)
   const [name, setName] = useState(item?.name ?? '')
   const [code, setCode] = useState<string | null>(item?.ciqual_code ?? null)
+  // Produit du foyer relié (scan ou « Mes produits ») : cherchable partout et retrouvé depuis le journal
+  const [customId, setCustomId] = useState<string | null>(item?.custom_food_id ?? null)
   const [quantity, setQuantity] = useState(item?.quantity != null ? String(item.quantity) : '')
   const [unit, setUnit] = useState(item?.unit ?? '')
   const [expires, setExpires] = useState(item?.expires_on ?? '')
@@ -50,7 +53,17 @@ export function FridgeSheet({ today, item, trigger = 'button', defaultOpen = fal
       const p = await lookupProduct(barcode)
       if (p.found && p.name) {
         setName(p.brand ? `${p.name} (${p.brand})` : p.name); setCode(null)
-        setLookup(null)
+        // Le produit rejoint « Mes produits » (s'il n'y est pas déjà) et reste relié à l'article
+        let id = p.saved?.id ?? null
+        if (!id && p.per100) {
+          const res = await saveProduct({
+            barcode, name: p.name, brand: p.brand ?? null, image_url: p.image_url ?? null, source: 'off',
+            per100: p.per100, perPortion: p.perPortion, portionGrams: p.portionGrams ?? null,
+          })
+          id = res.id ?? null
+        }
+        setCustomId(id)
+        setLookup(id ? 'Produit enregistré dans « Mes produits ».' : null)
       } else {
         setLookup(p.error ? 'Open Food Facts ne répond pas : écris son nom à la main.' : 'Produit inconnu : écris son nom à la main.')
       }
@@ -60,7 +73,7 @@ export function FridgeSheet({ today, item, trigger = 'button', defaultOpen = fal
   }
 
   const reset = () => {
-    if (!item) { setName(''); setCode(null); setQuantity(''); setUnit(''); setExpires('') }
+    if (!item) { setName(''); setCode(null); setCustomId(null); setQuantity(''); setUnit(''); setExpires('') }
     setLookup(null)
     setError(null)
   }
@@ -68,7 +81,7 @@ export function FridgeSheet({ today, item, trigger = 'button', defaultOpen = fal
 
   const submit = () => start(async () => {
     const q = quantity.trim() ? Number(quantity.replace(',', '.')) : null
-    const input = { name, ciqual_code: code, quantity: q, unit: unit || null, expires_on: expires || null }
+    const input = { name, ciqual_code: code, custom_food_id: customId, quantity: q, unit: unit || null, expires_on: expires || null }
     const res = item ? await updateFridgeItem(item.id, input) : await addFridgeItem(input)
     if (res.error) { setError(res.error); return }
     close()
@@ -121,17 +134,17 @@ export function FridgeSheet({ today, item, trigger = 'button', defaultOpen = fal
                   <IngredientAutocomplete
                     value={name}
                     ciqualCode={code}
-                    onChange={(n, c) => { setName(n); setCode(c) }}
+                    onChange={(n, c) => { setName(n); setCode(c); if (!c) setCustomId(null) }}
+                    onPick={(f) => { if (f.kind === 'custom') { setCustomId(f.code); setCode(null) } else setCustomId(null) }}
+                    includeProducts
                     placeholder="Ex : lait, poulet, courgettes…"
                     showStatus={false}
                     autoFocus={!item}
                   />
-                  {!item && (
-                    <button type="button" onClick={() => setScanning(true)}
-                      className="flex min-h-10 items-center gap-2 text-sm font-bold text-primary">
-                      <ScanBarcode className="h-4 w-4" /> Scanner le code-barres
-                    </button>
-                  )}
+                  <button type="button" onClick={() => setScanning(true)}
+                    className="flex min-h-11 items-center gap-2 text-sm font-bold text-primary">
+                    <ScanBarcode className="h-4 w-4" /> {item && !customId ? 'Relier au produit (code-barres)' : 'Scanner le code-barres'}
+                  </button>
                   <p className="text-xs text-muted-foreground">{lookup ?? 'Choisir dans la liste aide à le retrouver dans tes recettes.'}</p>
                 </div>
 

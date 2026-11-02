@@ -12,7 +12,9 @@ import { BarcodeScanner } from '@/components/scan/barcode-scanner'
 import { ScannedProduct } from '@/components/scan/scanned-product'
 import { QuantityField, defaultQty, parseQty } from '@/components/journal/quantity-field'
 import { defaultUnit, type PortionInfo, type QtyUnit } from '@/lib/portions'
-import { addAgain, addFoodToLog, addRecipeToLog } from '@/actions/journal'
+import { addAgain, addFoodToLog, addRecipeToLog, fridgeProposals } from '@/actions/journal'
+import { FridgePanel, fridgeUses, type FridgeChoice } from '@/components/journal/fridge-panel'
+import type { FridgeProposal } from '@/lib/fridge-use'
 import { MEALS, MEAL_LABELS, mealForHour, type FoodSuggestion, type Meal, type PickableRecipe } from '@/lib/types'
 import type { RecentEntry } from '@/lib/journal'
 
@@ -74,9 +76,14 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
   const [picked, setPicked] = useState<PickableRecipe | null>(recipe ?? null)
   const [servings, setServings] = useState('1')
 
+  // Frigo : ce qu'on pourrait en retirer, coché par défaut
+  const [proposals, setProposals] = useState<FridgeProposal[]>([])
+  const [choices, setChoices] = useState<Record<string, FridgeChoice>>({})
+
   const reset = () => {
     setFoodText(''); setFood(null); setGrams('100'); setUnit('g'); setBarcode(null); setScanning(false); setCreating(false)
     setQuery(''); setPicked(recipe ?? null); setServings('1'); setError(null); setAdded(new Set())
+    setProposals([]); setChoices({})
     setTab(firstTab)
   }
   const close = () => {
@@ -105,20 +112,40 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
     start(async () => {
       const amount = parseQty(grams)
       const qty = unit === 'portion' ? { portions: amount } : { grams: amount }
+      const uses = fridgeUses(proposals, choices)
       const res = tab === 'food'
         ? food
           ? await addFoodToLog(food.kind === 'custom'
-            ? { date: day, meal: selectedMeal, customId: food.code, ...qty }
-            : { date: day, meal: selectedMeal, code: food.code, ...qty })
+            ? { date: day, meal: selectedMeal, customId: food.code, ...qty, fridge: uses }
+            : { date: day, meal: selectedMeal, code: food.code, ...qty, fridge: uses })
           : { error: 'Choisis un aliment dans la liste, ou scanne-le.' }
         : picked
-          ? await addRecipeToLog({ date: day, meal: selectedMeal, recipeId: picked.id, servings: Number(servings.replace(',', '.')) })
+          ? await addRecipeToLog({ date: day, meal: selectedMeal, recipeId: picked.id, servings: Number(servings.replace(',', '.')), fridge: uses })
           : { error: 'Choisis une recette.' }
       if (res.error) { setError(res.error); return }
       close()
       router.refresh()
     })
   }
+
+  // Propositions du frigo, recalculées quand l'aliment, la quantité ou la recette changent
+  useEffect(() => {
+    if (!open || (tab === 'food' && (!food || barcode || creating)) || (tab === 'recipe' && !picked) || tab === 'recent') {
+      setProposals([]); return
+    }
+    const amount = parseQty(grams)
+    const n = Number(servings.replace(',', '.'))
+    // Une réponse arrivée après un changement (autre aliment, autre quantité) est ignorée
+    let live = true
+    const t = setTimeout(async () => {
+      const list = tab === 'food' && food
+        ? await fridgeProposals({ kind: 'food', ...(food.kind === 'custom' ? { customId: food.code } : { code: food.code }),
+            ...(unit === 'portion' ? { portions: amount } : { grams: amount }) })
+        : picked && n > 0 ? await fridgeProposals({ kind: 'recipe', recipeId: picked.id, servings: n }) : []
+      if (live) setProposals(list)
+    }, 350)
+    return () => { live = false; clearTimeout(t) }
+  }, [open, tab, food, picked, grams, unit, servings, barcode, creating])
 
   const filtered = recipes.filter((r) => r.title.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 30)
   const portion: PortionInfo = { perPortion: !!food?.perPortion, portionGrams: food?.portionGrams ?? null }
@@ -293,6 +320,11 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
                     <Input id="servings" type="number" inputMode="decimal" step="0.5" min={0.5} max={20} value={servings} onChange={(e) => setServings(e.target.value)} />
                   </div>
                 </div>
+              )}
+
+              {(tab === 'food' || tab === 'recipe') && showFooter && (
+                <FridgePanel proposals={proposals} choices={choices}
+                  onChange={(id, c) => setChoices((all) => ({ ...all, [id]: c }))} />
               )}
 
               {error && <p className="text-sm text-destructive">{error}</p>}
