@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 
 export function PageHeader({ title, back, children }: { title: React.ReactNode; back?: string; children?: React.ReactNode }) {
   return (
-    <header className="sticky top-0 md:top-14 z-10 bg-background/95 px-3 py-2 flex items-center justify-between gap-2 min-h-14">
+    <header className="sticky top-0 md:top-14 z-10 bg-background px-3 py-2 flex items-center justify-between gap-2 min-h-14">
       <div className="flex items-center gap-1 min-w-0">
         {back && (
           <Link href={back}>

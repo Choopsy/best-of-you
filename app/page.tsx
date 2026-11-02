@@ -96,9 +96,7 @@ export default async function HomePage() {
         </Link>
       )}
 
-      <Link href="/journal" className="block" aria-label="Ouvrir le journal du jour">
-        <DaySummary totals={totals} targets={ctx.targets} compact />
-      </Link>
+      <DaySummary totals={totals} targets={ctx.targets} />
 
       {lastWeek && (
         <Link href="/bilan" className="flex items-center gap-3 rounded-3xl bg-card px-4 py-3.5 shadow-card">

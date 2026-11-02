@@ -18,6 +18,13 @@ export default async function ({ browser }) {
       // Sinon la capture peut partir avant les polices (texte de secours)
       await page.evaluate(() => document.fonts.ready)
       await shot(page, `apercu-${name}-${theme}`, { fullPage: true })
+      if (name === 'journal') {
+        // La ligne d'énergie doit rester visible en haut pendant le défilement
+        await page.mouse.wheel(0, 700); await page.waitForTimeout(400)
+        const top = await page.getByRole('group', { name: /^Énergie/ }).evaluate((el) => el.getBoundingClientRect().top)
+        check(top >= 0 && top < 120, `journal : ligne d'énergie collée en haut (${Math.round(top)} px)`)
+        await shot(page, `apercu-journal-defile-${theme}`)
+      }
     }
     // Feuille « Que veux-tu ajouter ? » ouverte depuis le bouton + de la barre du bas
     await page.goto(B + '/')
