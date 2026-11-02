@@ -19,9 +19,9 @@ export function EntryRow({ entry }: { entry: FoodLog }) {
     : entry.label
 
   return (
-    <li className={`flex items-center gap-3 py-2 ${pending ? 'opacity-40' : ''}`}>
+    <li className={`flex items-center gap-3 py-2.5 ${pending ? 'opacity-40' : ''}`}>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium truncate">{title}</p>
+        <p className="text-[15px] font-semibold truncate">{title}</p>
         <p className="text-xs text-muted-foreground tabular-nums">
           {qty} · P {f(entry.proteins_g)} g · G {f(entry.carbs_g)} g · L {f(entry.fat_g)} g
         </p>
@@ -32,7 +32,7 @@ export function EntryRow({ entry }: { entry: FoodLog }) {
         aria-label="Supprimer"
         disabled={pending}
         onClick={() => start(async () => { await deleteFoodLog(entry.id) })}
-        className="h-8 w-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+        className="h-11 w-11 -mr-2 flex items-center justify-center rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10"
       >
         <Trash2 className="h-3.5 w-3.5" />
       </button>

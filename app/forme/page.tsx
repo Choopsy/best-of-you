@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ChevronRight, Dumbbell, Info } from 'lucide-react'
+import { BicepsFlexed, CircleCheck, Dumbbell, Flame, Info, ChevronRight } from 'lucide-react'
 import { getSession } from '@/lib/auth'
 import { getHealthContext } from '@/lib/health'
 import { formatShortFr, shiftDate, todayISO, weekStart } from '@/lib/dates'
@@ -24,17 +24,12 @@ const RANGES = [
 ]
 const f = (v: number, d = 0) => v.toLocaleString('fr-FR', { maximumFractionDigits: d })
 
-function WeekRing({ label, value, max, unit, hint }: { label: string; value: number; max: number; unit: string; hint: string }) {
-  const done = value >= max
+function Stat({ Icon, value, label }: { Icon: typeof Flame; value: string; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-1.5 text-center min-w-0">
-      <Ring value={value} max={max} size={80} stroke={9} color={done ? 'var(--sage)' : 'var(--terracotta)'}
-        label={`${label} : ${f(value)} sur ${f(max)} ${unit}`}>
-        <span className="font-heading text-xl leading-none tabular-nums">{f(value)}</span>
-        <span className="text-[10px] text-muted-foreground">/ {f(max)}</span>
-      </Ring>
-      <span className="text-[13px] font-bold leading-tight">{label}</span>
-      <span className="text-[11px] text-muted-foreground leading-tight">{hint}</span>
+    <div className="flex flex-col items-center gap-1 rounded-2xl bg-muted px-1 py-3 text-center min-w-0">
+      <Icon className="h-4 w-4 text-terracotta" aria-hidden="true" />
+      <span className="font-heading text-lg font-semibold leading-none tabular-nums">{value}</span>
+      <span className="text-[11px] text-muted-foreground leading-tight">{label}</span>
     </div>
   )
 }
@@ -62,6 +57,8 @@ export default async function FormePage({ searchParams }: Props) {
   const activities = (acts ?? []).map((a) => ({ ...a, met: Number(a.met), kcal_net: Number(a.kcal_net) }))
   const week = activities.filter((a) => a.done_on >= monday)
   const summary = weekSummary(week)
+  const weekKcal = week.reduce((a, w) => a + w.kcal_net, 0)
+  const minutesPct = Math.round((summary.moderateEquivalent / WHO_WEEKLY_MINUTES) * 100)
   const recentKeys = [...new Set(activities.map((a) => a.activity_key))].slice(0, 4)
   const sessionsGoal = ctx.health?.weekly_sessions_goal ?? null
   const logged = ctx.health?.sport_mode === 'logged'
@@ -87,21 +84,32 @@ export default async function FormePage({ searchParams }: Props) {
         {/* ── Semaine ── */}
         <section className="space-y-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg">Cette semaine</h2>
+            <h2 className="text-xl">Temps actif</h2>
             <Link href={`/bilan?semaine=${monday}`} className="flex min-h-10 items-center gap-1 text-sm font-bold text-primary">
               Bilan complet <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="rounded-3xl bg-card px-3 py-5 shadow-card space-y-4">
-            <div className="grid grid-cols-3 gap-2">
-              <WeekRing label="Séances" value={summary.sessions} max={sessionsGoal ?? 3} unit="séances"
-                hint={sessionsGoal ? 'ton objectif' : 'objectif à choisir'} />
-              <WeekRing label="Minutes actives" value={summary.moderateEquivalent} max={WHO_WEEKLY_MINUTES} unit="minutes"
-                hint="repère OMS" />
-              <WeekRing label="Renforcement" value={summary.strengthDays} max={WHO_STRENGTH_DAYS} unit="jours"
-                hint="jours · repère OMS" />
+          <div className="rounded-3xl bg-card px-5 py-5 shadow-card space-y-4">
+            <div className="flex items-center gap-5">
+              <Ring value={summary.moderateEquivalent} max={WHO_WEEKLY_MINUTES} size={124} stroke={12}
+                color={summary.moderateEquivalent >= WHO_WEEKLY_MINUTES ? 'var(--sage)' : 'var(--terracotta)'}
+                label={`Minutes actives : ${f(summary.moderateEquivalent)} sur ${WHO_WEEKLY_MINUTES}`}>
+                <span className="font-heading text-3xl font-bold leading-none tabular-nums">{f(summary.moderateEquivalent)}</span>
+                <span className="text-xs text-muted-foreground">/ {WHO_WEEKLY_MINUTES} min</span>
+              </Ring>
+              <div className="min-w-0 space-y-2">
+                <span className="inline-flex rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground tabular-nums">
+                  {minutesPct} % du repère OMS
+                </span>
+                <p className="text-sm leading-snug text-muted-foreground">Minutes d&apos;activité modérée cette semaine.</p>
+              </div>
             </div>
-            <p className="px-2 text-xs text-muted-foreground leading-relaxed">
+            <div className="grid grid-cols-3 gap-2">
+              <Stat Icon={CircleCheck} value={`${summary.sessions} / ${sessionsGoal ?? 3}`} label={sessionsGoal ? 'Séances' : 'Séances (à choisir)'} />
+              <Stat Icon={BicepsFlexed} value={`${summary.strengthDays} / ${WHO_STRENGTH_DAYS}`} label="Jours de renfo" />
+              <Stat Icon={Flame} value={`≈ ${f(weekKcal)}`} label="kcal dépensées" />
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
               L&apos;OMS conseille au moins 150 minutes d&apos;activité modérée par semaine (une minute soutenue,
               comme la course, compte double) et du renforcement musculaire au moins 2 jours.
               {!sessionsGoal && <> <Link href="/profile/health" className="font-bold text-primary underline-offset-2 hover:underline">Choisir mon objectif de séances</Link></>}
@@ -128,7 +136,7 @@ export default async function FormePage({ searchParams }: Props) {
 
         {/* ── Séances ── */}
         <section className="space-y-2">
-          <h2 className="text-lg">Mes séances</h2>
+          <h2 className="text-xl">Mes séances</h2>
           {activities.length === 0 ? (
             <div className="flex flex-col items-center gap-3 rounded-3xl bg-card px-6 py-8 text-center shadow-card">
               <Dumbbell className="h-10 w-10 text-muted-foreground/40" />
@@ -140,11 +148,14 @@ export default async function FormePage({ searchParams }: Props) {
               </div>
             </div>
           ) : (
-            <ul className="rounded-3xl bg-card divide-y shadow-card">
+            <ul className="space-y-2.5">
               {activities.slice(0, 15).map((a) => (
-                <li key={a.id} className="flex items-center gap-3 pl-4 pr-2 py-2.5">
+                <li key={a.id} className="flex items-center gap-3 rounded-3xl bg-card pl-4 pr-2 py-3 shadow-card">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sage/15">
+                    <Dumbbell className="h-5 w-5 text-sage" aria-hidden="true" />
+                  </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[15px] font-bold">{a.label}</p>
+                    <p className="truncate font-heading text-base font-semibold">{a.label}</p>
                     <p className="text-xs text-muted-foreground tabular-nums">
                       {a.done_on === today ? "Aujourd'hui" : formatShortFr(a.done_on)} · {a.duration_min} min · ≈ {f(a.kcal_net)} kcal
                     </p>
@@ -158,11 +169,11 @@ export default async function FormePage({ searchParams }: Props) {
 
         {/* ── Poids ── */}
         <section className="space-y-2">
-          <h2 className="text-lg">Mon poids</h2>
-          <div className="rounded-3xl bg-card px-4 py-4 shadow-card space-y-4">
+          <h2 className="text-xl">Tendance de poids</h2>
+          <div className="rounded-3xl bg-card px-5 py-5 shadow-card space-y-4">
             <div className="grid grid-cols-3 gap-2 text-center">
               <div>
-                <p className="font-heading text-2xl tabular-nums">{trendNow != null ? f(trendNow, 1) : '—'}</p>
+                <p className="font-heading text-3xl font-bold tabular-nums">{trendNow != null ? f(trendNow, 1) : '—'}</p>
                 <p className="text-[11px] text-muted-foreground">kg · tendance</p>
               </div>
               <div>
@@ -177,10 +188,10 @@ export default async function FormePage({ searchParams }: Props) {
               </div>
             </div>
 
-            <nav aria-label="Période" className="grid grid-cols-3 gap-1 rounded-2xl bg-muted p-1">
+            <nav aria-label="Période" className="grid grid-cols-3 gap-1 rounded-full bg-secondary p-1">
               {RANGES.map((r) => (
                 <Link key={r.key} href={`/forme?range=${r.key}`} scroll={false} aria-current={r.key === range.key ? 'page' : undefined}
-                  className={`flex min-h-9 items-center justify-center rounded-xl text-sm font-bold ${r.key === range.key ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}>
+                  className={`flex min-h-10 items-center justify-center rounded-full text-sm font-semibold ${r.key === range.key ? 'bg-card text-primary shadow-card' : 'text-muted-foreground'}`}>
                   {r.label}
                 </Link>
               ))}

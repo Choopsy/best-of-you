@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Activity, AlarmClock, ArrowRight, CalendarCheck, ChevronRight, Plus, Sparkles, User } from 'lucide-react'
+import { Activity, ArrowRight, CalendarCheck, ChefHat, ChevronRight, Leaf, Plus, Sparkles, User, UtensilsCrossed } from 'lucide-react'
+import { APP_SIGNATURE } from '@/lib/brand'
 import { weekSummary, WHO_WEEKLY_MINUTES } from '@/lib/activities'
 import { getSession } from '@/lib/auth'
 import { DaySummary } from '@/components/journal/day-summary'
@@ -17,9 +18,9 @@ import { MEALS, MEAL_LABELS } from '@/lib/types'
 import { WelcomeTour } from '@/components/onboarding/welcome-tour'
 
 const MEAL_TINT: Record<string, string> = {
-  breakfast: 'bg-secondary text-secondary-foreground',
+  breakfast: 'bg-accent text-accent-foreground',
   lunch: 'bg-sage/15 text-foreground',
-  dinner: 'bg-honey/20 text-foreground',
+  dinner: 'bg-coral/15 text-foreground',
   snack: 'bg-muted text-foreground',
 }
 const MEAL_SHORT: Record<string, string> = { breakfast: 'Matin', lunch: 'Midi', dinner: 'Soir', snack: 'Pause' }
@@ -62,7 +63,8 @@ export default async function HomePage() {
       <header className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm text-muted-foreground first-letter:uppercase">{formatDateFr(today)}</p>
-          <h1 className="text-[30px] leading-tight">Bonjour{firstName ? ` ${firstName}` : ''}</h1>
+          <h1 className="text-[30px] font-bold leading-tight">Bonjour{firstName ? ` ${firstName}` : ''}</h1>
+          <p className="mt-0.5 text-sm italic text-muted-foreground">{APP_SIGNATURE}</p>
         </div>
         <Link href="/profile" aria-label={friendRequests ? 'Mon profil (demandes d\'amis en attente)' : 'Mon profil'} className="md:hidden relative h-11 w-11 shrink-0">
           <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-muted">
@@ -75,8 +77,10 @@ export default async function HomePage() {
       </header>
 
       {expiring.length > 0 && (
-        <Link href="/frigo" className="flex items-center gap-3 rounded-3xl bg-honey/20 px-4 py-3.5">
-          <AlarmClock className="h-5 w-5 shrink-0 text-foreground" />
+        <Link href="/frigo" className="flex items-center gap-3 rounded-3xl bg-secondary px-4 py-3.5">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-honey/25">
+            <Leaf className="h-5 w-5 text-foreground" aria-hidden="true" />
+          </span>
           <span className="min-w-0 flex-1">
             <span className="block text-[15px] font-bold">
               {expiring.length === 1 ? '1 aliment à consommer vite' : `${expiring.length} aliments à consommer vite`}
@@ -86,9 +90,15 @@ export default async function HomePage() {
               {expiring.length > 3 ? '…' : ''}
             </span>
           </span>
-          <ChevronRight className="h-4 w-4 shrink-0" />
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-card">
+            <ChevronRight className="h-4 w-4" />
+          </span>
         </Link>
       )}
+
+      <Link href="/journal" className="block" aria-label="Ouvrir le journal du jour">
+        <DaySummary totals={totals} targets={ctx.targets} compact />
+      </Link>
 
       {lastWeek && (
         <Link href="/bilan" className="flex items-center gap-3 rounded-3xl bg-card px-4 py-3.5 shadow-card">
@@ -107,13 +117,11 @@ export default async function HomePage() {
 
       <WeekRings days={week} target={ctx.targets?.energyKcal ?? null} today={today} />
 
-      <Link href="/journal" className="block" aria-label="Ouvrir le journal du jour">
-        <DaySummary totals={totals} targets={ctx.targets} compact />
-      </Link>
-
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl">Mes repas</h2>
+          <h2 className="flex items-center gap-2 text-xl">
+            <UtensilsCrossed className="h-5 w-5 text-terracotta" aria-hidden="true" /> Aujourd&apos;hui
+          </h2>
           <Link href="/journal?add=1" className="flex items-center gap-1 text-sm font-bold text-primary">
             <Plus className="h-4 w-4" /> Ajouter
           </Link>
@@ -127,15 +135,15 @@ export default async function HomePage() {
             {meals.flatMap(({ meal, items }) => items.map((l) => (
               <li key={l.id}>
                 <Link href={l.recipe_id ? `/recipes/${l.recipe_id}` : '/journal'}
-                  className="flex items-center gap-3 rounded-2xl bg-card px-3.5 py-3">
-                  <span className={`flex h-10 w-12 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold ${MEAL_TINT[meal]}`}>
+                  className="flex min-h-16 items-center gap-3 rounded-2xl bg-card px-3.5 py-3 shadow-card">
+                  <span className={`flex h-7 min-w-14 shrink-0 items-center justify-center rounded-full px-2.5 text-[11px] font-semibold ${MEAL_TINT[meal]}`}>
                     {MEAL_SHORT[meal]}
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate text-[15px] font-bold">{l.label}</span>
                     <span className="text-xs text-muted-foreground">{MEAL_LABELS[meal]}</span>
                   </span>
-                  <span className="text-sm font-bold tabular-nums">{Math.round(Number(l.energy_kcal))} kcal</span>
+                  <span className="text-sm font-bold text-primary tabular-nums">{Math.round(Number(l.energy_kcal))} kcal</span>
                 </Link>
               </li>
             )))}
@@ -143,25 +151,50 @@ export default async function HomePage() {
         )}
       </section>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Link href="/idees" className="flex flex-col gap-2 rounded-3xl bg-card px-4 py-3.5 shadow-card">
-          <Sparkles className="h-5 w-5 text-primary" />
-          <span className="text-[15px] font-bold leading-snug">Qu&apos;est-ce qu&apos;on mange ce soir ?</span>
-          <span className="text-xs text-muted-foreground">Idées avec ton frigo</span>
-        </Link>
-        <Link href="/forme" className="flex flex-col gap-2 rounded-3xl bg-card px-4 py-3.5 shadow-card">
-          <Activity className="h-5 w-5 text-sage" />
-          <span className="text-[15px] font-bold leading-snug tabular-nums">
-            {sport.sessions} séance{sport.sessions > 1 ? 's' : ''}{sessionsGoal ? ` / ${sessionsGoal}` : ''}
+      <Link href="/forme" className="block rounded-3xl bg-secondary px-5 py-4 space-y-3">
+        <span className="flex items-center justify-between gap-2">
+          <span className="flex items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sage/15">
+              <Activity className="h-5 w-5 text-sage" aria-hidden="true" />
+            </span>
+            <span className="font-heading text-lg font-semibold">Sport cette semaine</span>
           </span>
-          <span className="text-xs text-muted-foreground tabular-nums">{sport.moderateEquivalent} / {WHO_WEEKLY_MINUTES} min actives cette semaine</span>
-        </Link>
-      </div>
+          {sport.moderateEquivalent >= WHO_WEEKLY_MINUTES && (
+            <span className="rounded-full bg-sage/15 px-3 py-1 text-xs font-semibold">Repère atteint</span>
+          )}
+        </span>
+        <span className="flex items-baseline justify-between gap-2">
+          <span className="tabular-nums">
+            <span className="font-heading text-3xl font-bold">{sport.moderateEquivalent}</span>
+            <span className="text-sm text-muted-foreground"> / {WHO_WEEKLY_MINUTES} min actives</span>
+          </span>
+          <span className="text-xs font-semibold text-muted-foreground tabular-nums">
+            {sport.sessions} séance{sport.sessions > 1 ? 's' : ''}{sessionsGoal ? ` sur ${sessionsGoal}` : ''}
+          </span>
+        </span>
+        <span className="block h-2 overflow-hidden rounded-full bg-track" aria-hidden="true">
+          <span className="block h-full rounded-full bg-sage" style={{ width: `${Math.min(100, Math.round((sport.moderateEquivalent / WHO_WEEKLY_MINUTES) * 100))}%` }} />
+        </span>
+        <span className="block text-[11px] text-muted-foreground">Repère OMS : {WHO_WEEKLY_MINUTES} min d&apos;activité modérée par semaine</span>
+      </Link>
+
+      <Link href="/idees" className="flex items-center gap-3 rounded-3xl bg-card px-4 py-3.5 shadow-card">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-terracotta/15">
+          <Sparkles className="h-5 w-5 text-primary" aria-hidden="true" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[15px] font-bold">Qu&apos;est-ce qu&apos;on mange ce soir ?</span>
+          <span className="block text-xs text-muted-foreground">Idées avec ton frigo</span>
+        </span>
+        <ChevronRight className="h-4 w-4 shrink-0" />
+      </Link>
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl">Mes recettes</h2>
-          <Link href="/recipes" className="flex items-center gap-1 text-sm font-bold text-muted-foreground">
+          <h2 className="flex items-center gap-2 text-xl">
+            <ChefHat className="h-5 w-5 text-honey" aria-hidden="true" /> Mes recettes
+          </h2>
+          <Link href="/recipes" className="flex min-h-11 items-center gap-1 text-sm font-bold text-primary">
             Tout voir <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -170,8 +203,13 @@ export default async function HomePage() {
             Ajoute ta première recette : ses valeurs nutritionnelles seront calculées automatiquement.
           </Link>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {recipes.map((r) => <RecipeCard key={r.id} recipe={r} showAuthor={false} from="/" />)}
+          // Défilement horizontal sur téléphone, comme une étagère de magazine
+          <div className="-mx-5 flex snap-x gap-3 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-4 sm:px-0">
+            {recipes.map((r) => (
+              <div key={r.id} className="w-[46%] shrink-0 snap-start sm:w-auto">
+                <RecipeCard recipe={r} showAuthor={false} from="/" />
+              </div>
+            ))}
           </div>
         )}
       </section>

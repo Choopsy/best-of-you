@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, Plus, Refrigerator, MoreHorizontal, ArrowDownUp, CloudOff, RefreshCw } from 'lucide-react'
+import { Check, Plus, Refrigerator, MoreHorizontal, ArrowDownUp, CloudOff, RefreshCw, CloudCheck, ShoppingBasket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -125,23 +125,23 @@ export function ShoppingList({ items, overrides, order, householdId, renderedAt 
   const groups = useMemo(() => groupByAisle(todo, base.overrides, base.order), [todo, base.overrides, base.order])
 
   const Row = ({ i }: { i: ShoppingItem }) => (
-    <li className="flex items-center gap-1 pl-2 pr-1 py-1">
+    <li className={`flex items-center gap-1 rounded-2xl pl-1 pr-0 py-0.5 ${i.checked ? 'bg-muted/60' : ''}`}>
       <button type="button" role="checkbox" aria-checked={i.checked}
         onClick={() => act({ kind: 'toggle', id: i.id, checked: !i.checked })}
-        className="flex min-h-12 flex-1 items-center gap-3 rounded-xl px-2 text-left">
-        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 transition-colors ${
-          i.checked ? 'border-sage bg-sage text-primary-foreground' : 'border-input'}`}>
+        className="flex min-h-12 flex-1 items-center gap-3 rounded-2xl px-2 text-left">
+        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+          i.checked ? 'border-sage bg-sage text-background' : 'border-transparent bg-muted'}`}>
           {i.checked && <Check className="h-4 w-4" strokeWidth={3} />}
         </span>
         <span className="min-w-0 flex-1">
-          <span className={`block text-[15px] font-bold ${i.checked ? 'line-through text-muted-foreground' : ''}`}>
+          <span className={`block text-[15px] font-semibold ${i.checked ? 'line-through text-muted-foreground' : ''}`}>
             {i.name}{qty(i) && <span className="font-normal text-muted-foreground"> · {qty(i)}</span>}
           </span>
           {i.note && !i.checked && <span className="block text-xs text-muted-foreground">{i.note}</span>}
         </span>
       </button>
       <button type="button" aria-label={`Options pour ${i.name}`} onClick={() => setMenuFor(i)}
-        className="h-11 w-11 shrink-0 flex items-center justify-center rounded-xl text-muted-foreground hover:bg-muted">
+        className="h-11 w-11 shrink-0 flex items-center justify-center rounded-full text-muted-foreground hover:bg-muted">
         <MoreHorizontal className="h-5 w-5" />
       </button>
     </li>
@@ -149,8 +149,10 @@ export function ShoppingList({ items, overrides, order, householdId, renderedAt 
 
   return (
     <div className="space-y-4">
-      {(!online || ops.length > 0) && (
-        <div role="status" className="flex items-start gap-2.5 rounded-2xl bg-muted px-4 py-3 text-sm">
+      {/* Un seul bandeau, toujours au même endroit et de même hauteur : sinon la liste saute
+          à chaque envoi (bandeau « envoi » qui apparaît, bandeau « disponible » qui disparaît) */}
+      {(!online || ops.length > 0) ? (
+        <div role="status" className="flex min-h-11 items-start gap-2.5 rounded-2xl bg-muted px-4 py-3 text-sm">
           {online ? <RefreshCw className={`h-4 w-4 shrink-0 mt-0.5 ${syncing ? 'animate-spin' : ''}`} /> : <CloudOff className="h-4 w-4 shrink-0 mt-0.5" />}
           <p>
             {online
@@ -158,15 +160,36 @@ export function ShoppingList({ items, overrides, order, householdId, renderedAt 
               : <>Hors connexion. Tes coches sont gardées sur ce téléphone{ops.length ? ` (${ops.length} en attente)` : ''} et seront envoyées au retour du réseau.</>}
           </p>
         </div>
+      ) : view.length > 0 && (
+        <p className="flex min-h-11 items-start gap-2.5 rounded-2xl bg-sage/15 px-4 py-3 text-sm font-semibold">
+          <CloudCheck className="h-4 w-4 shrink-0 mt-0.5 text-sage" aria-hidden="true" /> Disponible sans réseau en magasin
+        </p>
       )}
 
-      <form onSubmit={add} className="flex gap-2">
+      <form onSubmit={add} className="relative">
         <label htmlFor="new-item" className="sr-only">Ajouter un article</label>
-        <Input id="new-item" value={text} onChange={(e) => setText(e.target.value)} placeholder="Ajouter un article (pain, lessive…)" className="h-11 rounded-2xl" />
-        <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-full" aria-label="Ajouter" disabled={!text.trim()}>
+        <Input id="new-item" value={text} onChange={(e) => setText(e.target.value)} placeholder="Ajouter un article (pain, lessive…)" className="h-14 rounded-full pl-5 pr-16 shadow-card" />
+        <Button type="submit" size="icon" className="absolute right-1.5 top-1.5 h-11 w-11 rounded-full" aria-label="Ajouter" disabled={!text.trim()}>
           <Plus className="h-5 w-5" />
         </Button>
       </form>
+
+      {view.length > 0 && (
+        <div className="rounded-3xl bg-card px-5 py-4 shadow-card space-y-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <p className="flex items-center gap-2 text-[15px] font-semibold tabular-nums">
+              <ShoppingBasket className="h-5 w-5 text-terracotta" aria-hidden="true" />
+              {done.length} coché{done.length > 1 ? 's' : ''} sur {view.length} article{view.length > 1 ? 's' : ''}
+            </p>
+            <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-bold text-accent-foreground tabular-nums">
+              {Math.round((done.length / view.length) * 100)} %
+            </span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-track" aria-hidden="true">
+            <div className="h-full rounded-full bg-terracotta transition-[width] duration-500" style={{ width: `${(done.length / view.length) * 100}%` }} />
+          </div>
+        </div>
+      )}
 
       {todo.length > 0 && (
         <div className="flex justify-end -mb-2">
@@ -178,11 +201,14 @@ export function ShoppingList({ items, overrides, order, householdId, renderedAt 
       )}
 
       {groups.map((g) => (
-        <section key={g.aisle} className="space-y-1.5" aria-label={g.label}>
-          <h2 className="px-1 text-[13px] font-bold uppercase tracking-wide text-muted-foreground">
-            {g.label} <span className="font-normal">· {g.items.length}</span>
-          </h2>
-          <ul className="rounded-3xl bg-card divide-y shadow-card">
+        <section key={g.aisle} className="rounded-3xl bg-card px-3 pt-4 pb-2 shadow-card" aria-label={g.label}>
+          <div className="mb-1 flex items-center justify-between gap-2 px-2">
+            <h2 className="text-lg">{g.label}</h2>
+            <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground tabular-nums">
+              {g.items.length} article{g.items.length > 1 ? 's' : ''}
+            </span>
+          </div>
+          <ul>
             {g.items.map((i) => <Row key={i.id} i={i} />)}
           </ul>
         </section>
@@ -194,8 +220,8 @@ export function ShoppingList({ items, overrides, order, householdId, renderedAt 
 
       {done.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-base text-muted-foreground">Dans le panier ({done.length})</h2>
-          <ul className="rounded-3xl bg-card divide-y shadow-card">
+          <h2 className="px-1 text-lg text-muted-foreground">Dans le panier ({done.length})</h2>
+          <ul className="rounded-3xl bg-card px-3 py-2 shadow-card">
             {done.map((i) => <Row key={i.id} i={i} />)}
           </ul>
           <div className="grid grid-cols-2 gap-2">

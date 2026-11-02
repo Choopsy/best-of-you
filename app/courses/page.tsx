@@ -32,11 +32,11 @@ export default async function ShoppingPage() {
 
         {/* En magasin, la liste passe d'abord : la génération se replie quand la liste n'est pas vide */}
         <details open={items.length === 0} className="group rounded-3xl bg-card shadow-card">
-          <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between px-4 text-sm font-bold">
+          <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between px-5 font-heading text-base font-semibold">
             Générer depuis la semaine
             <span className="text-muted-foreground transition-transform group-open:rotate-180" aria-hidden="true">▾</span>
           </summary>
-          <div className="px-4 pb-4 space-y-3">
+          <div className="px-5 pb-5 space-y-3">
             <p className="text-sm">
               La liste reprend les recettes prévues dans <span className="font-bold">Semaine</span> et enlève
               ce que tu as déjà au <span className="font-bold">Frigo</span>.

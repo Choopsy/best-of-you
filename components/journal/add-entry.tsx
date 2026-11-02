@@ -31,7 +31,7 @@ interface Props {
   defaultBarcode?: string
   /** Recette pré-sélectionnée (bouton « Ajouter au journal » d'une recette) */
   recipe?: PickableRecipe
-  trigger?: 'button' | 'icon' | 'wide'
+  trigger?: 'button' | 'icon' | 'wide' | 'meal'
 }
 
 /** Clé stable d'une entrée récente : après un ajout, la liste se rafraîchit et l'entrée change d'id. */
@@ -44,6 +44,10 @@ function defaultMealForNow(): Meal {
   if (h < 18) return 'snack'
   return 'dinner'
 }
+
+/** « Ajouter au déjeuner », mais « Ajouter une collation » (féminin) */
+const addToMeal = (meal: keyof typeof MEAL_LABELS) =>
+  meal === 'snack' ? 'Ajouter une collation' : `Ajouter au ${MEAL_LABELS[meal].toLowerCase()}`
 
 export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = false, defaultScan = false, defaultBarcode, recipe, trigger = 'button' }: Props) {
   const router = useRouter()
@@ -139,8 +143,12 @@ export function AddEntry({ date, meal, recipes, recents = [], defaultOpen = fals
   return (
     <>
       {trigger === 'icon' ? (
-        <Button variant="ghost" size="icon" className="h-10 w-10" onClick={() => setOpen(true)} aria-label={`Ajouter au ${MEAL_LABELS[selectedMeal]}`}>
+        <Button variant="ghost" size="icon" className="h-11 w-11" onClick={() => setOpen(true)} aria-label={addToMeal(selectedMeal)}>
           <Plus className="h-5 w-5" />
+        </Button>
+      ) : trigger === 'meal' ? (
+        <Button variant="secondary" className="w-full gap-2 text-primary" onClick={() => setOpen(true)}>
+          <Plus className="h-4 w-4" /> {addToMeal(selectedMeal)}
         </Button>
       ) : trigger === 'wide' ? (
         <Button variant="outline" className="w-full gap-2" onClick={() => setOpen(true)}>

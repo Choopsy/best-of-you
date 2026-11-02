@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 
 export function PageHeader({ title, back, children }: { title: React.ReactNode; back?: string; children?: React.ReactNode }) {
   return (
-    <header className="sticky top-0 md:top-14 z-10 bg-background border-b px-2 py-2 flex items-center justify-between gap-2 min-h-13">
+    <header className="sticky top-0 md:top-14 z-10 bg-background/95 px-3 py-2 flex items-center justify-between gap-2 min-h-14">
       <div className="flex items-center gap-1 min-w-0">
         {back && (
           <Link href={back}>
@@ -13,7 +13,7 @@ export function PageHeader({ title, back, children }: { title: React.ReactNode; 
             </Button>
           </Link>
         )}
-        <h1 className={`font-semibold truncate ${back ? '' : 'pl-2'}`}>{title}</h1>
+        <h1 className={`font-heading text-xl font-semibold truncate ${back ? '' : 'pl-2'}`}>{title}</h1>
       </div>
       {children && <div className="flex items-center gap-1 shrink-0">{children}</div>}
     </header>
