@@ -2,6 +2,7 @@ import { type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import type { FoodSuggestion } from '@/lib/types'
 import { estimateKcal } from '@/lib/nutrition'
+import { getHouseholdId } from '@/lib/household'
 
 
 function normalizeSearch(s: string) {
@@ -23,6 +24,8 @@ export async function GET(request: NextRequest) {
 
   const q = normalizeSearch(raw)
   const supabase = await createClient()
+  // Seulement les produits de mon foyer (pas ceux d'autres foyers lisibles via une recette publique)
+  const householdId = withProducts ? await getHouseholdId(supabase) : null
   const cols = 'ciqual_code, name_fr, energy_kcal, proteins_g, carbs_g, fat_g, fiber_g'
 
   // Priorité : commence par la requête, puis contient la requête ;
@@ -32,8 +35,8 @@ export async function GET(request: NextRequest) {
       .ilike('search_name', `${q}%`).limit(40),
     supabase.from('canonical_ingredients').select(cols)
       .ilike('search_name', `%${q}%`).not('search_name', 'ilike', `${q}%`).limit(40),
-    withProducts
-      ? supabase.from('custom_foods').select('id, name, brand, energy_kcal, proteins_g, per_portion, portion_grams').ilike('name', `%${raw.replace(/[%_,()]/g, ' ')}%`).limit(5)
+    withProducts && householdId
+      ? supabase.from('custom_foods').select('id, name, brand, energy_kcal, proteins_g, per_portion, portion_grams').eq('household_id', householdId).ilike('name', `%${raw.replace(/[%_,()]/g, ' ')}%`).limit(5)
       : Promise.resolve({ data: [] as { id: string; name: string; brand: string | null; energy_kcal: number; proteins_g: number; per_portion: boolean; portion_grams: number | null }[] }),
   ])
   const byLength = (a: { name_fr: string }, b: { name_fr: string }) =>

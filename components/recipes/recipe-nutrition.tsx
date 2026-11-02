@@ -103,7 +103,7 @@ export function RecipeNutrition({ nutrition, goals }: Props) {
             {nutrition.missing.length > 0 && (
               <p>
                 Non comptés :{' '}
-                {nutrition.missing.map((m) => `${m.name} (${m.reason === 'not_linked' ? 'non lié à Ciqual' : 'quantité sans poids'})`).join(', ')}.
+                {nutrition.missing.map((m) => `${m.name} (${m.reason === 'not_linked' ? 'pas choisi dans la liste' : 'quantité sans poids'})`).join(', ')}.
               </p>
             )}
           </div>

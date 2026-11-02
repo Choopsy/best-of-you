@@ -60,7 +60,7 @@ export default function PrivacyPage() {
         <ul className="list-disc pl-5 space-y-1">
           <li><span className="font-bold">Toi seul·e</span> : tes données de santé, ton journal, tes séances, ton poids.</li>
           <li><span className="font-bold">Tes amis</span> : ton nom, ta photo de profil et les recettes que tu leur rends visibles ou partages.</li>
-          <li><span className="font-bold">Les membres de ton foyer</span> : le frigo, le planning de la semaine, la liste de courses et les produits scannés.</li>
+          <li><span className="font-bold">Les membres de ton foyer</span> : le frigo, le planning de la semaine, la liste de courses et les produits scannés. Un produit utilisé dans une recette est aussi lisible (nom et valeurs nutritionnelles) par ceux qui voient cette recette.</li>
           <li><span className="font-bold">Tout le monde</span> : seulement les recettes que tu mets en « publique ». Attention, les photos de recettes sont accessibles à toute personne qui possède leur lien.</li>
         </ul>
       </Section>

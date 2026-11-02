@@ -4,6 +4,8 @@ import { createClient } from './supabase/server'
 export interface SessionUser {
   id: string
   email: string | null
+  /** Présentation de l'appli déjà vue (métadonnées du compte) */
+  tourDone: boolean
 }
 
 /**
@@ -19,7 +21,11 @@ export const getSession = cache(async () => {
   const { data } = await supabase.auth.getClaims()
   const claims = data?.claims
   const user: SessionUser | null = claims?.sub
-    ? { id: claims.sub, email: typeof claims.email === 'string' ? claims.email : null }
+    ? {
+        id: claims.sub,
+        email: typeof claims.email === 'string' ? claims.email : null,
+        tourDone: (claims.user_metadata as Record<string, unknown> | undefined)?.tour_done === true,
+      }
     : null
   return { supabase, user }
 })

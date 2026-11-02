@@ -41,7 +41,7 @@ export async function loadRecipe(supabase: SupabaseClient, id: string): Promise<
       profiles!author_id ( full_name, avatar_url ),
       ingredient_groups (
         id, name, position,
-        ingredients ( id, name, amount, unit, ciqual_code, weight_g, position )
+        ingredients ( id, name, amount, unit, ciqual_code, custom_food_id, weight_g, position )
       ),
       steps ( id, position, content, image_url, step_ingredients ( ingredient_id ) )
     `)

@@ -32,7 +32,7 @@ export async function GET() {
       q(supabase.from('food_logs').select('*').eq('user_id', me).order('eaten_on')),
       q(supabase.from('recipes').select(`*,
         recipe_tags ( tags ( name ) ),
-        ingredient_groups ( name, position, ingredients ( name, amount, unit, ciqual_code, weight_g, position ) ),
+        ingredient_groups ( name, position, ingredients ( name, amount, unit, ciqual_code, custom_food_id, weight_g, position ) ),
         steps ( position, content, image_url )`).eq('author_id', me).order('created_at')),
       q(supabase.from('collections').select('name, cover_image_url, created_at, collection_recipes ( recipes ( id, title ) )').eq('owner_id', me)),
       q(supabase.from('recipe_likes').select('created_at, recipes ( id, title )').eq('user_id', me)),

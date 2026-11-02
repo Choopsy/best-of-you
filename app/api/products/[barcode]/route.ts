@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NUTRIENT_KEYS, type Nutrients } from '@/lib/nutrition'
 import { fetchOff, OFF_URL, type ProductLookup } from '@/lib/off'
 import { LEGAL } from '@/lib/legal'
+import { getHouseholdId } from '@/lib/household'
 
 export type { ProductLookup }
 
@@ -18,10 +19,11 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ barcode: st
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return Response.json({ error: 'Non connecté' }, { status: 401 })
 
-  // 1. Déjà enregistré par le foyer ?
+  // 1. Déjà enregistré par le foyer ? (filtre explicite : d'autres foyers peuvent être lisibles via une recette)
+  const householdId = await getHouseholdId(supabase)
   const { data: saved } = await supabase.from('custom_foods')
     .select(`id, name, brand, image_url, source, per_portion, portion_grams, ${NUTRIENT_KEYS.join(', ')}`)
-    .eq('barcode', barcode).maybeSingle()
+    .eq('household_id', householdId ?? '').eq('barcode', barcode).maybeSingle()
   if (saved) {
     const s = saved as unknown as Record<string, unknown>
     const out: ProductLookup = {

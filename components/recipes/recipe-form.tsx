@@ -28,19 +28,29 @@ import { createRecipe, updateRecipe, deleteRecipe } from '@/actions/recipes'
 import { ImagePicker } from '@/components/recipes/image-picker'
 import { IngredientAutocomplete } from '@/components/recipes/ingredient-autocomplete'
 import { UNITS, needsWeight } from '@/lib/nutrition'
+import { canUsePortions, type PortionInfo } from '@/lib/portions'
+import { ProductPicker, ProductCreator } from '@/components/recipes/product-picker'
+import type { PickedProduct } from '@/components/scan/scanned-product'
+import type { FoodSuggestion } from '@/lib/types'
 import { DIFFICULTY_LABELS, VISIBILITY_LABELS } from '@/lib/types'
 import type { Tag, Collection, RecipeDetail, Difficulty, CreateRecipeInput, RecipeVisibility } from '@/lib/types'
 
 // ── Types locaux ──────────────────────────────────────────────────────────────
 
-interface IngRow { id: string; name: string; amount: string; unit: string; ciqual_code: string | null; weight_g: string }
+interface IngRow {
+  id: string; name: string; amount: string; unit: string; ciqual_code: string | null; weight_g: string
+  /** Produit du foyer (scanné ou créé) à la place d'un aliment Ciqual */
+  custom_food_id: string | null
+  /** Portion du produit, connue quand on vient de le choisir (sert aux indications) */
+  portion?: PortionInfo
+}
 interface GroupRow { id: string; name: string; ingredients: IngRow[] }
 interface StepRow { id: string; content: string; image_url: string; ingredient_local_ids: string[] }
 
 const uid = () => Math.random().toString(36).slice(2)
 const UNIT_ITEMS = Object.fromEntries(UNITS.map((u) => [u, u || '—']))
 
-const emptyIng = (): IngRow => ({ id: uid(), name: '', amount: '', unit: '', ciqual_code: null, weight_g: '' })
+const emptyIng = (): IngRow => ({ id: uid(), name: '', amount: '', unit: '', ciqual_code: null, custom_food_id: null, weight_g: '' })
 
 const emptyGroup = (): GroupRow => ({
   id: uid(),
@@ -64,6 +74,7 @@ function initGroups(data?: RecipeDetail): GroupRow[] {
           amount: i.amount != null ? String(i.amount) : '',
           unit: i.unit ?? '',
           ciqual_code: i.ciqual_code ?? null,
+          custom_food_id: i.custom_food_id ?? null,
           weight_g: i.weight_g != null ? String(i.weight_g) : '',
         }))
       : [emptyIng()],
@@ -147,10 +158,38 @@ export function RecipeForm({ tags, collections, defaultCollectionId, initialData
     setGroups((gs) =>
       gs.map((g) =>
         g.id === gid
-          ? { ...g, ingredients: g.ingredients.map((i) => (i.id === iid ? { ...i, name, ciqual_code: code } : i)) }
+          ? { ...g, ingredients: g.ingredients.map((i) => (i.id === iid
+            ? { ...i, name, ciqual_code: code, ...(code ? {} : { custom_food_id: null, portion: undefined }) } : i)) }
           : g,
       ),
     )
+
+  /** Choix dans la liste : aliment Ciqual ou produit du foyer */
+  const pickIng = (gid: string, iid: string, food: FoodSuggestion) =>
+    setGroups((gs) => gs.map((g) => g.id !== gid ? g : {
+      ...g,
+      ingredients: g.ingredients.map((i) => {
+        if (i.id !== iid) return i
+        if (food.kind !== 'custom') return { ...i, name: food.name, ciqual_code: food.code, custom_food_id: null, portion: undefined }
+        const portion = { perPortion: !!food.perPortion, portionGrams: food.portionGrams ?? null }
+        const byPortion = canUsePortions(portion) && !i.amount && !i.unit
+        return { ...i, name: food.name, ciqual_code: null, custom_food_id: food.code, portion,
+          ...(byPortion ? { amount: '1', unit: 'portion' } : {}) }
+      }),
+    }))
+
+  /** Produit scanné ou créé : remplit la dernière ligne vide du groupe, ou en ajoute une */
+  const addPicked = (gid: string, p: PickedProduct) =>
+    setGroups((gs) => gs.map((g) => {
+      if (g.id !== gid) return g
+      const byPortion = canUsePortions(p.portion)
+      const row: IngRow = { ...emptyIng(), name: p.name, custom_food_id: p.id, portion: p.portion,
+        amount: byPortion ? '1' : '', unit: byPortion ? 'portion' : 'g' }
+      const last = g.ingredients[g.ingredients.length - 1]
+      return last && !last.name.trim()
+        ? { ...g, ingredients: [...g.ingredients.slice(0, -1), { ...row, id: last.id }] }
+        : { ...g, ingredients: [...g.ingredients, row] }
+    }))
 
   const setIngField = (gid: string, iid: string, field: 'amount' | 'unit' | 'weight_g', value: string) =>
     setGroups((gs) =>
@@ -205,7 +244,8 @@ export function RecipeForm({ tags, collections, defaultCollectionId, initialData
             name: i.name.trim(),
             amount: i.amount ? parseFloat(i.amount.replace(',', '.')) : null,
             unit: i.unit.trim(),
-            ciqual_code: i.ciqual_code,
+            ciqual_code: i.custom_food_id ? null : i.ciqual_code,
+            custom_food_id: i.custom_food_id,
             weight_g: i.weight_g && needsWeight(i.unit) ? parseFloat(i.weight_g.replace(',', '.')) || null : null,
           })),
       })),
@@ -377,7 +417,8 @@ export function RecipeForm({ tags, collections, defaultCollectionId, initialData
       <section className="space-y-3">
         <h2 className="font-semibold text-base">Ingrédients</h2>
         <p className="text-xs text-muted-foreground -mt-1">
-          Choisis chaque ingrédient dans la liste (base Ciqual) pour qu&apos;il soit compté dans les valeurs nutritionnelles.
+          Choisis chaque ingrédient dans la liste (base Ciqual ou tes produits) pour qu&apos;il soit compté dans les valeurs
+          nutritionnelles. Un produit du commerce ? Scanne-le.
         </p>
         {groups.map((group, gi) => (
           <div key={group.id} className="rounded-lg border p-3 space-y-2">
@@ -408,10 +449,12 @@ export function RecipeForm({ tags, collections, defaultCollectionId, initialData
                   <div className="grid grid-cols-[1fr_3.5rem_5rem_2rem] gap-1 items-center">
                     <IngredientAutocomplete
                       value={ing.name}
-                      ciqualCode={ing.ciqual_code}
+                      ciqualCode={ing.custom_food_id ?? ing.ciqual_code}
                       onChange={(name, code) => setIngName(group.id, ing.id, name, code)}
+                      onPick={(food) => pickIng(group.id, ing.id, food)}
                       placeholder="Farine de blé"
                       className="h-8 text-sm"
+                      includeProducts
                     />
                     <Input value={ing.amount} onChange={(e) => setIngField(group.id, ing.id, 'amount', e.target.value)}
                       placeholder="200" className="h-8 text-sm text-center px-1" type="number" min={0} step="any" />
@@ -430,7 +473,13 @@ export function RecipeForm({ tags, collections, defaultCollectionId, initialData
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
-                  {ing.name.trim() && ing.ciqual_code && needsWeight(ing.unit) && (
+                  {ing.name.trim() && ing.custom_food_id && needsWeight(ing.unit) && (ing.unit === 'portion' || (ing.portion && canUsePortions(ing.portion))) && (
+                    <p className="pl-1 text-xs text-muted-foreground">
+                      Compté en portions du produit{ing.portion?.portionGrams ? ` (1 = ${ing.portion.portionGrams.toLocaleString('fr-FR')} g)` : ''}.
+                    </p>
+                  )}
+                  {ing.name.trim() && (ing.ciqual_code || ing.custom_food_id) && needsWeight(ing.unit)
+                    && !(ing.custom_food_id && (ing.unit === 'portion' || (ing.portion && canUsePortions(ing.portion)))) && (
                     <div className="flex items-center gap-2 pl-1 text-xs text-muted-foreground">
                       <span>Poids total pour la nutrition :</span>
                       <Input value={ing.weight_g} onChange={(e) => setIngField(group.id, ing.id, 'weight_g', e.target.value)}
@@ -442,10 +491,14 @@ export function RecipeForm({ tags, collections, defaultCollectionId, initialData
               ))}
             </div>
 
-            <Button type="button" variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground -ml-1"
-              onClick={() => addIngredient(group.id)}>
-              <Plus className="h-3 w-3 mr-1" /> Ajouter un ingrédient
-            </Button>
+            <div className="flex flex-wrap items-center gap-x-3 -ml-1">
+              <Button type="button" variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground"
+                onClick={() => addIngredient(group.id)}>
+                <Plus className="h-3 w-3 mr-1" /> Ajouter un ingrédient
+              </Button>
+              <ProductPicker onPicked={(p) => addPicked(group.id, p)} />
+              <ProductCreator onPicked={(p) => addPicked(group.id, p)} />
+            </div>
           </div>
         ))}
         <Button type="button" variant="outline" size="sm" className="w-full" onClick={() => setGroups((gs) => [...gs, emptyGroup()])}>

@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { canUsePortions, nutrientFactor, type PortionInfo } from './portions'
 
 /**
  * Valeurs nutritionnelles, à partir de la table Ciqual (ANSES).
@@ -48,7 +49,7 @@ export function roundNutrients(n: Nutrients): Nutrients {
 /** Unités qui ne sont pas des poids : l'utilisateur peut indiquer un poids total. */
 export const UNITS = [
   'g', 'kg', 'mg', 'ml', 'cl', 'dl', 'L', 'c.c', 'c.s', 'pincée',
-  'pièce', 'tasse', 'verre', 'sachet', 'yaourt', 'botte', 'tranche', 'feuille', 'gousse', 'brin', '',
+  'pièce', 'portion', 'tasse', 'verre', 'sachet', 'yaourt', 'botte', 'tranche', 'feuille', 'gousse', 'brin', '',
 ] as const
 
 const EXACT: Record<string, number> = { g: 1, kg: 1000, mg: 0.001 }
@@ -109,6 +110,40 @@ export async function fetchCiqual(
   return map
 }
 
+/**
+ * Valeurs d'un aliment pour la nutrition d'une recette : aliment Ciqual (pour 100 g)
+ * ou produit du foyer (pour 100 g, ou pour 1 portion si portion.perPortion).
+ */
+export interface FoodValues {
+  name: string
+  /** Pour 100 g, ou pour 1 portion si portion.perPortion */
+  per100: Nutrients
+  portion?: PortionInfo
+}
+
+/** Aliments Ciqual et produits du foyer, dans une seule table (clé : code Ciqual ou identifiant du produit). */
+export async function fetchFoods(
+  supabase: SupabaseClient,
+  ingredients: { ciqual_code: string | null; custom_food_id?: string | null }[],
+): Promise<Map<string, FoodValues>> {
+  const ids = [...new Set(ingredients.map((i) => i.custom_food_id).filter((v): v is string => !!v))]
+  const [map, products] = await Promise.all([
+    fetchCiqual(supabase, ingredients.filter((i) => !i.custom_food_id).map((i) => i.ciqual_code ?? '')) as Promise<Map<string, FoodValues>>,
+    ids.length
+      ? supabase.from('custom_foods').select(`id, name, per_portion, portion_grams, ${COLS}`).in('id', ids)
+      : Promise.resolve({ data: [] }),
+  ])
+  for (const row of (products.data ?? []) as unknown as Array<Record<string, unknown>>) {
+    const per100 = zero()
+    for (const k of NUTRIENT_KEYS) per100[k] = Number(row[k] ?? 0) || 0
+    map.set(String(row.id), {
+      name: String(row.name), per100,
+      portion: { perPortion: !!row.per_portion, portionGrams: row.portion_grams != null ? Number(row.portion_grams) : null },
+    })
+  }
+  return map
+}
+
 // ── Nutrition d'une recette ──────────────────────────────────────────────────
 
 export interface NutritionIngredient {
@@ -116,7 +151,29 @@ export interface NutritionIngredient {
   amount: number | null
   unit: string | null
   ciqual_code: string | null
+  custom_food_id?: string | null
   weight_g: number | null
+}
+
+/**
+ * Coefficient à appliquer aux valeurs d'un aliment pour un ingrédient, ou null si la
+ * quantité ne permet pas de compter. Poids d'abord (g, kg, ml…, ou poids total saisi) ;
+ * sinon, pour un produit qui a une portion, « 2 pots » = 2 portions.
+ */
+export function ingredientFactor(
+  ing: Pick<NutritionIngredient, 'amount' | 'unit' | 'weight_g'>,
+  portion: PortionInfo = { perPortion: false, portionGrams: null },
+): { factor: number; approx: boolean } | null {
+  const g = toGrams(ing.amount, ing.unit, ing.weight_g)
+  if (g) {
+    const factor = nutrientFactor(portion, 'g', g.grams)
+    if (factor != null) return { factor, approx: g.approx }
+  }
+  if (ing.amount != null && ing.amount > 0 && needsWeight(ing.unit) && canUsePortions(portion)) {
+    const factor = nutrientFactor(portion, 'portion', ing.amount)
+    if (factor != null) return { factor, approx: false }
+  }
+  return null
 }
 
 export interface RecipeNutrition {
@@ -132,7 +189,7 @@ export interface RecipeNutrition {
 export function computeRecipeNutrition(
   ingredients: NutritionIngredient[],
   baseServings: number,
-  ciqual: Map<string, { name: string; per100: Nutrients }>,
+  foods: Map<string, FoodValues>,
 ): RecipeNutrition | null {
   const list = ingredients.filter((i) => i.name?.trim())
   if (list.length === 0) return null
@@ -142,12 +199,13 @@ export function computeRecipeNutrition(
   let approximate = false
 
   for (const ing of list) {
-    const food = ing.ciqual_code ? ciqual.get(ing.ciqual_code) : undefined
+    const key = ing.custom_food_id || ing.ciqual_code
+    const food = key ? foods.get(key) : undefined
     if (!food) { missing.push({ name: ing.name, reason: 'not_linked' }); continue }
-    const g = toGrams(ing.amount, ing.unit, ing.weight_g)
-    if (!g) { missing.push({ name: ing.name, reason: 'no_quantity' }); continue }
-    if (g.approx) approximate = true
-    parts.push(scale(food.per100, g.grams / 100))
+    const q = ingredientFactor(ing, food.portion)
+    if (!q) { missing.push({ name: ing.name, reason: 'no_quantity' }); continue }
+    if (q.approx) approximate = true
+    parts.push(scale(food.per100, q.factor))
   }
 
   if (parts.length === 0) return null
@@ -166,6 +224,5 @@ export async function calcRecipeNutrition(
   ingredients: NutritionIngredient[],
   baseServings: number,
 ): Promise<RecipeNutrition | null> {
-  const ciqual = await fetchCiqual(supabase, ingredients.map((i) => i.ciqual_code ?? ''))
-  return computeRecipeNutrition(ingredients, baseServings, ciqual)
+  return computeRecipeNutrition(ingredients, baseServings, await fetchFoods(supabase, ingredients))
 }

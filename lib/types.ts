@@ -97,6 +97,8 @@ export interface Ingredient {
   amount: number | null
   unit: string | null
   ciqual_code: string | null
+  /** Produit du foyer (scanné ou créé), à la place d'un aliment Ciqual */
+  custom_food_id?: string | null
   weight_g: number | null
   position: number
 }
@@ -190,6 +192,7 @@ export interface CreateRecipeInput {
       amount: number | null
       unit: string
       ciqual_code: string | null
+      custom_food_id?: string | null
       weight_g: number | null
     }[]
   }[]

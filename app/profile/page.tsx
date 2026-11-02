@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ChevronRight, Target, Users, Library, Heart, ShieldCheck } from 'lucide-react'
+import { ChevronRight, Target, Users, Library, Heart, ShieldCheck, Sparkles } from 'lucide-react'
 import { getSession } from '@/lib/auth'
 import { Notice, PageHeader } from '@/components/layout/page-header'
 import { ProfileForm } from '@/components/profile/profile-form'
@@ -29,6 +29,7 @@ export default async function ProfilePage({ searchParams }: Props) {
     { href: '/collections', icon: Library, label: 'Mes collections' },
     { href: '/favorites', icon: Heart, label: 'Recettes aimées' },
     { href: '/profile/donnees', icon: ShieldCheck, label: 'Mes données et confidentialité' },
+    { href: '/?tour=1', icon: Sparkles, label: 'Revoir la présentation de l\'appli' },
   ]
 
   return (

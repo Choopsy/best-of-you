@@ -14,6 +14,7 @@ import { formatDateFr, shiftDate, todayISO, weekStart } from '@/lib/dates'
 import { getWeekData } from '@/lib/weekly-data'
 import { RECIPE_SUMMARY_SELECT, toSummary } from '@/lib/recipes'
 import { MEALS, MEAL_LABELS } from '@/lib/types'
+import { WelcomeTour } from '@/components/onboarding/welcome-tour'
 
 const MEAL_TINT: Record<string, string> = {
   breakfast: 'bg-secondary text-secondary-foreground',
@@ -57,6 +58,7 @@ export default async function HomePage() {
 
   return (
     <main className="px-5 pt-7 pb-6 max-w-xl mx-auto space-y-5">
+      <WelcomeTour userId={user.id} seen={user.tourDone} />
       <header className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm text-muted-foreground first-letter:uppercase">{formatDateFr(today)}</p>

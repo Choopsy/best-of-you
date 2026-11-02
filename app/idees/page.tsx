@@ -6,7 +6,7 @@ import { getFridge } from '@/lib/household'
 import { getHealthContext } from '@/lib/health'
 import { getDayLogs } from '@/lib/journal'
 import { todayISO } from '@/lib/dates'
-import { computeRecipeNutrition, fetchCiqual } from '@/lib/nutrition'
+import { computeRecipeNutrition, fetchFoods } from '@/lib/nutrition'
 import { suggestRecipes } from '@/lib/suggest'
 import { DIET_TAGS, EXCLUSION_TAGS, type Diet, type Exclusion } from '@/lib/types'
 import { PageHeader } from '@/components/layout/page-header'
@@ -25,7 +25,7 @@ interface Row {
   cook_time_min: number | null
   author_id: string
   recipe_tags: { tags: { name: string } | null }[]
-  ingredients: { name: string; amount: number | null; unit: string | null; ciqual_code: string | null; weight_g: number | null }[]
+  ingredients: { name: string; amount: number | null; unit: string | null; ciqual_code: string | null; custom_food_id: string | null; weight_g: number | null }[]
 }
 
 export default async function IdeasPage() {
@@ -39,7 +39,7 @@ export default async function IdeasPage() {
     getDayLogs(supabase, user.id, today),
     // La sécurité (RLS) ne renvoie que mes recettes, celles du foyer, d'amis ou publiques
     supabase.from('recipes')
-      .select('id, title, cover_image_url, base_servings, prep_time_min, cook_time_min, author_id, recipe_tags ( tags ( name ) ), ingredients ( name, amount, unit, ciqual_code, weight_g )')
+      .select('id, title, cover_image_url, base_servings, prep_time_min, cook_time_min, author_id, recipe_tags ( tags ( name ) ), ingredients ( name, amount, unit, ciqual_code, custom_food_id, weight_g )')
       .order('created_at', { ascending: false }).limit(150),
   ])
 
@@ -55,8 +55,7 @@ export default async function IdeasPage() {
   const byId = new Map(rows.map((r) => [r.id, r]))
 
   const suggestions = suggestRecipes(rows, fridge, today, 12)
-  const ciqual = await fetchCiqual(supabase,
-    suggestions.flatMap((s) => byId.get(s.id)!.ingredients.map((i) => i.ciqual_code ?? '')))
+  const ciqual = await fetchFoods(supabase, suggestions.flatMap((s) => byId.get(s.id)!.ingredients))
   const remaining = ctx.targets ? ctx.targets.energyKcal - totals.energy_kcal : null
 
   return (

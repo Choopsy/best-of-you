@@ -12,5 +12,5 @@ export const LEGAL = {
   /** Date de la dernière mise à jour de la politique */
   updatedOn: '27 octobre 2026',
   /** Version, enregistrée avec l'accord de l'utilisateur */
-  version: '2026-10-27',
+  version: '2026-11-02',
 }

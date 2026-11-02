@@ -114,18 +114,23 @@ async function insertRelations(
     if (!groupRow) continue
 
     if (validIngredients.length > 0) {
-      const { data: ingRows } = await supabase.from('ingredients').insert(
-        validIngredients.map((ing, ii) => ({
-          recipe_id: recipeId,
-          group_id: groupRow.id,
-          name: ing.name,
-          amount: ing.amount && ing.amount > 0 ? ing.amount : null,
-          unit: ing.unit || null,
-          ciqual_code: ing.ciqual_code || null,
-          weight_g: ing.weight_g && ing.weight_g > 0 ? ing.weight_g : null,
-          position: ii,
-        })),
-      ).select('id')
+      const rows = validIngredients.map((ing, ii) => ({
+        recipe_id: recipeId,
+        group_id: groupRow.id,
+        name: ing.name,
+        amount: ing.amount && ing.amount > 0 ? ing.amount : null,
+        unit: ing.unit || null,
+        ciqual_code: ing.custom_food_id ? null : ing.ciqual_code || null,
+        custom_food_id: ing.custom_food_id || null,
+        weight_g: ing.weight_g && ing.weight_g > 0 ? ing.weight_g : null,
+        position: ii,
+      }))
+      let { data: ingRows, error: ingError } = await supabase.from('ingredients').insert(rows).select('id')
+      // Produit devenu inaccessible (supprimé par le foyer…) : on garde l'ingrédient, sans le lien
+      if (ingError && rows.some((r) => r.custom_food_id)) {
+        ;({ data: ingRows, error: ingError } = await supabase.from('ingredients')
+          .insert(rows.map((r) => ({ ...r, custom_food_id: null }))).select('id'))
+      }
 
       ingRows?.forEach((row, ii) => {
         ingDbIds[`${gi}_${ii}`] = row.id

@@ -18,10 +18,21 @@ interface Props {
   barcode: string | null
   /** Nom proposé quand on crée un aliment (texte déjà tapé dans la recherche) */
   initialName?: string
-  date: string
-  meal: Meal
+  date?: string
+  meal?: Meal
   onDone: () => void
   onRescan: () => void
+  /**
+   * Mode « choisir un produit » (ingrédient de recette) : le produit est enregistré
+   * pour le foyer puis renvoyé, sans rien ajouter au journal.
+   */
+  onPicked?: (p: PickedProduct) => void
+}
+
+export interface PickedProduct {
+  id: string
+  name: string
+  portion: PortionInfo
 }
 
 const emptyPer100 = (): Record<keyof Nutrients, string> =>
@@ -30,7 +41,7 @@ const emptyPer100 = (): Record<keyof Nutrients, string> =>
 /** Produit scanné : trouvé (Open Food Facts ou déjà enregistré) ou à recopier depuis l'étiquette. */
 const fr = (v: number) => v.toLocaleString('fr-FR', { maximumFractionDigits: 1 })
 
-export function ScannedProduct({ barcode, initialName = '', date, meal, onDone, onRescan }: Props) {
+export function ScannedProduct({ barcode, initialName = '', date, meal, onDone, onRescan, onPicked }: Props) {
   const [lookup, setLookup] = useState<ProductLookup | null>(null)
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState('')
@@ -93,7 +104,7 @@ export function ScannedProduct({ barcode, initialName = '', date, meal, onDone, 
     if (!name.trim()) { setError('Indique le nom du produit.'); return }
     if (!per100.energy_kcal.trim()) { setError(`Indique au moins l'énergie (kcal ${perPortion ? 'pour 1 portion' : 'pour 100 g'}).`); return }
     const amount = parseQty(grams)
-    const badQty = checkQuantity(portion, unit, amount)
+    const badQty = onPicked ? null : checkQuantity(portion, unit, amount)
     if (badQty) { setError(badQty); return }
     let id = lookup?.saved?.id
     // Enregistre (ou met à jour si on a corrigé les valeurs) pour la prochaine fois
@@ -107,6 +118,11 @@ export function ScannedProduct({ barcode, initialName = '', date, meal, onDone, 
       if (res.error || !res.id) { setError(res.error ?? 'Erreur'); return }
       id = res.id
     }
+    if (onPicked) {
+      onPicked({ id, name: brand.trim() ? `${name.trim()} (${brand.trim()})` : name.trim(), portion })
+      return
+    }
+    if (!date || !meal) return
     const res = await addFoodToLog({ date, meal, customId: id, ...(unit === 'portion' ? { portions: amount } : { grams: amount }) })
     if (res.error) { setError(res.error); return }
     onDone()
@@ -210,8 +226,10 @@ export function ScannedProduct({ barcode, initialName = '', date, meal, onDone, 
         </div>
       )}
 
-      <QuantityField id="sg" portion={portion} unit={unit} onUnit={setUnit} value={grams} onValue={setGrams}
-        kcal={kcal100 > 0 ? kcal100 : null} />
+      {!onPicked && (
+        <QuantityField id="sg" portion={portion} unit={unit} onUnit={setUnit} value={grams} onValue={setGrams}
+          kcal={kcal100 > 0 ? kcal100 : null} />
+      )}
 
       {lookup.found && !editing && (
         <button type="button" onClick={() => setEditing(true)} className="text-xs text-muted-foreground underline">
@@ -222,7 +240,7 @@ export function ScannedProduct({ barcode, initialName = '', date, meal, onDone, 
 
       <div className="flex gap-3">
         <Button variant="outline" className="flex-1" onClick={onRescan} disabled={pending}>{barcode ? 'Scanner un autre' : 'Retour'}</Button>
-        <Button className="flex-1" onClick={submit} disabled={pending}>{pending ? 'Ajout…' : 'Ajouter'}</Button>
+        <Button className="flex-1" onClick={submit} disabled={pending}>{pending ? 'Ajout…' : onPicked ? 'Utiliser ce produit' : 'Ajouter'}</Button>
       </div>
       {lookup.source === 'off' && (
         <p className="text-[11px] text-muted-foreground">Données : Open Food Facts (licence ODbL).</p>
