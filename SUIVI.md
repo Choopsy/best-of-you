@@ -32,6 +32,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 - [ ] `[Journal]` Plats composés courants à ajouter à la base (tartiflette maison, salades traiteur…) : aujourd'hui Ciqual n'a que des versions industrielles
 - [ ] `[Journal]` Vitamines et minéraux (fer, calcium, B12, vitamine D) depuis la table Ciqual
 - [ ] `[Cuisine]` Créer un produit déjà existant (même nom) : proposer de réutiliser l'ancien plutôt qu'un doublon
+- [ ] `[Cuisine]` Import de recettes en JSON (suite de l'import de repas : relier chaque ingrédient à un aliment Ciqual, à confirmer)
 - [ ] `[Cuisine]` Import de recettes depuis un site (projet à part)
 - [ ] `[Cuisine]` Courses : plusieurs magasins avec chacun son ordre de rayons
 - [ ] `[Cuisine]` « Qu'est-ce qu'on mange ? » : compter le sucre et la farine comme placard de base ?
@@ -46,6 +47,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-02 | Importer un repas depuis un fichier JSON (Profil > Mes données) | `54e66d0` |
 | 2026-11-02 | Journal repensé (semaine pour choisir le jour, ligne d'énergie fixe, détail replié) ; tests de nouveau stables (lien dans un lien sur l'accueil) | `19d68fc` |
 | 2026-11-02 | Nouveau design, étapes 2 et 3 : ronds, cartes, barre du bas, feuilles, boutons ; écrans Accueil, Journal, Ajouter, Courses, Forme | `4013359`, `0c797ad` |
 | 2026-11-02 | Nouveau design, étape 1 : couleurs, polices (Epilogue, Karla) et ombres en clair et en sombre | `4766c95` |
