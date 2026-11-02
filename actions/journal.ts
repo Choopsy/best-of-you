@@ -8,6 +8,7 @@ import { isISODate } from '@/lib/dates'
 import { checkQuantity, eatenGrams, nutrientFactor, type PortionInfo } from '@/lib/portions'
 import { MEALS, type Meal } from '@/lib/types'
 import { parseMealImport } from '@/lib/meal-import'
+import { canImportMeals } from '@/lib/features'
 
 type Result = { error: string | null }
 
@@ -167,6 +168,7 @@ export async function deleteFoodLog(id: string): Promise<Result> {
 export async function importMealFile(input: { text: string; date: string; meal: Meal }): Promise<Result & { count?: number }> {
   const { supabase, user } = await auth()
   if (!user) return { error: 'Non connecté' }
+  if (!canImportMeals(user.id)) return { error: 'Import non disponible.' }
   const bad = checkCommon(input.date, input.meal)
   if (bad) return { error: bad }
   const parsed = parseMealImport(String(input.text ?? ''))

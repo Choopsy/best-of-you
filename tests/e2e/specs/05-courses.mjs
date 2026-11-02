@@ -30,8 +30,13 @@ export default async function ({ browser, db }) {
     if (await up.isDisabled()) break
     await up.click()
   }
-  await page.getByRole('button', { name: 'Enregistrer' }).click(); await page.waitForTimeout(1500)
-  check((await headings())[0]?.toLowerCase().startsWith('entretien'), 'Entretien en premier après réglage')
+  await page.getByRole('button', { name: 'Enregistrer' }).click()
+  // On attend le nouvel ordre plutôt qu'une pause fixe (serveur parfois lent juste après un build)
+  let first = ''
+  for (let i = 0; i < 32 && !first.toLowerCase().startsWith('entretien'); i++) {
+    await page.waitForTimeout(250); first = (await headings())[0] ?? ''
+  }
+  check(first.toLowerCase().startsWith('entretien'), 'Entretien en premier après réglage')
 
   // 4. Le service worker est installé et a gardé une copie
   await page.reload(); await page.waitForLoadState('networkidle'); await page.waitForTimeout(2500)

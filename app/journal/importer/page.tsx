@@ -1,14 +1,17 @@
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { getHealthContext } from '@/lib/health'
+import { canImportMeals } from '@/lib/features'
 import { todayISO } from '@/lib/dates'
 import { PageHeader } from '@/components/layout/page-header'
 import { MealImportForm } from '@/components/journal/meal-import'
 
-/** Import d'un repas depuis un fichier JSON : volontairement à l'écart (Profil > Mes données). */
+/** Import d'un repas depuis un fichier JSON : réservé aux comptes de MEAL_IMPORT_USERS (Profil > Mes données). */
 export default async function ImportMealPage() {
   const { supabase, user } = await getSession()
   if (!user) redirect('/login')
+  // Pour les autres comptes, la page n'existe pas
+  if (!canImportMeals(user.id)) notFound()
   // Données de santé, comme le journal : sans accord, redirige vers /consentement
   await getHealthContext(supabase, user.id)
 

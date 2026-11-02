@@ -1,9 +1,24 @@
-// Import d'un repas depuis un fichier JSON : lien discret dans Mes données, aperçu, choix du repas, ajout au journal
-import { ALICE, B, check, newPage, shot, textOf } from '../helpers.mjs'
+// Import d'un repas depuis un fichier JSON : réservé (Alice oui, Bob non), aperçu, choix du repas, ajout au journal
+import { ALICE, B, BOB, check, newPage, shot, textOf } from '../helpers.mjs'
 
 const file = (name, data) => ({ name, mimeType: 'application/json', buffer: Buffer.from(typeof data === 'string' ? data : JSON.stringify(data)) })
 
 export default async function ({ browser, db }) {
+  // Bob n'est pas dans MEAL_IMPORT_USERS : ni lien, ni page
+  {
+    const { ctx, page } = await newPage(browser, { user: BOB })
+    await page.goto(B + '/profile/donnees'); await page.getByRole('heading', { name: 'Mes données', exact: true }).waitFor()
+    check(await page.getByRole('link', { name: /Importer un repas/ }).count() === 0, "autre compte : pas de lien vers l'import")
+    // Avec le chargement progressif (loading.tsx), le code HTTP part avant notFound() : on vérifie l'écran
+    await page.goto(B + '/journal/importer'); await page.waitForLoadState('networkidle')
+    const form = await page.getByLabel('Fichier du repas').count()
+    const heading = await page.getByRole('heading', { name: 'Importer un repas' }).count()
+    const lost = await page.getByRole('heading', { name: 'Page introuvable' }).count()
+    check(form === 0 && heading === 0 && lost === 1, `autre compte : page introuvable (formulaire ${form}, titre ${heading})`)
+    await shot(page, 'import-repas-refuse')
+    await ctx.close()
+  }
+
   const { ctx, page, errors } = await newPage(browser)
   await page.goto(B + '/profile/donnees')
   await page.getByRole('link', { name: /Importer un repas/ }).click()

@@ -17,7 +17,7 @@ import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { chromium } from 'playwright'
 import { ROOT } from '../support/db.mjs'
-import { GATEWAY_PORT, startStack } from './stack.mjs'
+import { ALICE, GATEWAY_PORT, startStack } from './stack.mjs'
 import { B, results_ as results } from './helpers.mjs'
 
 const args = process.argv.slice(2)
@@ -35,6 +35,8 @@ const env = {
   // Le secours côté serveur ne doit jamais joindre le vrai Open Food Facts : adresse injoignable,
   // le navigateur seul est simulé par mockOff (sinon une « panne » trouve quand même le produit)
   OPENFOODFACTS_URL: 'http://127.0.0.1:9',
+  // Import de repas réservé : Alice oui, Bob non (voir lib/features.ts)
+  MEAL_IMPORT_USERS: ALICE,
   NEXT_TELEMETRY_DISABLED: '1',
 }
 
