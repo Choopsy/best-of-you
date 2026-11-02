@@ -1,17 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Nunito_Sans } from "next/font/google";
+import { Epilogue, Karla } from "next/font/google";
 import { AppNav } from "@/components/nav/app-nav";
 import { Splash, SPLASH_SCRIPT } from "@/components/brand/splash";
 import "./globals.css";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 
-const display = Fraunces({
+// Titres : Epilogue (caractère, chaleur) ; texte : Karla (lisible en petit). Voir design/DESIGN.md
+const display = Epilogue({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["500", "600"],
+  weight: ["500", "600", "700"],
 });
 
-const body = Nunito_Sans({
+const body = Karla({
   variable: "--font-body",
   subsets: ["latin"],
 });
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F6EEE3",
+  themeColor: "#FFF8F5",
 };
 
 /**

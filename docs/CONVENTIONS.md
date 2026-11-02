@@ -10,8 +10,8 @@
 ## Interface
 
 - Mobile d'abord (390 px) : cibles tactiles de 44 px minimum (`min-h-11`, `h-11 w-11`), barre du bas avec le bouton + au centre.
-- Design « Fournil » : couleurs en variables dans `app/globals.css` (crème, terracotta `--primary`, sauge `--sage`, miel `--honey`), thème clair par défaut et sombre (`.dark`, cookie `theme`). Utiliser les jetons Tailwind (`bg-card`, `text-muted-foreground`, `bg-primary`…), jamais de couleur en dur.
-- Titres en `font-heading` (Fraunces), texte en Nunito Sans. Cartes `rounded-3xl bg-card`, fenêtres en feuille du bas (`rounded-t-3xl`, `Portal`).
+- Design « Chaleur éditoriale » (référence : `design/DESIGN.md` et maquettes Stitch) : couleurs en variables dans `app/globals.css` (sable, terracotta `--primary` pour boutons et liens, `--terracotta` vif pour ronds et bouton +, olive `--sage`, ocre `--honey`, corail `--coral`, sarcelle `--teal`), thème clair par défaut et sombre (`.dark`, cookie `theme`). Utiliser les jetons Tailwind (`bg-card`, `text-muted-foreground`, `bg-primary`, `shadow-card`, `shadow-float`…), jamais de couleur en dur.
+- Titres en `font-heading` (Epilogue), texte en Karla. Cartes `rounded-3xl bg-card`, fenêtres en feuille du bas (`rounded-t-3xl`, `Portal`).
 - Accessibilité : `role="dialog"` + `aria-label` sur les fenêtres, `aria-pressed` / `role="radio"` sur les choix, libellés sur les boutons icônes. Les tests e2e s'appuient sur ces rôles.
 
 ## Base de données : migrations

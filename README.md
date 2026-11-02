@@ -63,7 +63,7 @@ Dignis réunit tes recettes, ce que tu manges et tes objectifs du jour au même 
 - Onglet « Découvrir », filtrable selon son régime (végétarien, vegan, sans gluten…).
 
 ### 🎨 Confort
-- Design « Fournil » : crème, terracotta, sauge et miel.
+- Design « Chaleur éditoriale » : sable, terracotta, olive et ocre (Epilogue + Karla).
 - **Mode clair, mode sombre ou automatique** (suit le réglage du téléphone).
 - Interface mobile d'abord, avec une barre de navigation en bas de l'écran.
 

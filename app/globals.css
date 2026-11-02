@@ -9,9 +9,11 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
-  --font-heading: var(--font-display), Georgia, serif;
+  --font-heading: var(--font-display), ui-sans-serif, system-ui, sans-serif;
   --color-sage: var(--sage);
   --color-honey: var(--honey);
+  --color-coral: var(--coral);
+  --color-teal: var(--teal);
   --color-terracotta: var(--terracotta);
   --color-track: var(--track);
   --color-surface: var(--surface);
@@ -44,6 +46,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --shadow-card: var(--elev-card);
+  --shadow-float: var(--elev-float);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -54,85 +58,96 @@
 }
 
 :root {
-  /* ── Fournil clair : crème, terracotta, sauge, miel ── */
-  --background: #F6EEE3;
-  --foreground: #3A2A20;
-  --surface: #FFF9F1;            /* cartes */
-  --card: #FFF9F1;
-  --card-foreground: #3A2A20;
-  --popover: #FFF9F1;
-  --popover-foreground: #3A2A20;
-  --primary: #B9552F;            /* terracotta */
-  --primary-foreground: #FFF9F1;
-  --secondary: #F3DCC4;
-  --secondary-foreground: #5A3A26;
-  --muted: #EFE3D4;
-  --muted-foreground: #74604F;
-  --accent: #F3DCC4;
-  --accent-foreground: #3A2A20;
-  --destructive: #B3261E;
-  --border: #E7D7C3;
-  --input: #E2D0BB;
-  --ring: #B9552F;
-  --terracotta: #B9552F;
-  --sage: #5F7D50;
-  --honey: #C98F2A;
-  --track: #EADBC8;              /* fond des ronds */
-  --chart-1: #B9552F;
-  --chart-2: #C98F2A;
-  --chart-3: #5F7D50;
-  --chart-4: #8E6A4B;
-  --chart-5: #A4473F;
-  --radius: 1rem;
-  --sidebar: #FFF9F1;
-  --sidebar-foreground: #3A2A20;
-  --sidebar-primary: #B9552F;
-  --sidebar-primary-foreground: #FFF9F1;
-  --sidebar-accent: #F3DCC4;
-  --sidebar-accent-foreground: #3A2A20;
-  --sidebar-border: #E7D7C3;
-  --sidebar-ring: #B9552F;
+  /* ── Chaleur éditoriale, clair (design/DESIGN.md) : sable, terracotta, olive, ocre ── */
+  --background: #FFF8F5;         /* toile sable rosé */
+  --foreground: #201A17;         /* cacao torréfié */
+  --surface: #FFFFFF;            /* cartes, niveau 1 (porcelaine) */
+  --card: #FFFFFF;
+  --card-foreground: #201A17;
+  --popover: #FFFFFF;
+  --popover-foreground: #201A17;
+  /* Boutons et liens : terracotta assombri pour rester lisible (≥ 4,5:1 sur tous les fonds clairs) ;
+     le terracotta vif de la maquette (--terracotta) est réservé aux ronds et au bouton + */
+  --primary: #AD5219;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F8ECE5;          /* boutons doux, niveau 2 (crème d'avoine) */
+  --secondary-foreground: #201A17;
+  --muted: #F8ECE5;
+  --muted-foreground: #6E5A4E;
+  --accent: #FFDBC9;             /* pastilles « reste 390 kcal » */
+  --accent-foreground: #753400;
+  --destructive: #BA1A1A;
+  --border: #ECE0DA;             /* filets discrets */
+  --input: #E3D3C9;
+  --ring: #D97736;
+  --terracotta: #D97736;         /* énergie, ronds, bouton + */
+  --sage: #587053;               /* lipides, sport, « en équilibre » */
+  --honey: #D4943C;              /* glucides, recettes */
+  --coral: #CF6B5A;              /* protéines */
+  --teal: #3F7A74;               /* fibres */
+  --track: #F2E6DF;              /* fond des ronds */
+  --chart-1: #D97736;
+  --chart-2: #D4943C;
+  --chart-3: #587053;
+  --chart-4: #CF6B5A;
+  --chart-5: #3F7A74;
+  --radius: 0.9rem;              /* rounded-3xl ≈ 2rem : cartes « galet » */
+  /* Ombres teintées cacao, jamais noires */
+  --elev-card: 0 8px 24px -4px rgb(41 35 31 / 0.05), 0 2px 6px -1px rgb(41 35 31 / 0.03);
+  --elev-float: 0 18px 40px -8px rgb(41 35 31 / 0.08), 0 4px 12px -2px rgb(41 35 31 / 0.04);
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #201A17;
+  --sidebar-primary: #AD5219;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F8ECE5;
+  --sidebar-accent-foreground: #201A17;
+  --sidebar-border: #ECE0DA;
+  --sidebar-ring: #D97736;
   color-scheme: light;
 }
 
 .dark {
-  /* ── Fournil sombre : cacao, braise, miel ── */
-  --background: #1F1713;
-  --foreground: #F3E8DA;
-  --surface: #2B211B;
-  --card: #2B211B;
-  --card-foreground: #F3E8DA;
-  --popover: #2B211B;
-  --popover-foreground: #F3E8DA;
-  --primary: #E07A4F;
-  --primary-foreground: #1F1713;
-  --secondary: #3B2D24;
-  --secondary-foreground: #F3E8DA;
-  --muted: #352920;
-  --muted-foreground: #C2AC98;
-  --accent: #3B2D24;
-  --accent-foreground: #F3E8DA;
-  --destructive: #F2846F;
-  --border: #3E3027;
-  --input: #4A3A2F;
-  --ring: #E07A4F;
-  --terracotta: #E07A4F;
-  --sage: #9DB98A;
-  --honey: #E3B25A;
-  --track: #3D3027;
-  --chart-1: #E07A4F;
-  --chart-2: #E3B25A;
-  --chart-3: #9DB98A;
-  --chart-4: #C2AC98;
-  --chart-5: #F2846F;
-  --sidebar: #2B211B;
-  --sidebar-foreground: #F3E8DA;
-  --sidebar-primary: #E07A4F;
-  --sidebar-primary-foreground: #1F1713;
-  --sidebar-accent: #3B2D24;
-  --sidebar-accent-foreground: #F3E8DA;
-  --sidebar-border: #3E3027;
-  --sidebar-ring: #E07A4F;
+  /* ── Chaleur éditoriale, sombre (déduit : la maquette n'en a pas) : cacao, braise, olive claire ── */
+  --background: #1A1512;
+  --foreground: #F3EAE2;
+  --surface: #252019;
+  --card: #252019;
+  --card-foreground: #F3EAE2;
+  --popover: #2B241E;
+  --popover-foreground: #F3EAE2;
+  --primary: #F0955A;
+  --primary-foreground: #1C1714;
+  --secondary: #302823;
+  --secondary-foreground: #F3EAE2;
+  --muted: #2E2621;
+  --muted-foreground: #C9B5A6;
+  --accent: #4A2E1E;
+  --accent-foreground: #FFDBC9;
+  --destructive: #FFB4AB;
+  --border: #3A302A;
+  --input: #4A3E36;
+  --ring: #F0955A;
+  --terracotta: #E8894A;
+  --sage: #9DBB94;
+  --honey: #E3AE5F;
+  --coral: #E58C7C;
+  --teal: #6FB1A9;
+  --track: #3A302A;
+  --chart-1: #E8894A;
+  --chart-2: #E3AE5F;
+  --chart-3: #9DBB94;
+  --chart-4: #E58C7C;
+  --chart-5: #6FB1A9;
+  --elev-card: 0 8px 24px -4px rgb(0 0 0 / 0.25), 0 2px 6px -1px rgb(0 0 0 / 0.15);
+  --elev-float: 0 18px 40px -8px rgb(0 0 0 / 0.4), 0 4px 12px -2px rgb(0 0 0 / 0.2);
+  --sidebar: #252019;
+  --sidebar-foreground: #F3EAE2;
+  --sidebar-primary: #F0955A;
+  --sidebar-primary-foreground: #1C1714;
+  --sidebar-accent: #302823;
+  --sidebar-accent-foreground: #F3EAE2;
+  --sidebar-border: #3A302A;
+  --sidebar-ring: #F0955A;
   color-scheme: dark;
 }
 
@@ -151,7 +166,7 @@
   h1, h2, h3 {
     font-family: var(--font-heading);
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;  /* Epilogue serrée, façon magazine */
   }
   button, a, [role="button"] {
     transition: opacity 150ms ease, background-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
