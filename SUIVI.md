@@ -11,7 +11,6 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 ## À faire
 
 ### Mise en ligne
-- [ ] `[Supabase]` Emails : remplacer « Équilibre » par « Dignis » dans les deux modèles (Confirm signup, Reset password) et dans le nom d'expéditeur SMTP
 - [ ] `[RGPD]` Tester la suppression de compte en ligne avec un compte jetable (avec une photo de recette)
 
 ### Données et vie privée
@@ -46,6 +45,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-02 | Emails : « Dignis » dans les modèles et le nom d'expéditeur | — |
 | 2026-11-02 | Consignes Claude Code (`CLAUDE.md`, `AGENTS.md`) sorties du dépôt public ; fichiers inutiles de `public/` supprimés | — |
 | 2026-11-02 | Migrations `006`, `007`, `008` lancées dans Supabase | — |
 | 2026-11-02 | Outils pour Claude Code : `npm run test:db`, `npm run test:e2e` (7 scénarios), docs de contexte, skills du projet | `fffff3c` |
