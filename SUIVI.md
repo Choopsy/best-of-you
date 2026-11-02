@@ -49,6 +49,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-02 | Journal : sucres, gras saturés et sel de nouveau visibles (détail du jour toujours ouvert), sport sous la ligne d'énergie | `78c53d2` |
 | 2026-11-02 | Import de repas réservé à mon compte (MEAL_IMPORT_USERS) ; page « introuvable » en français | `3b55986` |
 | 2026-11-02 | Importer un repas depuis un fichier JSON (Profil > Mes données) | `54e66d0` |
 | 2026-11-02 | Journal repensé (semaine pour choisir le jour, ligne d'énergie fixe, détail replié) ; tests de nouveau stables (lien dans un lien sur l'accueil) | `19d68fc` |
