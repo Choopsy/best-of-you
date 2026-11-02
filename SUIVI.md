@@ -14,6 +14,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 - [ ] `[Supabase]` Emails : remplacer « Équilibre » par « Dignis » dans les deux modèles (Confirm signup, Reset password) et dans le nom d'expéditeur SMTP
 - [ ] `[Supabase]` Lancer `supabase/migrations/006_rayons.sql` dans le SQL Editor (avant le push)
 - [ ] `[Supabase]` Lancer `supabase/migrations/007_portions.sql` dans le SQL Editor (avant le push)
+- [ ] `[Supabase]` Lancer `supabase/migrations/008_produits_recettes.sql` dans le SQL Editor (après la 007, avant le push)
 - [ ] `[RGPD]` Tester la suppression de compte en ligne avec un compte jetable (avec une photo de recette)
 
 ### Données et vie privée
@@ -32,6 +33,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 - [ ] `[Design]` Icône aux couleurs de Dignis (ou garder l'actuelle)
 - [ ] `[Journal]` Plats composés courants à ajouter à la base (tartiflette maison, salades traiteur…) : aujourd'hui Ciqual n'a que des versions industrielles
 - [ ] `[Journal]` Vitamines et minéraux (fer, calcium, B12, vitamine D) depuis la table Ciqual
+- [ ] `[Cuisine]` Créer un produit déjà existant (même nom) : proposer de réutiliser l'ancien plutôt qu'un doublon
 - [ ] `[Cuisine]` Import de recettes depuis un site (projet à part)
 - [ ] `[Cuisine]` Courses : plusieurs magasins avec chacun son ordre de rayons
 - [ ] `[Cuisine]` « Qu'est-ce qu'on mange ? » : compter le sucre et la farine comme placard de base ?
@@ -46,6 +48,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-02 | Recettes : produits scannés ou créés comme ingrédients ; présentation de l'appli au premier lancement (migration 008) | `dd65c5c` |
 | 2026-10-28 | Journal : aliments comptés en portions (burger, menu) ou en pots, parts…, poids de portion repris du scan | `2dafde1` |
 | 2026-10-27 | Journal : « Créer un aliment » sans code-barres (plat maison, restaurant) | `db7d58b` |
 | 2026-10-27 | Nouvelle identité : Dignis, « Prends soin de ta valeur. » | `e4349a9` |
