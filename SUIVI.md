@@ -11,8 +11,6 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 ## À faire
 
 ### Mise en ligne
-- [ ] `[Vercel]` Photo du repas : ajouter `ANTHROPIC_API_KEY` (clé de la console Anthropic, jamais dans le dépôt) et, si besoin, `ANTHROPIC_MODEL` (par défaut `claude-haiku-5-5`), puis redéployer ; sans clé, l'appli affiche « pas encore configurée »
-- [ ] `[Supabase]` Activer la photo du repas pour ton compte : `INSERT INTO photo_access (user_id) VALUES ('<User UID>') ON CONFLICT DO NOTHING;`
 - [ ] `[Vercel]` Ajouter la variable `MEAL_IMPORT_USERS` = ton identifiant (Supabase > Authentication > Users > User UID), puis redéployer : sans elle, l'import de repas est caché pour tout le monde
 - [ ] `[RGPD]` Tester la suppression de compte en ligne avec un compte jetable (avec une photo de recette)
 
