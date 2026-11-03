@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password']
 /** Lisibles par tout le monde, connecté ou non */
-const OPEN_ROUTES = ['/confidentialite']
+const OPEN_ROUTES = ['/confidentialite', '/conditions', '/mentions-legales']
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })

@@ -6,6 +6,7 @@ import { SubmitButton } from '@/components/auth/submit-button'
 import { AuthAlerts, AuthHeader } from '@/components/auth/auth-header'
 import { APP_SIGNATURE } from '@/lib/brand'
 import { ClearOfflineData } from '@/components/pwa/service-worker'
+import { LegalLinks } from '@/components/legal/legal-page'
 
 interface Props {
   searchParams: Promise<{ error?: string; message?: string }>
@@ -43,9 +44,7 @@ export default async function LoginPage({ searchParams }: Props) {
           Créer un compte
         </Link>
       </p>
-      <p className="text-center text-xs text-muted-foreground">
-        <Link href="/confidentialite" className="underline underline-offset-4">Confidentialité et données</Link>
-      </p>
+      <LegalLinks />
     </div>
   )
 }

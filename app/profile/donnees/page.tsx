@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Camera, ChevronRight, Download, FileUp, HeartPulse, ShieldCheck, Trash2 } from 'lucide-react'
+import { Camera, ChevronRight, Download, FileUp, HeartPulse, Trash2 } from 'lucide-react'
 import { getSession } from '@/lib/auth'
 import { canImportMeals } from '@/lib/features'
 import { Notice, PageHeader } from '@/components/layout/page-header'
@@ -8,6 +8,7 @@ import { WithdrawButton } from '@/components/privacy/withdraw-button'
 import { DeleteAccountForm } from '@/components/privacy/delete-account-form'
 import { SubmitButton } from '@/components/auth/submit-button'
 import { withdrawPhotoConsent } from '@/actions/photo'
+import { LegalLinks } from '@/components/legal/legal-page'
 
 interface Props {
   searchParams: Promise<{ error?: string; message?: string }>
@@ -116,9 +117,7 @@ export default async function MyDataPage({ searchParams }: Props) {
           <DeleteAccountForm />
         </section>
 
-        <Link href="/confidentialite" className="flex items-center justify-center gap-2 py-2 text-sm text-muted-foreground underline underline-offset-4">
-          <ShieldCheck className="h-4 w-4" /> Politique de confidentialité
-        </Link>
+        <LegalLinks className="py-2" />
       </main>
     </div>
   )

@@ -20,8 +20,9 @@ export default async function ({ browser, db }) {
     await page.locator('#password').fill('Abcdef1!'); await page.locator('#confirm_password').fill('Abcdef1!')
     const before = await page.getByRole('button', { name: 'Créer mon compte' }).isDisabled()
     await page.locator('input[name=privacy]').check()
+    await page.locator('input[name=adult]').check()
     const after = await page.getByRole('button', { name: 'Créer mon compte' }).isDisabled()
-    check(before && !after, "Inscription bloquée tant que la case n'est pas cochée")
+    check(before && !after, "Inscription bloquée tant que les cases ne sont pas cochées")
   }
 
   // 1. Alice : profil existant sans accord → page d'accord

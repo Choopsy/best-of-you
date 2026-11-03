@@ -64,6 +64,8 @@ export async function GET() {
         email: user.email,
         created_at: user.created_at,
         privacy_accepted_at: user.user_metadata?.privacy_accepted_at ?? null,
+        privacy_version: user.user_metadata?.privacy_version ?? null,
+        terms_version: user.user_metadata?.terms_version ?? null,
         profile,
       },
       health: { profile: health, weights, activities, food_journal: foodLogs },

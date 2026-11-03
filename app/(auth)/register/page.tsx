@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { RegisterForm } from '@/components/auth/register-form'
 import { AuthAlerts, AuthHeader } from '@/components/auth/auth-header'
+import { LegalLinks } from '@/components/legal/legal-page'
 
 interface Props {
   searchParams: Promise<{ error?: string }>
@@ -20,6 +21,7 @@ export default async function RegisterPage({ searchParams }: Props) {
           Se connecter
         </Link>
       </p>
+      <LegalLinks />
     </div>
   )
 }

@@ -1,19 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowLeft, ShieldCheck } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 import { APP_NAME } from '@/lib/brand'
 import { LEGAL } from '@/lib/legal'
+import { LegalPage, Section } from '@/components/legal/legal-page'
 
 export const metadata: Metadata = { title: `Confidentialité · ${APP_NAME}` }
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="space-y-2">
-      <h2 className="text-lg">{title}</h2>
-      <div className="space-y-2 text-[15px] leading-relaxed text-foreground/90">{children}</div>
-    </section>
-  )
-}
 
 export default function PrivacyPage() {
   const contact = LEGAL.contactEmail
@@ -21,17 +13,7 @@ export default function PrivacyPage() {
     : <>le responsable via la page GitHub du projet (<a href="https://github.com/Choopsy" className="underline underline-offset-2">@Choopsy</a>)</>
 
   return (
-    <main className="px-5 pt-6 pb-28 max-w-2xl mx-auto space-y-7">
-      <Link href="/" className="inline-flex min-h-10 items-center gap-1.5 text-sm font-bold text-muted-foreground">
-        <ArrowLeft className="h-4 w-4" /> Retour
-      </Link>
-
-      <header className="space-y-2">
-        <ShieldCheck className="h-9 w-9 text-sage" />
-        <h1 className="text-[28px] leading-tight">Tes données et ta vie privée</h1>
-        <p className="text-sm text-muted-foreground">Mise à jour le {LEGAL.updatedOn}</p>
-      </header>
-
+    <LegalPage icon={<ShieldCheck className="h-9 w-9 text-sage" />} title="Tes données et ta vie privée" updatedOn={LEGAL.updatedOn}>
       <div className="rounded-3xl bg-card px-5 py-4 shadow-card space-y-2 text-[15px] leading-relaxed">
         <p className="font-bold">L&apos;essentiel</p>
         <ul className="list-disc pl-5 space-y-1">
@@ -50,7 +32,7 @@ export default function PrivacyPage() {
       </Section>
 
       <Section title="Quelles données, et pourquoi ?">
-        <p><span className="font-bold">Ton compte</span> : nom, email, mot de passe (stocké chiffré, illisible même pour nous) et photo de profil si tu en ajoutes une. Ils servent à te connecter et à te retrouver entre amis. Base légale : l&apos;exécution du service que tu demandes en créant ton compte.</p>
+        <p><span className="font-bold">Ton compte</span> : nom, email, mot de passe (stocké chiffré, illisible même pour nous) et photo de profil si tu en ajoutes une. Ils servent à te connecter et à te retrouver entre amis. Base légale : l&apos;exécution du service que tu demandes en créant ton compte. {APP_NAME} est réservé aux personnes de {LEGAL.minAge} ans et plus : à l&apos;inscription, tu confirmes ton âge.</p>
         <p><span className="font-bold">Tes données de santé</span> : sexe, date de naissance, taille, poids, niveau d&apos;activité, objectifs, régime, repas notés, séances de sport. Elles servent seulement à calculer tes objectifs du jour et à suivre ta progression. Comme ce sont des données sensibles, elles ne sont enregistrées qu&apos;avec ton <span className="font-bold">accord explicite</span>, que tu peux retirer à tout moment (article 9 du RGPD).</p>
         <p><span className="font-bold">Ta cuisine</span> : recettes, photos, collections, frigo, planning et liste de courses, produits scannés. Ils servent à faire fonctionner ces fonctions, et à les partager quand tu le choisis.</p>
         <p><span className="font-bold">Photo du repas</span> (seulement pour les comptes où elle est activée) : quand tu prends ton assiette en photo, elle est envoyée à Anthropic, qui reconnaît les aliments et estime les quantités. {APP_NAME} ne garde pas la photo : elle n&apos;est enregistrée nulle part, ni dans la base ni dans les journaux du serveur. Nous gardons seulement la date de chaque analyse (pour limiter le nombre de photos par jour) et la date de ton accord. Les valeurs nutritionnelles viennent de la table Ciqual, pas de l&apos;IA, et tu vérifies tout avant d&apos;ajouter. Base légale : ton <span className="font-bold">accord</span>, demandé à la première photo et que tu peux retirer dans <Link href="/profile/donnees" className="underline underline-offset-2">Mes données</Link>.</p>
@@ -122,6 +104,6 @@ export default function PrivacyPage() {
           chaque compte de lire les données des autres, sauf ce qui est explicitement partagé. Ces règles sont testées automatiquement.
         </p>
       </Section>
-    </main>
+    </LegalPage>
   )
 }
