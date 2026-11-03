@@ -107,7 +107,7 @@ export default async function ({ browser, db, anthropic }) {
   check(logs.length === 3 && logs.every((l) => l.meal === 'dinner'), `3 aliments ajoutés au dîner ${JSON.stringify(logs)}`)
   check(logs[0]?.g === 300, 'grammes corrigés enregistrés (300 g)')
   check(logs.every((l) => l.ciqual_code && Math.abs(l.kcal - l.ciqual_kcal) <= 1), 'kcal enregistrées = valeurs Ciqual, pas celles de l\'IA')
-  // Échoue encore de temps en temps (Next 16 garde parfois l'ancienne page) : voir SUIVI.md
+  // Le journal se met à jour (il ratait quand la barre du bas préchargeait la page en cours)
   check(await page.getByText(logs[0]?.label ?? '—').first().waitFor({ timeout: 8000 }).then(() => true, () => false), 'visible dans le journal')
   await shot(page, 'photo-repas-journal', { fullPage: true })
 

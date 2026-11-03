@@ -72,17 +72,6 @@ export function MealPhoto({ date, status, defaultOpen = false }: { date: string;
   const nextId = useRef(1)
   const cameraInput = useRef<HTMLInputElement>(null)
   const galleryInput = useRef<HTMLInputElement>(null)
-  // Après un ajout, le journal est relu une fois la fenêtre fermée. router.refresh() (comme la
-  // revalidation de l'action) laissait souvent l'ancienne page affichée alors que le serveur
-  // renvoyait la nouvelle ; la navigation vers la même adresse rate plus rarement, mais rate encore
-  // (tests/e2e/specs/11-photo-repas.mjs) : à creuser, voir SUIVI.md.
-  const [saved, setSaved] = useState(0)
-  useEffect(() => {
-    if (!saved) return
-    const q = new URLSearchParams(window.location.search)
-    q.delete('photo') // venue du menu + : on ne rouvre pas la fenêtre
-    router.replace(q.size ? `${window.location.pathname}?${q}` : window.location.pathname, { scroll: false })
-  }, [saved, router])
 
   const openSheet = () => {
     setError(null); setLines([])
@@ -169,7 +158,9 @@ export function MealPhoto({ date, status, defaultOpen = false }: { date: string;
       })
       if (res.error) { setError(res.error); return }
       setOpen(false)
-      setSaved((n) => n + 1)
+      // Venue du menu + : on retire ?photo=1 (la navigation relit aussi le journal)
+      if (params.has('photo')) close()
+      else router.refresh()
     })
   }
 

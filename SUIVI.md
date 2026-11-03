@@ -32,11 +32,10 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 - [ ] `[Premium]` Activer `photo_access` automatiquement à l'abonnement (aujourd'hui : à la main dans le SQL Editor)
 - [ ] `[RGPD]` Photo du repas : effacer les dates d'analyse de plus d'un jour (seul le jour en cours sert au quota)
-- [ ] `[Journal]` Photo du repas : après « Ajouter au repas », le journal garde parfois l'ancienne page (environ 1 fois sur 4 dans les tests) alors que les aliments sont bien enregistrés et que le serveur renvoie la page à jour ; recharger la page les affiche. `router.refresh()` et la revalidation de l'action ratent aussi : à creuser (Next 16)
 
 - [ ] `[Journal]` Après un ajout ouvert par le bouton + (`/journal?add=1`), l'adresse garde `?add=1` : recharger la page rouvre la fenêtre d'ajout
 - [ ] `[Journal]` Frigo : proposer aussi le retrait pour « Ajouter à nouveau », « Comme hier » et le scan direct
-- [ ] `[Infra]` Tests e2e : rares délais dépassés au premier passage juste après un build (scénario différent à chaque fois) ; relancer avec `--no-build` passe
+- [ ] `[Infra]` Tests e2e : délais dépassés de temps en temps dans 01-journal-scan (la fenêtre « Ajouter » ne se ferme pas après le scan) et 02-aliments, aussi sans rebuild ; peut-être une cause voisine du bug du préchargement (corrigé le 2026-11-03)
 - [ ] `[Design]` Écarts restants avec les maquettes : icône par rayon dans les courses, photos des aliments dans le journal, en-tête « Dignis » avec cloche, autres pages (recettes, frigo, semaine, profil) à harmoniser
 - [ ] `[Design]` Icône aux couleurs de Dignis (ou garder l'actuelle)
 - [ ] `[Journal]` Plats composés courants à ajouter à la base (tartiflette maison, salades traiteur…) : aujourd'hui Ciqual n'a que des versions industrielles

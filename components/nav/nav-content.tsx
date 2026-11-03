@@ -42,8 +42,10 @@ export function NavContent({ avatarUrl, fullName, pendingFriendsCount, kitchenAl
   const MobileLink = ({ href, icon: Icon, label, dot }: { href: string; icon: typeof Home; label: string; dot?: boolean }) => {
     const active = isActive(href === '/frigo' ? '/recipes' : href)
     return (
-      // prefetch : la page entière (données comprises) est chargée en arrière-plan, l'appui est instantané
-      <Link href={href} prefetch aria-current={active ? 'page' : undefined} className="flex min-h-11 min-w-14 flex-col items-center gap-1 py-2 px-2">
+      // prefetch : la page entière (données comprises) est chargée en arrière-plan, l'appui est instantané.
+      // Pas pour la page où l'on est : ce préchargement, relancé après chaque ajout, croisait le
+      // rafraîchissement de la page et laissait parfois l'ancienne version affichée (journal)
+      <Link href={href} prefetch={pathname !== href} aria-current={active ? 'page' : undefined} className="flex min-h-11 min-w-14 flex-col items-center gap-1 py-2 px-2">
         <span className="relative inline-flex">
           <Icon className={`h-6 w-6 transition-colors ${active ? 'text-primary' : 'text-muted-foreground'}`} strokeWidth={active ? 2.2 : 1.8} />
           {dot && <span className="absolute -top-0.5 -right-1 h-2 w-2 rounded-full bg-red-500" />}
@@ -65,7 +67,7 @@ export function NavContent({ avatarUrl, fullName, pendingFriendsCount, kitchenAl
 
         <div className="flex items-center gap-1 flex-1">
           {DESKTOP_ITEMS.map(({ href, icon: Icon, label }) => (
-            <Link key={href} href={href} prefetch>
+            <Link key={href} href={href} prefetch={pathname !== href}>
               <Button variant={isActive(href) ? 'secondary' : 'ghost'} size="sm" className="gap-1.5">
                 <Icon className="h-4 w-4" />
                 {label}
