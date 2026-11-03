@@ -34,7 +34,8 @@ CREATE FUNCTION storage.foldername(name text) RETURNS text[] LANGUAGE sql IMMUTA
   $$ SELECT (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
 GRANT USAGE ON SCHEMA auth, storage, public TO authenticated, anon;
 GRANT EXECUTE ON FUNCTION auth.uid() TO authenticated, anon;
-GRANT ALL ON storage.objects TO authenticated;
+-- Comme Supabase : les visiteurs ont aussi les droits, seules les règles (RLS) filtrent
+GRANT ALL ON storage.objects TO authenticated, anon;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO authenticated, anon;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO authenticated, anon;
 `

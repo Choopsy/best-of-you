@@ -9,6 +9,11 @@ RUN npm ci --no-audit --no-fund
 
 COPY . .
 
+# Sans droits root : l'utilisateur « node » de l'image possède le projet et le cache de Next
+# (les volumes nommés de docker-compose.yml reprennent ces droits à leur création)
+RUN mkdir -p .next && chown -R node:node /app
+USER node
+
 ENV NEXT_TELEMETRY_DISABLED=1
 EXPOSE 3000
 
