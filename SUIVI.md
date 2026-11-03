@@ -22,6 +22,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 - [ ] `[RGPD]` Décider si les photos des recettes privées passent dans un stockage privé (aujourd'hui : visibles par qui a le lien)
 - [ ] `[RGPD]` Avant d'ouvrir au-delà des proches : remplacer Gmail par un service d'envoi avec accord de traitement (Brevo ou Resend, nom de domaine)
 - [ ] `[RGPD]` Si l'appli s'ouvre au-delà des proches : refaire le point sur l'analyse d'impact (AIPD) et relire le registre des traitements
+- [ ] `[RGPD]` Mentions légales : vérifier l'entité Supabase de ton contrat (Supabase Pte. Ltd., Singapour, sauf achat via AWS Marketplace) ; adresse personnelle non publiée (particulier, LCEN art. 6-III-2) : c'est un choix à confirmer
 
 ### Protection
 - [ ] `[Infra]` Sauvegarde hebdomadaire de la base, gratuite (GitHub Actions)
@@ -30,6 +31,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 ## Idées
 
+- [ ] `[RGPD]` Comptes créés avant le 3 novembre 2026 : pas d'acceptation des conditions ni d'âge confirmé enregistrés ; les demander à la prochaine connexion si l'appli s'ouvre
 - [ ] `[Premium]` Activer `photo_access` automatiquement à l'abonnement (aujourd'hui : à la main dans le SQL Editor)
 - [ ] `[RGPD]` Photo du repas : effacer les dates d'analyse de plus d'un jour (seul le jour en cours sert au quota)
 
@@ -56,6 +58,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-03 | Mentions légales, conditions d'utilisation, inscription réservée aux 18 ans et plus (case vérifiée côté serveur) | `3bffcb2` |
 | 2026-11-03 | Nouveau slogan « Digne de soin, chaque jour. » ; connexion : logo et slogan | `a124d7f` |
 | 2026-11-03 | Journal à jour après un ajout : la barre du bas ne précharge plus la page en cours (elle laissait parfois l'ancien journal affiché) | `7e6c41a` |
 | 2026-11-03 | Menu + : « Photo du repas » sur toute la largeur, seulement pour les comptes activés | `b03d07a` |
