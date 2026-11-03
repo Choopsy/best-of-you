@@ -56,6 +56,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-03 | Connexion : le sens du nom (« digne ») en tête, présenté comme une entrée de dictionnaire | `4b4d8ca` |
 | 2026-11-03 | Journal à jour après un ajout : la barre du bas ne précharge plus la page en cours (elle laissait parfois l'ancien journal affiché) | `7e6c41a` |
 | 2026-11-03 | Menu + : « Photo du repas » sur toute la largeur, seulement pour les comptes activés | `b03d07a` |
 | 2026-11-03 | Photo du repas : Claude reconnaît les aliments et estime les grammes, valeurs Ciqual, vérification avant ajout ; accès réservé, accord, 3 photos par jour (migration 010) | `bb0a0c6` |
