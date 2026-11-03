@@ -24,7 +24,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 - [ ] `[RGPD]` Mentions légales : vérifier l'entité Supabase de ton contrat (Supabase Pte. Ltd., Singapour, sauf achat via AWS Marketplace) ; adresse personnelle non publiée (particulier, LCEN art. 6-III-2) : c'est un choix à confirmer
 
 ### Protection
-- [ ] `[Infra]` Sécurité : corriger les points de l'audit du 3 novembre 2026 (document privé « Audit de sécurité — Dignis ») ; relancer avec `npm run test:security`, `npm audit`, gitleaks et semgrep (commandes dans le document)
+- [ ] `[Infra]` Sécurité : relancer l'audit régulièrement (`npm run test:security`, `npm audit`, gitleaks, semgrep : commandes dans le document privé « Audit de sécurité — Dignis ») ; étape suivante possible : CSP avec nonce dans `proxy.ts`
 - [ ] `[Infra]` Sauvegarde hebdomadaire de la base, gratuite (GitHub Actions)
 - [ ] `[Infra]` Vérification automatique à chaque push : typage, `npm test`, `npm run test:db`, build (GitHub Actions)
 - [ ] `[Infra]` Au-delà de quelques centaines d'utilisateurs : passer Supabase en offre Pro (sauvegardes, plus de mise en pause, 8 Go)
@@ -58,6 +58,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-03 | Sécurité : corrections de l'audit (Next 16.4.4, en-têtes, stockage et fonctions fermés, migration 011) ; `npm run test:security` | `dd6f1a1` |
 | 2026-11-03 | Mentions légales, conditions d'utilisation, inscription réservée aux 18 ans et plus (case vérifiée côté serveur) | `3bffcb2` |
 | 2026-11-03 | Nouveau slogan « Digne de soin, chaque jour. » ; connexion : logo et slogan | `a124d7f` |
 | 2026-11-03 | Journal à jour après un ajout : la barre du bas ne précharge plus la page en cours (elle laissait parfois l'ancien journal affiché) | `7e6c41a` |
