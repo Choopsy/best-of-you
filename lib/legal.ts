@@ -10,7 +10,7 @@ export const LEGAL = {
   /** Région du projet Supabase (Project Settings > General), ex. « Irlande (Union européenne) » */
   databaseRegion: process.env.NEXT_PUBLIC_DATABASE_REGION || 'Irlande (Union européenne)',
   /** Date de la dernière mise à jour de la politique */
-  updatedOn: '2 novembre 2026',
+  updatedOn: '3 novembre 2026',
   /** Version, enregistrée avec l'accord de l'utilisateur */
-  version: '2026-11-02b',
+  version: '2026-11-03',
 }

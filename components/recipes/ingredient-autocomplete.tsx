@@ -18,10 +18,12 @@ interface Props {
   autoFocus?: boolean
   /** Inclure les produits enregistrés du foyer (code-barres) */
   includeProducts?: boolean
+  /** Libellé du champ quand il n'a pas de <Label> visible (plusieurs champs dans une liste) */
+  ariaLabel?: string
 }
 
 export function IngredientAutocomplete({
-  value, ciqualCode, onChange, onPick, placeholder, className, showStatus = true, autoFocus, includeProducts = false,
+  value, ciqualCode, onChange, onPick, placeholder, className, showStatus = true, autoFocus, includeProducts = false, ariaLabel,
 }: Props) {
   const [suggestions, setSuggestions] = useState<FoodSuggestion[]>([])
   const [open, setOpen] = useState(false)
@@ -89,6 +91,7 @@ export function IngredientAutocomplete({
         className={`${className ?? ''} ${showStatus ? 'pr-7' : ''}`}
         autoComplete="off"
         autoFocus={autoFocus}
+        aria-label={ariaLabel}
       />
       {showStatus && value.trim() && (
         <span

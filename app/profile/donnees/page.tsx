@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ChevronRight, Download, FileUp, HeartPulse, ShieldCheck, Trash2 } from 'lucide-react'
+import { Camera, ChevronRight, Download, FileUp, HeartPulse, ShieldCheck, Trash2 } from 'lucide-react'
 import { getSession } from '@/lib/auth'
 import { canImportMeals } from '@/lib/features'
 import { Notice, PageHeader } from '@/components/layout/page-header'
 import { WithdrawButton } from '@/components/privacy/withdraw-button'
 import { DeleteAccountForm } from '@/components/privacy/delete-account-form'
+import { SubmitButton } from '@/components/auth/submit-button'
+import { withdrawPhotoConsent } from '@/actions/photo'
 
 interface Props {
   searchParams: Promise<{ error?: string; message?: string }>
@@ -21,9 +23,12 @@ export default async function MyDataPage({ searchParams }: Props) {
   const { supabase, user } = await getSession()
   if (!user) redirect('/login')
 
-  const [{ data: health }, { data: member }] = await Promise.all([
+  const [{ data: health }, { data: member }, { data: photo }, { count: analyses }] = await Promise.all([
     supabase.from('health_profiles').select('health_consent_at').eq('user_id', user.id).maybeSingle(),
     supabase.from('household_members').select('household_id').eq('user_id', user.id).maybeSingle(),
+    // Photo du repas : seulement pour les comptes activés (migration 010)
+    supabase.from('photo_access').select('consent_at').eq('user_id', user.id).maybeSingle(),
+    supabase.from('photo_analyses').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
   ])
   const { count: members } = member
     ? await supabase.from('household_members').select('*', { count: 'exact', head: true }).eq('household_id', member.household_id)
@@ -72,6 +77,25 @@ export default async function MyDataPage({ searchParams }: Props) {
             </p>
           )}
         </section>
+
+        {photo && (
+          <section className={card}>
+            <h2 className="flex items-center gap-2 text-lg"><Camera className="h-5 w-5 text-primary" /> Photo du repas</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Tes photos sont envoyées à Anthropic pour l&apos;analyse puis supprimées : Dignis ne les garde pas.
+              Seule la date de chaque analyse est enregistrée, pour compter les photos du jour
+              ({`${(analyses ?? 0).toLocaleString('fr-FR')} analyse${(analyses ?? 0) > 1 ? 's' : ''} jusqu’ici`}).
+            </p>
+            {photo.consent_at ? (
+              <form action={withdrawPhotoConsent} className="space-y-2">
+                <p className="text-sm leading-relaxed">Tu as donné ton accord le {fmt(photo.consent_at)}.</p>
+                <SubmitButton className="w-full border border-border bg-card text-foreground hover:bg-muted">Retirer mon accord pour les photos</SubmitButton>
+              </form>
+            ) : (
+              <p className="text-sm leading-relaxed">Accord pas donné : il te sera demandé à la prochaine photo.</p>
+            )}
+          </section>
+        )}
 
         <section id="supprimer" className={`${card} border border-destructive/25 scroll-mt-20`}>
           <h2 className="flex items-center gap-2 text-lg"><Trash2 className="h-5 w-5 text-destructive" /> Supprimer mon compte</h2>

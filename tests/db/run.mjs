@@ -10,7 +10,7 @@ import path from 'node:path'
 import { ROOT, startDb } from '../support/db.mjs'
 
 // rls_tests.sql crée les fonctions t_eq / t_fails et les premiers utilisateurs : toujours en premier
-const ORDER = ['rls', 'foyer', 'sport', 'rgpd', 'rayons', 'portions', 'produits_recettes', 'frigo_journal']
+const ORDER = ['rls', 'foyer', 'sport', 'rgpd', 'rayons', 'portions', 'produits_recettes', 'frigo_journal', 'photo_repas']
 
 const dir = path.join(ROOT, 'supabase/tests')
 const files = readdirSync(dir).filter((f) => f.endsWith('_tests.sql'))

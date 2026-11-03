@@ -70,6 +70,9 @@ export async function startStack({ latencyMs = 0 } = {}) {
 
   // Métadonnées de compte modifiées pendant le test (supabase.auth.updateUser)
   const metadata = new Map()
+  // Fausse API Anthropic (photo du repas) : le scénario choisit la réponse avec anthropic.respond.
+  // Jamais d'appel réel : l'appli de test vise ANTHROPIC_BASE_URL = cette passerelle.
+  const anthropic = { calls: [], respond: () => fakeClaude([]) }
   const gateway = http.createServer(async (req, res) => {
     if (latencyMs) await new Promise((r) => setTimeout(r, latencyMs))
     const url = new URL(req.url, 'http://x')
@@ -96,6 +99,16 @@ export async function startStack({ latencyMs = 0 } = {}) {
       } catch { res.writeHead(401); res.end('{}') }
       return
     }
+    if (url.pathname === '/anthropic/v1/messages' && req.method === 'POST') {
+      let body = ''
+      for await (const chunk of req) body += chunk
+      const request = JSON.parse(body || '{}')
+      anthropic.calls.push({ model: request.model, apiKey: req.headers['x-api-key'], content: request.messages?.[0]?.content?.map((c) => c.type) ?? [], outputConfig: request.output_config })
+      const r = await anthropic.respond(request, anthropic.calls.length)
+      res.writeHead(r.status ?? 200, { 'content-type': 'application/json' })
+      res.end(JSON.stringify(r.body))
+      return
+    }
     if (url.pathname.startsWith('/storage/v1/object/')) { res.writeHead(200, { 'content-type': 'application/json' }); res.end('[]'); return }
     if (url.pathname === '/auth/v1/logout') { res.writeHead(204); res.end(); return }
     res.writeHead(404, { 'content-type': 'application/json' }); res.end('{"message":"non imité par tests/e2e/stack.mjs"}')
@@ -109,5 +122,21 @@ export async function startStack({ latencyMs = 0 } = {}) {
     await new Promise((r) => (pgrst.exitCode !== null ? r() : pgrst.once('exit', r)))
     await stopDb()
   }
-  return { db, metadata, stop }
+  return { db, metadata, anthropic, stop }
+}
+
+/**
+ * Réponse de l'API Messages imitée : `aliments` = [{ nom, grammes, confiance }] renvoyés en JSON
+ * dans un bloc texte (comme avec output_config.format) ; `{ status: 500 }` pour une panne.
+ */
+export function fakeClaude(aliments, { status = 200 } = {}) {
+  if (status !== 200) return { status, body: { type: 'error', error: { type: 'api_error', message: 'Panne simulée' } } }
+  return {
+    status,
+    body: {
+      id: 'msg_e2e', type: 'message', role: 'assistant', model: 'claude-haiku-5-5', stop_reason: 'end_turn', stop_sequence: null,
+      content: [{ type: 'text', text: JSON.stringify({ aliments }) }],
+      usage: { input_tokens: 1000, output_tokens: 100 },
+    },
+  }
 }

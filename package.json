@@ -6,12 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "tsx scripts/test-targets.ts && tsx scripts/test-shopping.ts && tsx scripts/test-suggest.ts && tsx scripts/test-aisles.ts && tsx scripts/test-offline-list.ts && tsx scripts/test-weekly.ts && tsx scripts/test-off.ts && tsx scripts/test-portions.ts && tsx scripts/test-meal-import.ts && tsx scripts/test-fridge-use.ts",
+    "test": "tsx scripts/test-targets.ts && tsx scripts/test-shopping.ts && tsx scripts/test-suggest.ts && tsx scripts/test-aisles.ts && tsx scripts/test-offline-list.ts && tsx scripts/test-weekly.ts && tsx scripts/test-off.ts && tsx scripts/test-portions.ts && tsx scripts/test-meal-import.ts && tsx scripts/test-fridge-use.ts && tsx scripts/test-meal-photo.ts",
     "test:db": "node tests/db/run.mjs",
     "test:e2e": "node tests/e2e/run.mjs",
     "test:all": "npm test && npm run test:db && npm run test:e2e"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.4.0",
     "@base-ui/react": "^1.4.1",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.105.3",

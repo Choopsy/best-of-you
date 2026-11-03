@@ -37,6 +37,10 @@ const env = {
   OPENFOODFACTS_URL: 'http://127.0.0.1:9',
   // Import de repas réservé : Alice oui, Bob non (voir lib/features.ts)
   MEAL_IMPORT_USERS: ALICE,
+  // Photo du repas : fausse API Anthropic dans la passerelle (stack.mjs), jamais la vraie
+  ANTHROPIC_API_KEY: 'e2e-cle-factice',
+  ANTHROPIC_BASE_URL: `http://localhost:${GATEWAY_PORT}/anthropic`,
+  ANTHROPIC_MODEL: '',
   NEXT_TELEMETRY_DISABLED: '1',
 }
 
@@ -70,7 +74,7 @@ for (const f of specs) {
   const stack = await startStack()
   try {
     const spec = await import(pathToFileURL(path.join(specsDir, f)).href)
-    await spec.default({ browser, db: stack.db, metadata: stack.metadata })
+    await spec.default({ browser, db: stack.db, metadata: stack.metadata, anthropic: stack.anthropic })
   } catch (e) {
     crashed.push(f)
     console.log(`  ✗ arrêt du scénario : ${e.message.split('\n')[0]}`)

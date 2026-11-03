@@ -13,6 +13,8 @@ import { DayBar, DayDetail } from '@/components/journal/day-summary'
 import { WeekRings } from '@/components/journal/week-rings'
 import { EntryRow } from '@/components/journal/entry-row'
 import { AddEntry } from '@/components/journal/add-entry'
+import { MealPhoto } from '@/components/journal/meal-photo'
+import { getPhotoStatus } from '@/lib/photo-access'
 
 // Pastille de chaque repas : icône et teinte, comme dans la maquette
 const MEAL_ICON = {
@@ -39,13 +41,14 @@ export default async function JournalPage({ searchParams }: Props) {
   // 7 jours autour du jour affiché (jamais dans le futur) : il reste au milieu quand c'est possible
   const plus3 = shiftDate(date, 3)
   const weekEnd = plus3 < today ? plus3 : today
-  const [ctx, { logs, totals }, recipes, recents, { logs: prevLogs }, week] = await Promise.all([
+  const [ctx, { logs, totals }, recipes, recents, { logs: prevLogs }, week, photo] = await Promise.all([
     getHealthContext(supabase, user.id, date),
     getDayLogs(supabase, user.id, date),
     getPickableRecipes(supabase, user.id),
     getRecentEntries(supabase, user.id, date),
     getDayLogs(supabase, user.id, yesterday),
     getWeekTotals(supabase, user.id, weekEnd),
+    getPhotoStatus(supabase),
   ])
 
   const isToday = date === today
@@ -82,6 +85,9 @@ export default async function JournalPage({ searchParams }: Props) {
           } />
 
         <DayBar totals={totals} targets={ctx.targets} />
+
+        {/* Réservé aux comptes activés à la main (photo_access, migration 010) */}
+        {photo.enabled && <MealPhoto date={date} status={photo} />}
 
         {MEALS.map((meal) => {
           const entries = logs.filter((l) => l.meal === meal)

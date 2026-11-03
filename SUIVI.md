@@ -12,12 +12,16 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 ### Mise en ligne
 - [ ] `[Supabase]` Lancer `supabase/migrations/009_frigo_journal.sql` dans le SQL Editor (avant le push)
+- [ ] `[Vercel]` Photo du repas : ajouter `ANTHROPIC_API_KEY` (clé de la console Anthropic, jamais dans le dépôt) et, si besoin, `ANTHROPIC_MODEL` (par défaut `claude-haiku-5-5`), puis redéployer ; sans clé, l'appli affiche « pas encore configurée »
+- [ ] `[Supabase]` Activer la photo du repas pour ton compte : `INSERT INTO photo_access (user_id) VALUES ('<User UID>') ON CONFLICT DO NOTHING;`
 - [ ] `[Vercel]` Ajouter la variable `MEAL_IMPORT_USERS` = ton identifiant (Supabase > Authentication > Users > User UID), puis redéployer : sans elle, l'import de repas est caché pour tout le monde
 - [ ] `[RGPD]` Tester la suppression de compte en ligne avec un compte jetable (avec une photo de recette)
 
 ### Données et vie privée
 - [ ] `[RGPD]` Compléter le registre des traitements (document privé) avec les migrations 006 à 009 : rayons, portions, produits lisibles via une recette, présentation vue, frigo qui suit le journal
 - [ ] `[RGPD]` Télécharger et garder une copie des accords de traitement (DPA) de Supabase et de Vercel
+- [ ] `[RGPD]` Anthropic : accepter / télécharger son accord de traitement (DPA, clauses types) avant d'activer la photo pour quelqu'un d'autre, et vérifier la durée de conservation des requêtes de l'API pour préciser la politique (aujourd'hui : « supprimée après un court délai prévu par son contrat »)
+- [ ] `[RGPD]` Registre des traitements : ajouter la photo du repas (Anthropic sous-traitant, accord, photo non conservée, dates des analyses gardées)
 - [ ] `[RGPD]` Décider si les photos des recettes privées passent dans un stockage privé (aujourd'hui : visibles par qui a le lien)
 - [ ] `[RGPD]` Avant d'ouvrir au-delà des proches : remplacer Gmail par un service d'envoi avec accord de traitement (Brevo ou Resend, nom de domaine)
 - [ ] `[RGPD]` Si l'appli s'ouvre au-delà des proches : refaire le point sur l'analyse d'impact (AIPD) et relire le registre des traitements
@@ -28,6 +32,10 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 - [ ] `[Infra]` Au-delà de quelques centaines d'utilisateurs : passer Supabase en offre Pro (sauvegardes, plus de mise en pause, 8 Go)
 
 ## Idées
+
+- [ ] `[Premium]` Activer `photo_access` automatiquement à l'abonnement (aujourd'hui : à la main dans le SQL Editor)
+- [ ] `[RGPD]` Photo du repas : effacer les dates d'analyse de plus d'un jour (seul le jour en cours sert au quota)
+- [ ] `[Journal]` Photo du repas : après « Ajouter au repas », le journal garde parfois l'ancienne page (environ 1 fois sur 4 dans les tests) alors que les aliments sont bien enregistrés et que le serveur renvoie la page à jour ; recharger la page les affiche. `router.refresh()` et la revalidation de l'action ratent aussi : à creuser (Next 16)
 
 - [ ] `[Journal]` Après un ajout ouvert par le bouton + (`/journal?add=1`), l'adresse garde `?add=1` : recharger la page rouvre la fenêtre d'ajout
 - [ ] `[Journal]` Frigo : proposer aussi le retrait pour « Ajouter à nouveau », « Comme hier » et le scan direct

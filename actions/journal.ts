@@ -99,18 +99,15 @@ function checkCommon(date: string, meal: string): string | null {
   return null
 }
 
-export async function addFoodToLog(input: {
-  date: string; meal: Meal
+type FoodInput = {
   /** Quantité en grammes… */ grams?: number
   /** …ou en portions (aliments enregistrés avec une portion) */ portions?: number
   /** Aliment Ciqual */ code?: string
   /** Produit enregistré (code-barres ou saisi à la main) */ customId?: string
-  /** Retraits du frigo confirmés à l'écran */ fridge?: FridgeUse[]
-}): Promise<Result> {
-  const { supabase, user } = await auth()
-  if (!user) return { error: 'Non connecté' }
-  const bad = checkCommon(input.date, input.meal)
-  if (bad) return { error: bad }
+}
+
+/** Ligne du journal pour un aliment et une quantité (sans user_id, date ni repas), ou un message d'erreur. */
+async function foodRow(supabase: Awaited<ReturnType<typeof createClient>>, input: FoodInput) {
   const unit = input.portions != null ? 'portion' as const : 'g' as const
   const amount = Number(unit === 'portion' ? input.portions : input.grams)
 
@@ -135,26 +132,64 @@ export async function addFoodToLog(input: {
     return { error: 'Choisis un aliment.' }
   }
 
-  const bad2 = checkQuantity(portion, unit, amount)
-  if (bad2) return { error: bad2 }
+  const bad = checkQuantity(portion, unit, amount)
+  if (bad) return { error: bad, label }
   const factor = nutrientFactor(portion, unit, amount)
-  if (factor == null) return { error: 'Quantité impossible pour cet aliment.' }
-  const n = roundNutrients(scale(values, factor))
+  if (factor == null) return { error: 'Quantité impossible pour cet aliment.', label }
+  return {
+    row: {
+      ciqual_code: input.customId ? null : input.code,
+      custom_food_id: input.customId ?? null,
+      label,
+      grams: eatenGrams(portion, unit, amount),
+      servings: unit === 'portion' ? amount : null,
+      ...roundNutrients(scale(values, factor)),
+    },
+  }
+}
+
+export async function addFoodToLog(input: FoodInput & {
+  date: string; meal: Meal
+  /** Retraits du frigo confirmés à l'écran */ fridge?: FridgeUse[]
+}): Promise<Result> {
+  const { supabase, user } = await auth()
+  if (!user) return { error: 'Non connecté' }
+  const bad = checkCommon(input.date, input.meal)
+  if (bad) return { error: bad }
+  const built = await foodRow(supabase, input)
+  if ('error' in built) return { error: built.error ?? 'Erreur lors de l\'ajout.' }
   const { data: log, error } = await supabase.from('food_logs').insert({
-    user_id: user.id,
-    eaten_on: input.date,
-    meal: input.meal,
-    ciqual_code: input.customId ? null : input.code,
-    custom_food_id: input.customId ?? null,
-    label,
-    grams: eatenGrams(portion, unit, amount),
-    servings: unit === 'portion' ? amount : null,
-    ...n,
+    user_id: user.id, eaten_on: input.date, meal: input.meal, ...built.row,
   }).select('id').single()
   if (error || !log) return { error: error?.message ?? 'Erreur lors de l\'ajout.' }
   await saveMoves(supabase, log.id, await applyFridgeUses(supabase, input.fridge))
   refresh()
   return { error: null }
+}
+
+/**
+ * Plusieurs aliments d'un coup (photo du repas, après vérification à l'écran).
+ * Chaque ligne est recalculée ici depuis Ciqual ou le produit du foyer : rien ne vient de l'IA.
+ */
+export async function addFoodsToLog(input: { date: string; meal: Meal; items: { code?: string; customId?: string; grams: number }[] }): Promise<Result & { count?: number }> {
+  const { supabase, user } = await auth()
+  if (!user) return { error: 'Non connecté' }
+  const bad = checkCommon(input.date, input.meal)
+  if (bad) return { error: bad }
+  const items = Array.isArray(input.items) ? input.items : []
+  if (!items.length) return { error: 'Aucun aliment à ajouter.' }
+  if (items.length > 20) return { error: '20 aliments maximum.' }
+  const rows = []
+  for (const it of items) {
+    const built = await foodRow(supabase, it.customId ? { customId: String(it.customId), grams: Number(it.grams) } : { code: String(it.code ?? ''), grams: Number(it.grams) })
+    // Plusieurs lignes : on dit laquelle pose problème
+    if ('error' in built) return { error: 'label' in built ? `${built.label} : ${built.error}` : built.error ?? 'Erreur lors de l\'ajout.' }
+    rows.push({ user_id: user.id, eaten_on: input.date, meal: input.meal, ...built.row })
+  }
+  const { error } = await supabase.from('food_logs').insert(rows)
+  if (error) return { error: error.message }
+  refresh()
+  return { error: null, count: rows.length }
 }
 
 /** « Ajouter à nouveau » : recopie une entrée du journal (mêmes quantités) à une autre date / un autre repas. */

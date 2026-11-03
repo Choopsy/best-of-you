@@ -24,6 +24,7 @@ export async function GET() {
     const [
       profile, health, weights, activities, foodLogs, recipes, collections, likes, reviews,
       friendships, sharesGiven, sharesReceived, members, fridge, plan, shopping, products,
+      photoAccess, photoAnalyses,
     ] = await Promise.all([
       q(supabase.from('profiles').select('*').eq('id', me).maybeSingle()),
       q(supabase.from('health_profiles').select('*').eq('user_id', me).maybeSingle()),
@@ -46,6 +47,9 @@ export async function GET() {
       q(supabase.from('meal_plan').select('*, recipes ( title )')),
       q(supabase.from('shopping_items').select('*')),
       q(supabase.from('custom_foods').select('*')),
+      // Photo du repas : accès, accord et dates des analyses (les photos ne sont jamais gardées)
+      q(supabase.from('photo_access').select('enabled_at, consent_at').eq('user_id', me).maybeSingle()),
+      q(supabase.from('photo_analyses').select('created_at').eq('user_id', me).order('created_at')),
     ])
 
     const body = {
@@ -66,6 +70,12 @@ export async function GET() {
       kitchen: { recipes, collections, likes, reviews },
       friends: { friendships, recipes_i_shared: sharesGiven, recipes_shared_with_me: sharesReceived },
       household: { members, fridge, meal_plan: plan, shopping_list: shopping, scanned_products: products },
+      meal_photo: {
+        note: 'Les photos sont envoyées à Anthropic pour l\'analyse puis supprimées : seules ces dates sont gardées.',
+        access: photoAccess,
+        analyses_count: photoAnalyses?.length ?? 0,
+        analyses: (photoAnalyses ?? []).map((a) => a.created_at),
+      },
     }
 
     return new Response(JSON.stringify(body, null, 2), {
