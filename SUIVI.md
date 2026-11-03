@@ -23,6 +23,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 - [ ] `[RGPD]` Mentions légales : vérifier l'entité Supabase de ton contrat (Supabase Pte. Ltd., Singapour, sauf achat via AWS Marketplace) ; adresse personnelle non publiée (particulier, LCEN art. 6-III-2) : c'est un choix à confirmer
 
 ### Protection
+- [ ] `[Infra]` Sécurité : corriger les points de l'audit du 3 novembre 2026 (document privé « Audit de sécurité — Dignis ») ; relancer avec `npm run test:security`, `npm audit`, gitleaks et semgrep (commandes dans le document)
 - [ ] `[Infra]` Sauvegarde hebdomadaire de la base, gratuite (GitHub Actions)
 - [ ] `[Infra]` Vérification automatique à chaque push : typage, `npm test`, `npm run test:db`, build (GitHub Actions)
 - [ ] `[Infra]` Au-delà de quelques centaines d'utilisateurs : passer Supabase en offre Pro (sauvegardes, plus de mise en pause, 8 Go)

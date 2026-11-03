@@ -7,6 +7,7 @@
 | `npm run test:db` | Règles de sécurité de la base : toutes les migrations sur un Postgres jetable, puis `supabase/tests/*.sql` | 30 s |
 | `npm run test:e2e` | L'appli dans Chromium au format téléphone, scénario par scénario (`tests/e2e/specs`) | 3-4 min |
 | `npm run test:all` | Les trois derniers | |
+| `npm run test:security` | Linter de sécurité de Supabase (splinter) sur une base jetable, puis sonde HTTP de l'appli locale : en-têtes, accès sans compte, redirections, fuites (`tests/security/`) | 2-3 min |
 
 ## Avec Docker (conseillé)
 
