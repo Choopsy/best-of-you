@@ -25,11 +25,11 @@ const MEAL_ICON = {
 } as const
 
 interface Props {
-  searchParams: Promise<{ date?: string; add?: string; scan?: string; barcode?: string }>
+  searchParams: Promise<{ date?: string; add?: string; scan?: string; barcode?: string; photo?: string }>
 }
 
 export default async function JournalPage({ searchParams }: Props) {
-  const { date: rawDate, add, scan, barcode: rawBarcode } = await searchParams
+  const { date: rawDate, add, scan, barcode: rawBarcode, photo: photoParam } = await searchParams
   const barcode = rawBarcode && /^[0-9]{8,14}$/.test(rawBarcode) ? rawBarcode : undefined
   const today = todayISO()
   const date = isISODate(rawDate) ? rawDate : today
@@ -87,7 +87,8 @@ export default async function JournalPage({ searchParams }: Props) {
         <DayBar totals={totals} targets={ctx.targets} />
 
         {/* Réservé aux comptes activés à la main (photo_access, migration 010) */}
-        {photo.enabled && <MealPhoto date={date} status={photo} />}
+        {/* ?photo=1 (menu +) l'ouvre directement ; la clé la rouvre si on y revient depuis le journal */}
+        {photo.enabled && <MealPhoto key={photoParam ?? ''} date={date} status={photo} defaultOpen={photoParam === '1'} />}
 
         {MEALS.map((meal) => {
           const entries = logs.filter((l) => l.meal === meal)

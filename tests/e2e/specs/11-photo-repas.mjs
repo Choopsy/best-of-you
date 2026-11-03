@@ -17,6 +17,10 @@ export default async function ({ browser, db, anthropic }) {
     const { ctx, page } = await newPage(browser, { user: BOB })
     await page.goto(B + '/journal'); await page.waitForLoadState('networkidle')
     check(await page.getByRole('button', { name: /Photo du repas/ }).count() === 0, 'sans accès : pas de bouton « Photo du repas »')
+    await page.locator('nav button[aria-label="Ajouter"]').click()
+    const menu = page.getByRole('dialog', { name: 'Ajouter' })
+    await menu.getByRole('button', { name: /Une séance/ }).waitFor()
+    check(await menu.getByRole('button', { name: /Photo du repas/ }).count() === 0, 'sans accès : pas de « Photo du repas » dans le menu +')
     const png = await page.screenshot()
     const res = await page.request.post(B + '/api/meal-photo', { multipart: { photo: { name: 'a.png', mimeType: 'image/png', buffer: png } } })
     check(res.status() === 403 && (await res.json()).code === 'no_access', `sans accès : la route refuse (${res.status()})`)
@@ -31,12 +35,24 @@ export default async function ({ browser, db, anthropic }) {
   // Cheun active Alice dans le SQL Editor
   await db.query('INSERT INTO photo_access (user_id) VALUES ($1)', [ALICE])
   await page.reload(); await page.waitForLoadState('networkidle')
-  const open = page.getByRole('button', { name: /Photo du repas/ })
+  const open = page.locator('main').getByRole('button', { name: /Photo du repas/ })
   check(await open.count() === 1, 'activée : bouton visible')
   check((await textOf(open)).includes('Encore 3 photos aujourd\'hui'), 'photos restantes affichées (3)')
 
+  // Menu + : « Photo du repas » sur toute la largeur (septième case), ouvre la fenêtre photo du journal
+  await page.locator('nav button[aria-label="Ajouter"]').click()
+  const menu = page.getByRole('dialog', { name: 'Ajouter' })
+  const photoItem = menu.getByRole('button', { name: /Photo du repas/ })
+  await photoItem.waitFor()
+  const w = (await photoItem.boundingBox())?.width ?? 0
+  const wOther = (await menu.getByRole('button', { name: /Une séance/ }).boundingBox())?.width ?? 1
+  check(w > wOther * 1.8, `menu + : « Photo du repas » sur deux colonnes (${Math.round(w)} px contre ${Math.round(wOther)})`)
+  await page.waitForTimeout(400)
+  await shot(page, 'photo-repas-menu-plus')
+  await photoItem.click()
+  await page.waitForURL('**/journal?photo=1')
+
   // Accord à la première utilisation
-  await open.click()
   const dlg = page.getByRole('dialog', { name: 'Photo du repas' })
   await dlg.waitFor()
   const consentText = await textOf(dlg)

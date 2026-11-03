@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BarcodeScanner } from '@/components/scan/barcode-scanner'
-import { Plus, BookOpen, NotebookPen, Refrigerator, ScanBarcode, Dumbbell, Scale, Search, X } from 'lucide-react'
+import { Plus, BookOpen, Camera, NotebookPen, Refrigerator, ScanBarcode, Dumbbell, Scale, Search, X } from 'lucide-react'
 
 // Teinte de la pastille : terracotta pour manger, olive pour bouger, ocre pour cuisiner
 const ITEMS = [
@@ -15,7 +15,10 @@ const ITEMS = [
   { href: '/forme?add=poids', Icon: Scale, title: 'Ma pesée', hint: 'Du jour', tint: 'bg-sage/15 text-sage' },
 ]
 
-export function NewItemSheet() {
+// Réservée aux comptes activés ; septième case, donc sur toute la largeur
+const PHOTO_ITEM = { href: '/journal?photo=1', Icon: Camera, title: 'Photo du repas', hint: 'Les aliments reconnus sur ta photo', tint: 'bg-terracotta/15 text-primary', wide: true }
+
+export function NewItemSheet({ photoMeal = false }: { photoMeal?: boolean }) {
   const [open, setOpen] = useState(false)
   const [scanning, setScanning] = useState(false)
   const router = useRouter()
@@ -74,12 +77,12 @@ export function NewItemSheet() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            {ITEMS.map(({ href, Icon, title, hint, tint }) => (
+            {[...ITEMS, ...(photoMeal ? [PHOTO_ITEM] : [])].map(({ href, Icon, title, hint, tint, ...rest }) => (
               <button
                 key={href}
                 type="button"
                 onClick={() => go(href)}
-                className="flex items-center gap-2.5 rounded-3xl bg-muted px-3 py-3.5 text-left hover:bg-secondary transition-colors"
+                className={`flex items-center gap-2.5 rounded-3xl bg-muted px-3 py-3.5 text-left hover:bg-secondary transition-colors ${'wide' in rest ? 'col-span-2' : ''}`}
               >
                 <div className={`flex items-center justify-center h-10 w-10 shrink-0 rounded-full ${tint}`}>
                   <Icon className="h-5 w-5" />

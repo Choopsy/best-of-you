@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Camera, ImageUp, Loader2, Plus, Trash2, X } from 'lucide-react'
 import { Portal } from '@/components/ui/portal'
 import { Button } from '@/components/ui/button'
@@ -57,8 +57,10 @@ function lineKcal(l: Line): number | null {
 const gramsOnly = (f: FoodSuggestion) => f.kind !== 'custom' || canUseGrams({ perPortion: !!f.perPortion, portionGrams: f.portionGrams ?? null })
 
 /** Bouton « Photo du repas » du journal et sa fenêtre : accord, photo, attente, vérification. */
-export function MealPhoto({ date, status }: { date: string; status: PhotoStatus }) {
+export function MealPhoto({ date, status, defaultOpen = false }: { date: string; status: PhotoStatus; /** Ouverte depuis le menu + (?photo=1) */ defaultOpen?: boolean }) {
   const router = useRouter()
+  const pathname = usePathname()
+  const params = useSearchParams()
   const [open, setOpen] = useState(false)
   const [consented, setConsented] = useState(status.consented)
   const [remaining, setRemaining] = useState(status.remaining)
@@ -76,7 +78,10 @@ export function MealPhoto({ date, status }: { date: string; status: PhotoStatus 
   // (tests/e2e/specs/11-photo-repas.mjs) : à creuser, voir SUIVI.md.
   const [saved, setSaved] = useState(0)
   useEffect(() => {
-    if (saved) router.replace(window.location.pathname + window.location.search, { scroll: false })
+    if (!saved) return
+    const q = new URLSearchParams(window.location.search)
+    q.delete('photo') // venue du menu + : on ne rouvre pas la fenêtre
+    router.replace(q.size ? `${window.location.pathname}?${q}` : window.location.pathname, { scroll: false })
   }, [saved, router])
 
   const openSheet = () => {
@@ -85,7 +90,20 @@ export function MealPhoto({ date, status }: { date: string; status: PhotoStatus 
     setStep(consented ? 'pick' : 'consent')
     setOpen(true)
   }
-  const close = () => { if (step !== 'wait') setOpen(false) }
+  // Ouverte depuis le menu + : la fenêtre s'affiche, la caméra attend un geste (« Prendre la photo »),
+  // les téléphones refusant de l'ouvrir sans action de l'utilisateur
+  useEffect(() => { if (defaultOpen) openSheet() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const close = () => {
+    if (step === 'wait') return
+    setOpen(false)
+    // ?photo=1 retiré de l'adresse : recharger la page ne rouvre pas la fenêtre
+    if (params.has('photo')) {
+      const q = new URLSearchParams(params)
+      q.delete('photo')
+      router.replace(q.size ? `${pathname}?${q}` : pathname, { scroll: false })
+    }
+  }
 
   const accept = () => start(async () => {
     setError(null)

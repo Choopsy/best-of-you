@@ -15,6 +15,8 @@ interface Props {
   pendingFriendsCount: number
   /** Aliments qui périment bientôt + invitations de foyer */
   kitchenAlerts: number
+  /** Photo du repas activée pour ce compte */
+  photoMeal: boolean
 }
 
 const DESKTOP_ITEMS = [
@@ -25,7 +27,7 @@ const DESKTOP_ITEMS = [
   { href: '/friends', icon: Users, label: 'Amis' },
 ]
 
-export function NavContent({ avatarUrl, fullName, pendingFriendsCount, kitchenAlerts }: Props) {
+export function NavContent({ avatarUrl, fullName, pendingFriendsCount, kitchenAlerts, photoMeal }: Props) {
   const pathname = usePathname()
   // Pas de barre de navigation pendant le premier remplissage du profil
   if (pathname === '/onboarding') return null
@@ -103,7 +105,7 @@ export function NavContent({ avatarUrl, fullName, pendingFriendsCount, kitchenAl
           <MobileLink href="/" icon={Home} label="Accueil" />
           <MobileLink href="/journal" icon={NotebookPen} label="Journal" />
         </div>
-        <NewItemSheet />
+        <NewItemSheet photoMeal={photoMeal} />
         <div className="flex flex-1 items-center justify-around">
           {/* Avec une alerte (aliment qui périme), on emmène directement au frigo */}
           <MobileLink href={kitchenAlerts > 0 ? '/frigo' : '/recipes'} icon={ChefHat} label="Cuisine" dot={kitchenAlerts > 0} />
