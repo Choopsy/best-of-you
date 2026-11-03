@@ -59,6 +59,7 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 
 | Date | Quoi | Commit |
 | --- | --- | --- |
+| 2026-11-03 | Menu + : « Photo du repas » sur toute la largeur, seulement pour les comptes activés | `b03d07a` |
 | 2026-11-03 | Photo du repas : Claude reconnaît les aliments et estime les grammes, valeurs Ciqual, vérification avant ajout ; accès réservé, accord, 3 photos par jour (migration 010) | `bb0a0c6` |
 | 2026-11-02 | Frigo qui suit le journal (retrait proposé à l'ajout, remis à la suppression) ; produits scannés au frigo cherchables (migration 009) | `cba8111` |
 | 2026-11-02 | Journal : sucres, gras saturés et sel de nouveau visibles (détail du jour toujours ouvert), sport sous la ligne d'énergie | `78c53d2` |
