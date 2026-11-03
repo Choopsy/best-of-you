@@ -155,7 +155,7 @@ This design system establishes an intimate, tactile lifestyle aesthetic crafted 
 - **Intimate Editorial:** Clean grotesque letterforms and warm, generous spacing produce an inviting, reflective rhythm akin to an artisanal food and living quarterly.
 
 ### Voice & Copywriting Tone
-The voice addresses the user directly in an informal, caring French register (*tutoiement*), anchoring everyday routines in self-worth rather than clinical achievement ("Prends soin de ta valeur"). Microcopy is conversational, calm, and reassuring.
+The voice addresses the user directly in an informal, caring French register (*tutoiement*), anchoring everyday routines in self-worth rather than clinical achievement ("Digne de soin, chaque jour."). Microcopy is conversational, calm, and reassuring.
 
 ## Colors
 

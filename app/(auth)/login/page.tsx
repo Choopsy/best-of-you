@@ -3,8 +3,8 @@ import { signIn } from '@/actions/auth'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { SubmitButton } from '@/components/auth/submit-button'
-import { AuthAlerts } from '@/components/auth/auth-header'
-import { NameEntry } from '@/components/auth/name-entry'
+import { AuthAlerts, AuthHeader } from '@/components/auth/auth-header'
+import { APP_SIGNATURE } from '@/lib/brand'
 import { ClearOfflineData } from '@/components/pwa/service-worker'
 
 interface Props {
@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: Props) {
   return (
     <div className="w-full max-w-sm space-y-8">
       <ClearOfflineData />
-      <NameEntry />
+      <AuthHeader subtitle={APP_SIGNATURE} />
       <AuthAlerts error={error} message={message} />
 
       <form action={signIn} className="space-y-4">

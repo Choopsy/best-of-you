@@ -2,7 +2,7 @@
 
 **Cuisine perso, nutrition et bien-être — une appli web pensée pour le téléphone.**
 
-> *Prends soin de ta valeur.* — Dignis vient du latin *dignus*, « digne » : tu mérites autant de soin que tu en donnes.
+> *Digne de soin, chaque jour.* — Dignis vient du latin *dignus*, « digne » : tu mérites autant de soin que tu en donnes.
 
 Dignis réunit tes recettes, ce que tu manges et tes objectifs du jour au même endroit. Les objectifs ne sortent pas d'un chapeau : chaque chiffre est calculé à partir de références scientifiques publiées (ANSES, EFSA, OMS…), et l'appli montre d'où il vient.
 
