@@ -12,7 +12,7 @@ export const LEGAL = {
   /** Date de la dernière mise à jour de la politique */
   updatedOn: '3 novembre 2026',
   /** Version, enregistrée avec l'accord de l'utilisateur */
-  version: '2026-11-03b',
+  version: '2026-11-03c',
   /** Conditions d'utilisation : version enregistrée à l'inscription */
   termsVersion: '2026-11-03',
   termsUpdatedOn: '3 novembre 2026',

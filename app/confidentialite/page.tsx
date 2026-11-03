@@ -53,7 +53,7 @@ export default function PrivacyPage() {
         <ul className="list-disc pl-5 space-y-1">
           <li><span className="font-bold">Supabase</span> : base de données, comptes et photos{LEGAL.databaseRegion ? <>, hébergés en {LEGAL.databaseRegion}</> : null}.</li>
           <li><span className="font-bold">Vercel</span> : hébergement du site, exécuté en Irlande.</li>
-          <li><span className="font-bold">Anthropic</span> : analyse des photos de repas (comptes où la photo est activée), aux États-Unis. Il reçoit la photo, réduite sur ton téléphone, sans ton nom ni ton email ; il ne s&apos;en sert pas pour entraîner ses modèles et la supprime après un court délai prévu par son contrat.</li>
+          <li><span className="font-bold">Anthropic</span> (Anthropic Ireland pour l&apos;Europe) : analyse des photos de repas (comptes où la photo est activée), avec un traitement possible aux États-Unis. Il reçoit la photo, réduite sur ton téléphone, sans ton nom ni ton email. Son contrat lui interdit de s&apos;en servir pour entraîner ses modèles ; il l&apos;efface au plus tard 30 jours après (jusqu&apos;à 2 ans seulement si elle est signalée comme contraire à ses règles d&apos;utilisation).</li>
           <li><span className="font-bold">Google (Gmail)</span> : envoi des emails du compte (confirmation de l&apos;inscription, mot de passe oublié). Il reçoit ton adresse email et le contenu de ces messages, dont une copie reste dans la boîte d&apos;envoi du responsable.</li>
         </ul>
         <p>

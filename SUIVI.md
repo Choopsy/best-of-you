@@ -15,10 +15,8 @@ Ce qui reste à faire, les idées et ce qui est déjà en ligne. On coche au fur
 - [ ] `[RGPD]` Tester la suppression de compte en ligne avec un compte jetable (avec une photo de recette)
 
 ### Données et vie privée
-- [ ] `[RGPD]` Compléter le registre des traitements (document privé) avec les migrations 006 à 009 : rayons, portions, produits lisibles via une recette, présentation vue, frigo qui suit le journal
-- [ ] `[RGPD]` Télécharger et garder une copie des accords de traitement (DPA) de Supabase et de Vercel
-- [ ] `[RGPD]` Anthropic : accepter / télécharger son accord de traitement (DPA, clauses types) avant d'activer la photo pour quelqu'un d'autre, et vérifier la durée de conservation des requêtes de l'API pour préciser la politique (aujourd'hui : « supprimée après un court délai prévu par son contrat »)
-- [ ] `[RGPD]` Registre des traitements : ajouter la photo du repas (Anthropic sous-traitant, accord, photo non conservée, dates des analyses gardées)
+- [ ] `[RGPD]` Vercel : son DPA ne couvre que les offres Pro et Enterprise, pas l'offre gratuite Hobby — écrire à privacy@vercel.com ou passer en Pro avant d'ouvrir l'appli
+- [ ] `[RGPD]` Garder une copie (PDF) des DPA de Supabase (supabase.com/legal/dpa) et d'Anthropic (anthropic.com/legal/data-processing-addendum) : déjà acceptés avec leurs conditions, rien à signer
 - [ ] `[RGPD]` Décider si les photos des recettes privées passent dans un stockage privé (aujourd'hui : visibles par qui a le lien)
 - [ ] `[RGPD]` Avant d'ouvrir au-delà des proches : remplacer Gmail par un service d'envoi avec accord de traitement (Brevo ou Resend, nom de domaine)
 - [ ] `[RGPD]` Si l'appli s'ouvre au-delà des proches : refaire le point sur l'analyse d'impact (AIPD) et relire le registre des traitements
